@@ -33,32 +33,6 @@
                   <Button type="success" class="login-btn" @click="handleSubmit('ruleForm')">登录</Button>
                 </FormItem>
               </Form>
-              <!--<form onsubmit="return false" id="loginForm">
-                <input type="hidden" name="type" value="employee"/>
-                <input type="hidden" name="lt" value="" id="J_LoginTicket"><br>
-                <input type="hidden" name="execution" value="" id="J_Execution">
-                <input type="hidden" name="_eventId" value="submit"/>
-
-                <div class="input-login-div" style="margin-top:0px;">
-                  <Input class="input-login" placeholder="请输入账号"></Input>
-                </div>
-                <div class="input-login-div" style="margin-top:25px;">
-                  <Input class="input-login" type="password"  placeholder="请输入密码"></Input>
-                </div>
-                <div class="form-group input-login-div" id="authcodebox" style="margin-top:25px;">
-                  <Input name="captcha" class="input-login pull-left"  placeholder="请输入验证" type="password" style="width: 60%"></Input>
-                  <div class="pull-right" style="width: 36%;">
-                    <img src="" class="ticketImg" onclick="changeimage()" style="width: 100%;height: 45px"/>
-                  </div>
-                  <div class="clearfix"></div>
-                </div>
-                <div class="padding-errortips text-danger"></div>
-                <div style="margin-top:15px;">
-                  &lt;!&ndash;<button type="button" class="btn btn-green"  id="loginBtn" style="width: 100%;height:45px">{{{__ "登录"}}}</button>&ndash;&gt;
-                  <Button type="success"id="casLoginBtn" style="width: 100%;height:45px">登录</Button>
-                  &lt;!&ndash;<button type="button" class="btn btn-green"  id="casLoginBtn" style="width: 100%;height:45px">登录</button>&ndash;&gt;
-                </div>
-              </form>-->
             </div>
           </div>
         </div>

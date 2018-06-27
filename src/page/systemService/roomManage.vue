@@ -147,13 +147,14 @@
     <Modal
       :styles="{top: '65px'}"
       v-model="addModal"
-      title="添加房间"
-      @on-ok="ok"
-      @on-cancel="cancel"
+      title=""
       @on-visible-change = "chgModal">
-      <Form ref="formValidate" :model="formValidate" :rules="ruleValidate" :label-width="80" style="width: 60%;margin:0 auto;">
-        <FormItem label="房间号" prop="name">
-          <Input v-model="formValidate.name" placeholder="" class="w200"></Input>
+      <div slot="header" style="color:#434343;text-align:left">
+        <h3>{{modalTitle}}</h3>
+      </div>
+      <Form :model="ruleForm" ref="ruleForm" :label-width="80" style="width: 60%;margin:0 auto;">
+        <FormItem label="房间号" prop="username" :rules="$filter_rules({required:true})">
+          <Input v-model="ruleForm.username" placeholder="" class="w200"></Input>
         </FormItem>
         <FormItem label="房间分组" prop="mail">
           <Dropdown trigger="click" class="w200">
@@ -166,29 +167,43 @@
             </DropdownMenu>
           </Dropdown>
         </FormItem>
-        <FormItem label="房型" prop="city">
+        <FormItem label="房型" prop="roomType" :rules="$filter_rules({required:true})">
           <Dropdown trigger="click" class="w200">
             <Button type="default" class="dropdown-align-100">
-              请选择房型
+              {{roomTypeText}}
+              <Input v-model="ruleForm.roomType" style="display: none"></Input>
               <Icon type="arrow-down-b" class="dropdown-icon-align-2"></Icon>
             </Button>
             <DropdownMenu slot="list" style="width: 100%">
-              <DropdownItem>驴打滚</DropdownItem>
+              <DropdownItem data-name="1" data-text="驴打滚" @click.native="selRoomType($event)">驴打滚</DropdownItem>
             </DropdownMenu>
           </Dropdown>
         </FormItem>
-        <FormItem label="房间特性" prop="city">
+        <FormItem label="房间特性" prop="roomTags">
           <Dropdown trigger="click" class="w200">
             <Button type="default" class="dropdown-align-100">
               请选择特性
               <Icon type="arrow-down-b" class="dropdown-icon-align-2"></Icon>
             </Button>
             <DropdownMenu slot="list" style="width: 100%">
-              <DropdownItem>驴打滚</DropdownItem>
+              <DropdownItem style="background: #ffffff">
+                <CheckboxGroup v-model="ruleForm.roomTags">
+                  <div><Checkbox label="Eat"></Checkbox></div>
+                  <div><Checkbox label="Eat1"></Checkbox></div>
+                  <div class="line"></div>
+                  <div>
+                    <Button type="dashed" long size="small" icon="plus-round" class="text-left">添加特性</Button>
+                  </div>
+                </CheckboxGroup>
+              </DropdownItem>
             </DropdownMenu>
           </Dropdown>
         </FormItem>
       </Form>
+      <div slot="footer">
+        <Button type="success" :loading="modal_loading" @click="save('ruleForm')">保存</Button>
+        <Button type="ghost" @click="handleReset('ruleForm')">取消</Button>
+      </div>
     </Modal>
   </div>
 </template>
@@ -198,6 +213,9 @@
     name: 'roomManage',
     data () {
       return {
+        modal_loading: false,
+        modalTitle:'添加房间',
+        roomTypeText:'请选择房型',
         columns: [
           {
             title: '房间号',
@@ -241,7 +259,7 @@
                   },
                   on: {
                     click: () => {
-                      this.show(params.index)
+                      this.edit(params.index)
                     }
                   }
                 }, '编辑'),
@@ -271,44 +289,11 @@
           }
         ],
         addModal: false,
-        formValidate: {
-          name: '',
-          mail: '',
-          city: '',
-          gender: '',
-          interest: [],
-          date: '',
-          time: '',
-          desc: ''
-        },
-        ruleValidate: {
-          name: [
-            { required: true, message: 'The name cannot be empty', trigger: 'blur' }
-          ],
-          mail: [
-            { required: true, message: 'Mailbox cannot be empty', trigger: 'blur' },
-            { type: 'email', message: 'Incorrect email format', trigger: 'blur' }
-          ],
-          city: [
-            { required: true, message: 'Please select the city', trigger: 'change' }
-          ],
-          gender: [
-            { required: true, message: 'Please select gender', trigger: 'change' }
-          ],
-          interest: [
-            { required: true, type: 'array', min: 1, message: 'Choose at least one hobby', trigger: 'change' },
-            { type: 'array', max: 2, message: 'Choose two hobbies at best', trigger: 'change' }
-          ],
-          date: [
-            { required: true, type: 'date', message: 'Please select the date', trigger: 'change' }
-          ],
-          time: [
-            { required: true, type: 'string', message: 'Please select time', trigger: 'change' }
-          ],
-          desc: [
-            { required: true, message: 'Please enter a personal introduction', trigger: 'blur' },
-            { type: 'string', min: 20, message: 'Introduce no less than 20 words', trigger: 'blur' }
-          ]
+        ruleForm: {
+          username: '',
+          roomGroup:'',
+          roomType: '',
+          roomTags: []
         },
         tags:[{
           tag:'ceshi'
@@ -349,6 +334,11 @@
         console.log(1);
       },
       show (index) {
+        this.modalTitle = "添加房间";
+        this.addModal = true;
+      },
+      edit (index) {
+        this.modalTitle = "编辑房间";
         this.addModal = true;
       },
       remove (index) {
@@ -363,17 +353,22 @@
       chgModal(status) {
         console.log(status);
       },
-      handleSubmit (name) {
+      selRoomType(event){
+        this.ruleForm.roomType = event.currentTarget.getAttribute("data-name");
+        this.roomTypeText = event.currentTarget.getAttribute("data-text");
+      },
+      save (name) {
         this.$refs[name].validate((valid) => {
           if (valid) {
-            this.$Message.success('Success!');
-          } else {
-            this.$Message.error('Fail!');
+            //this.$Message.success('Success!');
+            var data = Object.assign({}, this.ruleForm);
+            console.log(data);
           }
         })
       },
       handleReset (name) {
         this.$refs[name].resetFields();
+        this.addModal = false;
       }
     }
   }
