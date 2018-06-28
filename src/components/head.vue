@@ -26,7 +26,7 @@
           <Icon type="arrow-down-b"></Icon>
         </a>
         <DropdownMenu slot="list">
-          <DropdownItem>退出登录</DropdownItem>
+          <DropdownItem @click.native="logout">退出登录</DropdownItem>
         </DropdownMenu>
       </Dropdown>
     </div>
@@ -58,6 +58,13 @@
         this.setLeftFirstMenu(name);
         sessionStorage.setItem('topMenu',name);
         sessionStorage.removeItem('leftMenu');
+      },
+      logout(){
+        this.$api.get("/proxy/cas/logout", {} ,res => {
+          sessionStorage.removeItem('topMenu');
+          sessionStorage.removeItem('leftMenu');
+          window.location = "#/login";
+        });
       }
     },
     mounted(){

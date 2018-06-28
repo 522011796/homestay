@@ -30,7 +30,10 @@
                   <div class="clearfix"></div>
                 </FormItem>
                 <FormItem>
-                  <Button type="success" class="login-btn" @click="handleSubmit('ruleForm')">登录</Button>
+                  <Button type="success" long size="large" :loading="loading" @click="handleSubmit('ruleForm')">
+                    <span v-if="!loading">登录</span>
+                    <span v-else>Loading...</span>
+                  </Button>
                 </FormItem>
               </Form>
             </div>
@@ -59,6 +62,7 @@
       return {
         cas:'',
         casServer:'',
+        loading:false,
         ticketImg:'',
         ruleForm: {
           username: '',
@@ -139,10 +143,10 @@
       },
       handleSubmit (formName) {
         var _self = this;
+        this.loading = true;
         this.$refs[formName].validate((valid) => {
           if (valid) {
             _self.getLt(function (res) {
-              console.log(res);
               switch (res.body.code) {
                 case 200://如果已经在线则退出并重新获取lt再登陆
                   console.log(5);

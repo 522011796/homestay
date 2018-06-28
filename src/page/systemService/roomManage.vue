@@ -149,7 +149,7 @@
       v-model="addModal"
       title=""
       @on-visible-change = "chgModal">
-      <div slot="header" style="color:#434343;text-align:left">
+      <div slot="header" class="modalTitle">
         <h3>{{modalTitle}}</h3>
       </div>
       <Form :model="ruleForm" ref="ruleForm" :label-width="80" style="width: 60%;margin:0 auto;">

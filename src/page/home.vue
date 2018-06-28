@@ -266,7 +266,7 @@
               <div v-if="item.use_status == 99">
                 <div v-if="item.enable_des">
                   <span class="custom-font-ffa044">停用:</span>
-                  <span class="custom-font-ffa044">{{item.fix_des}}</span>
+                  <span class="custom-font-ffa044">{{item.enable_des}}</span>
                 </div>
               </div>
               <div v-else>
@@ -282,24 +282,25 @@
                       <div v-if="item.battery_status == 2">
                         <Button type="success" size="small" disabled>入住</Button>
                         <Button type="ghost" size="small" @click="setZang(item.id)">置脏</Button>
-                        <Button type="ghost" size="small"v-if="item.fix_des">清除故障</Button>
-                        <Button type="warning" size="small"v-else>故障</Button>
-                        <Button type="error" size="small" v-if="item.book_status != 1">停用</Button>
+                        <Button type="ghost" size="small" v-if="item.fix_des" @click="clearFault(item.id)">清除故障</Button>
+                        <Button type="warning" size="small" v-else @click="show('fault',item.id,item.room_no,item.name)">故障</Button>
+                        <Button type="error" size="small" v-if="item.book_status != 1" @click="show('stop',item.id,item.room_no,item.name)">停用</Button>
                       </div>
                       <div v-else>
                         <Button type="success" size="small">入住</Button>
                         <Button type="ghost" size="small" @click="setZang(item.id)">置脏</Button>
-                        <Button type="ghost" size="small">清除故障</Button>
-                        <Button type="error" size="small" v-if="item.book_status != 1">停用</Button>
+                        <Button type="ghost" size="small" v-if="item.fix_des" @click="clearFault(item.id)">清除故障</Button>
+                        <Button type="warning" size="small" v-else @click="show('fault',item.id,item.room_no,item.name)">故障</Button>
+                        <Button type="error" size="small" v-if="item.book_status != 1" @click="show('stop',item.id,item.room_no,item.name)">停用</Button>
                       </div>
                     </div>
                   </div>
                   <div  v-if="item.use_status == 1 && !item.iotdeviceId">
                     <Button type="success" size="small" disabled>入住</Button>
                     <Button type="ghost" size="small" @click="setZang(item.id)">置脏</Button>
-                    <Button type="ghost" size="small"v-if="item.fix_des">清除故障</Button>
-                    <Button type="warning" size="small"v-else>故障</Button>
-                    <Button type="error" size="small" v-if="item.book_status != 1">停用</Button>
+                    <Button type="ghost" size="small" v-if="item.fix_des" @click="clearFault(item.id)">清除故障</Button>
+                    <Button type="warning" size="small" v-else @click="show('fault',item.id,item.room_no,item.name)">故障</Button>
+                    <Button type="error" size="small" v-if="item.book_status != 1" @click="show('stop',item.id,item.room_no,item.name)">停用</Button>
                   </div>
                 </template>
 
@@ -307,39 +308,39 @@
                   <div v-if="item.use_status == 2">
                     <Button type="success" size="small">入住</Button>
                     <Button type="ghost" size="small" @click="setJing(item.id)">置净</Button>
-                    <Button type="ghost" size="small"v-if="item.fix_des">清除故障</Button>
-                    <Button type="warning" size="small"v-else>故障</Button>
-                    <Button type="error" size="small" v-if="item.book_status != 1">停用</Button>
+                    <Button type="ghost" size="small" v-if="item.fix_des" @click="clearFault(item.id)">清除故障</Button>
+                    <Button type="warning" size="small" v-else @click="show('fault',item.id,item.room_no,item.name)">故障</Button>
+                    <Button type="error" size="small" v-if="item.book_status != 1" @click="show('stop',item.id,item.room_no,item.name)">停用</Button>
                   </div>
                 </template>
 
                 <template>
                   <div v-if="item.use_status == 3">
-                    <Button type="ghost" size="small">退房</Button>
+                    <Button type="ghost" size="small" @click="setLogut(item.live_order_id,item.room_no,item.name)">退房</Button>
                     <Button type="ghost" size="small">延住</Button>
                     <Button type="ghost" size="small">换房</Button>
                     <Button type="ghost" size="small" @click="setZang(item.id)">置脏</Button>
-                    <Button type="ghost" size="small"v-if="item.fix_des">清除故障</Button>
-                    <Button type="warning" size="small"v-else>故障</Button>
+                    <Button type="ghost" size="small" v-if="item.fix_des" @click="clearFault(item.id)">清除故障</Button>
+                    <Button type="warning" size="small"v-else @click="show('fault',item.id,item.room_no,item.name)">故障</Button>
                   </div>
                 </template>
 
                 <template>
                   <div v-if="item.use_status == 4">
-                    <Button type="ghost" size="small">退房</Button>
+                    <Button type="ghost" size="small" @click="setLogut(item.live_order_id,item.room_no,item.name)">退房</Button>
                     <Button type="ghost" size="small">延住</Button>
                     <Button type="ghost" size="small">换房</Button>
                     <Button type="ghost" size="small" @click="setJing(item.id)">置净</Button>
-                    <Button type="ghost" size="small"v-if="item.fix_des">清除故障</Button>
-                    <Button type="warning" size="small"v-else>故障</Button>
+                    <Button type="ghost" size="small" v-if="item.fix_des" @click="clearFault(item.id)">清除故障</Button>
+                    <Button type="warning" size="small" v-else @click="show('fault',item.id,item.room_no,item.name)">故障</Button>
                   </div>
                 </template>
 
                 <template>
                   <div v-if="item.use_status == 99">
                     <Button type="ghost" size="small" @click="setEnable(item.id)">启用</Button>
-                    <Button type="ghost" size="small"v-if="item.fix_des">清除故障</Button>
-                    <Button type="warning" size="small"v-else>故障</Button>
+                    <Button type="ghost" size="small" v-if="item.fix_des" @click="clearFault(item.id)">清除故障</Button>
+                    <Button type="warning" size="small" v-else @click="show('fault',item.id,item.room_no,item.name)">故障</Button>
                   </div>
                 </template>
               </div>
@@ -421,10 +422,42 @@
       </div>
     </div>
     <div style="clear: both"></div>
+
+    <!--暂时不显示和处理-->
+    <Modal
+      :styles="{top: '65px'}"
+      v-model="addModal"
+      title=""
+      @on-visible-change = "chgModal" class="home-textarea">
+      <div slot="header" class="modalTitle">
+        <h3>{{modalTitle}}</h3>
+      </div>
+      <Form :model="ruleForm" ref="ruleForm" style="width: 100%;margin:0 auto;">
+        <FormItem prop="enableDes" :rules="$filter_rules({required:true})" v-if="setType == 'stop'">
+          <Input v-model="ruleForm.enableDes" type="textarea" :autosize="{minRows: 2,maxRows: 10}" placeholder="Enter something..."></Input>
+        </FormItem>
+        <FormItem prop="fixDes" :rules="$filter_rules({required:true})" v-if="setType == 'fault'">
+          <Input v-model="ruleForm.fixDes" type="textarea" :autosize="{minRows: 2,maxRows: 10}" placeholder="Enter something..."></Input>
+        </FormItem>
+      </Form>
+      <div slot="footer">
+        <Button v-if="setType == 'stop'" type="success" :loading="modal_loading" @click="setDisabled('ruleForm')">
+          <span v-if="!loading">保存</span>
+          <span v-else>Loading...</span>
+        </Button>
+        <Button v-if="setType == 'fault'" type="success" :loading="modal_loading" @click="setFault('ruleForm')">
+          <span v-if="!loading">保存</span>
+          <span v-else>Loading...</span>
+        </Button>
+        <Button type="ghost" @click="handleReset('ruleForm')">取消</Button>
+      </div>
+    </Modal>
   </div>
 </template>
 
 <script>
+  const outTips_1 = "你确定要为房间";
+  const outTips_2 = "的客人办理退房？";
   const MyComponent = {
     props: ['myData','myList'],
     data() {
@@ -461,6 +494,7 @@
     },
     data () {
       return {
+        roomId:'',
         visible:false,
         currentView: MyComponent,
         searchRoomNo:'',
@@ -489,11 +523,19 @@
         searchRoomGroup:"分组",
         searchRoomType:"房型",
         searchRoomTags:"房态",
+        addModal: false,
+        loading: false,
+        modal_loading: false,
+        modalTitle: '',
+        setType:'',
+        ruleForm: {
+          enableDes: '',
+          fixDes:''
+        },
         styleMenuObject: {
           height: '',
           'overflow-y':'auto',
         },
-
       }
     },
     created(){
@@ -570,6 +612,7 @@
         };
         this.$api.postQs("/proxy/room/countList", this.$utils.clearData(params) ,res => {
           var data = Object.assign({}, res.data.data);
+          console.log(data);
           this.roomList = data;
           this.showLoading = false;
         },null,{"Content-Type":'application/x-www-form-urlencoded; charset=UTF-8'});
@@ -603,6 +646,9 @@
           }
         });
       },
+      chgModal(status) {
+        console.log(status);
+      },
       setZang(id){
         var params = {
           id:id,
@@ -612,6 +658,7 @@
           this.$Message.success(res.data.desc);
           this.visible = false;
           this.getRoomList();
+          this.getStatus();
         },null,{"Content-Type":'application/x-www-form-urlencoded; charset=UTF-8'});
       },
       setJing(id){
@@ -623,6 +670,19 @@
           this.$Message.success(res.data.desc);
           this.visible = false;
           this.getRoomList();
+          this.getStatus();
+        },null,{"Content-Type":'application/x-www-form-urlencoded; charset=UTF-8'});
+      },
+      clearFault(id){
+        var params = {
+          id:id,
+          fixStatus:0
+        };
+        this.$api.postQs("/proxy/room/updateFixStatus", params ,res => {
+          this.$Message.success(res.data.desc);
+          this.visible = false;
+          this.getRoomList();
+          this.getStatus();
         },null,{"Content-Type":'application/x-www-form-urlencoded; charset=UTF-8'});
       },
       setEnable(id){
@@ -630,11 +690,83 @@
           id:id,
           enable:0
         };
-        this.$api.postQs("/proxy/room/enable", params ,res => {
+        this.$api.postQs("/proxy/room/enabled", params ,res => {
           this.$Message.success(res.data.desc);
           this.visible = false;
           this.getRoomList();
+          this.getStatus();
         },null,{"Content-Type":'application/x-www-form-urlencoded; charset=UTF-8'});
+      },
+      show(type,id,roomNo,name){
+        this.setType = type;
+        if(type == "stop"){
+          this.modalTitle = roomNo + "("+ name +")"+"-停用";
+        }
+        if(type == "fault"){
+          this.modalTitle = "("+ roomNo + "-" + name +")"+"-故障原因";
+        }
+        this.roomId = id;
+        this.addModal = true;
+      },
+      setFault(name){
+        let _self = this;
+        var params = {
+          id:this.roomId,
+          fixStatus:1,
+          fixDes:this.ruleForm.fixDes
+        };
+        this.$refs[name].validate((valid) => {
+          if (valid) {
+            _self.loading = true;
+            this.$api.postQs("/proxy/room/updateFixStatus", params ,res => {
+              this.$Message.success(res.data.desc);
+              _self.getRoomList();
+              _self.getStatus();
+              _self.loading = false;
+              _self.addModal = false;
+              _self.$refs[name].resetFields();
+            },null,{"Content-Type":'application/x-www-form-urlencoded; charset=UTF-8'});
+          }
+        })
+      },
+      setDisabled(name){
+        let _self = this;
+        var params = {
+          id:this.roomId,
+          enable:1,
+          enableDes:this.ruleForm.enableDes
+        };
+        this.$refs[name].validate((valid) => {
+          if (valid) {
+            _self.loading = true;
+            this.$api.postQs("/proxy/room/enabled", params ,res => {
+              this.$Message.success(res.data.desc);
+              _self.getRoomList();
+              _self.getStatus();
+              _self.loading = false;
+              _self.addModal = false;
+              _self.$refs[name].resetFields();
+            },null,{"Content-Type":'application/x-www-form-urlencoded; charset=UTF-8'});
+          }
+        })
+      },
+      setLogut(id,roomNo,name){
+        var _selft = this;
+        this.$layer.confirm(outTips_1+"<span class='text-green'>["+roomNo+"("+name+")"+"]</span>"+outTips_2, {} ,function (index) {
+          var params = {
+            id:id
+          };
+          _selft.$api.postQs("/proxy/order/liveOut", params ,res => {
+            this.$Message.success(res.data.desc);
+            _self.getRoomList();
+            _self.getStatus();
+            this.$layer.close(index);
+          },null,{"Content-Type":'application/x-www-form-urlencoded; charset=UTF-8'});
+        });
+      },
+      handleReset (name) {
+        this.$refs[name].resetFields();
+        this.addModal = false;
       }
     },
     mounted () {

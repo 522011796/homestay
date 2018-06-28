@@ -51,10 +51,13 @@ import utils from './utils/index.js'
 // 将工具方法绑定到全局
 Vue.prototype.$utils = utils
 
-
 //qs
 import qs from 'qs'
 Vue.prototype.$qs = qs
+
+//layer
+import layer from 'vue-layer'
+Vue.prototype.$layer = layer(Vue);
 
 Vue.config.productionTip = false
 

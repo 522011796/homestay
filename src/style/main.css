@@ -445,3 +445,13 @@ tr:hover{
   padding:1px 5px;
   margin-left:3px;
 }
+.modalTitle{
+  color:#434343;
+  text-align:left
+}
+.home-textarea .ivu-modal-mask,.home-textarea .ivu-modal-wrap{
+  z-index: 9999 !important;
+}
+.home-textarea textarea{
+  height:150px !important;
+}
