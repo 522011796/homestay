@@ -455,3 +455,12 @@ tr:hover{
 .home-textarea textarea{
   height:150px !important;
 }
+.table-loading .ivu-spin-main {
+  position: absolute;
+  top: 260px;
+  left: 50%;
+  transform: translate(-50%,-50%);
+}
+.text-center{
+  text-align: center;
+}
