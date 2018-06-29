@@ -96,7 +96,7 @@
                 <span>{{item.room_no}}({{item.room_group_name}})</span>
               </td>
               <td class="custom-td-value">
-                <span>{{$moment.unix(item.check_in_time).format("YYYY-MM-DD hh:mm")}}</span>
+                <span>{{$moment.unix(item.check_in_time/1000).format("YYYY-MM-DD hh:mm")}}</span>
               </td>
               <td class="custom-td-value">
                 <span v-if="item.channel == null">--</span>
@@ -160,7 +160,8 @@
           userSearch:this.userSearch,
           orderStatus:this.orderStatus,
           channel:this.orderChannel,
-          payType:this.orderPayType
+          payType:this.orderPayType,
+          filter:'currentLive'
         };
         console.log(this.$utils.clearData(params));
         this.showLoading = true;

@@ -19,11 +19,29 @@
     </div>
 
     <div id="orderService" :class="{'hidden':getLeftFirstMenu!='orderService'}" style="padding:15px 35px;">
-        <router-link to="/layout/allOrderManage" @click.native="activeSliderMenu('allOrderManage')">
-          <div :class="{'menu-active-green':menu=='allOrderManage'}" style="height:35px;line-height:35px;border-radius: 5px;text-align: center;">
+      <router-link to="/layout/allOrderManage" @click.native="activeSliderMenu('allOrderManage')">
+        <div :class="{'menu-active-green':menu=='allOrderManage'}" style="height:35px;line-height:35px;border-radius: 5px;text-align: center;">
           全部订单
-          </div>
-        </router-link>
+        </div>
+      </router-link>
+      <router-link to="/layout/preInOrderManage" @click.native="activeSliderMenu('preInOrderManage')">
+        <div :class="{'menu-active-green':menu=='preInOrderManage'}" style="height:35px;line-height:35px;border-radius: 5px;text-align: center;position: relative">
+          今日预住
+          <Badge :count="preInOrder" class-name="demo-badge-alone menu-badge text-green"></Badge>
+        </div>
+      </router-link>
+      <router-link to="/layout/nowInOrderManage" @click.native="activeSliderMenu('nowInOrderManage')">
+        <div :class="{'menu-active-green':menu=='nowInOrderManage'}" style="height:35px;line-height:35px;border-radius: 5px;text-align: center;position: relative">
+          当前入住
+          <Badge :count="nowInOrder" class-name="demo-badge-alone menu-badge text-green"></Badge>
+        </div>
+      </router-link>
+      <router-link to="/layout/preOutOrderManage" @click.native="activeSliderMenu('preOutOrderManage')">
+        <div :class="{'menu-active-green':menu=='preOutOrderManage'}" style="height:35px;line-height:35px;border-radius: 5px;text-align: center;position: relative">
+          今日预离
+          <Badge :count="preOutOrder" class-name="demo-badge-alone menu-badge text-green"></Badge>
+        </div>
+      </router-link>
     </div>
   </div>
 </template>
@@ -42,12 +60,26 @@
     },
     data () {
       return {
-        menuActice: ''
+        menuActice: '',
+        preInOrder:0,
+        preOutOrder:0,
+        nowInOrder:0,
       }
+    },
+    created(){
+      this.getNum();
     },
     methods:{
       activeSliderMenu(item){
         this.menuActice = item;
+      },
+      getNum(){
+        this.$api.get("/proxy/order/static", {} ,res => {
+          var data = Object.assign({}, res.data).data;
+          this.preInOrder = data.todayCheckIn;
+          this.preOutOrder = data.todayCheckOut;
+          this.nowInOrder = data.currentLive;
+        });
       }
     }
   }

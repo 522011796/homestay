@@ -752,16 +752,21 @@
       },
       setLogut(id,roomNo,name){
         var _selft = this;
-        this.$layer.confirm(outTips_1+"<span class='text-green'>["+roomNo+"("+name+")"+"]</span>"+outTips_2, {} ,function (index) {
-          var params = {
-            id:id
-          };
-          _selft.$api.postQs("/proxy/order/liveOut", params ,res => {
-            this.$Message.success(res.data.desc);
-            _self.getRoomList();
-            _self.getStatus();
-            this.$layer.close(index);
-          },null,{"Content-Type":'application/x-www-form-urlencoded; charset=UTF-8'});
+        this.$Modal.confirm({
+          title: '退房信息',
+          content: "<div class='font-15'>"+outTips_1+"<span class='text-green'>["+roomNo+"("+name+")"+"]</span>"+outTips_2 + "</div>",
+          onOk: () => {
+            var params = {id:id};
+            var params = {
+              id:id
+            };
+            _selft.$api.postQs("/proxy/order/liveOut", params ,res => {
+              this.$Message.success(res.data.desc);
+              _self.getRoomList();
+              _self.getStatus();
+              this.$layer.close(index);
+            },null,{"Content-Type":'application/x-www-form-urlencoded; charset=UTF-8'});
+          }
         });
       },
       handleReset (name) {

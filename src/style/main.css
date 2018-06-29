@@ -464,3 +464,9 @@ tr:hover{
 .text-center{
   text-align: center;
 }
+.menu-badge{
+  background: #ffffff;
+  position: absolute;
+  left:30px;
+  top:-10px;
+}

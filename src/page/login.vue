@@ -91,7 +91,6 @@
       initCfg(){
         let _self = this;
         this.$api.get('/proxy/server/cfgs', {}, res => {
-          //console.log(JSON.stringify(res.data.data));
           let data = res.data;
           if(data.code == 200) {
             this.cas = data.data;
@@ -111,7 +110,6 @@
                       switch (res.data.code) {
                         //已经是登陆成功的，跳转路由页
                         case 200:
-                          console.log("登陆成功");
                           window.location = "/";
                           break;
                         case 422:
@@ -131,7 +129,6 @@
         let version = "20161009";
         var params = {jsonpCallback:'jsonp'};
         this.$http.jsonp(this.cas.casServer.host + this.cas.casServer.login + "?getlt=true&service=" + this.casServer + "&version="+version, params).then(function(res){
-          console.log(res);
           switch(res.code) {
             case 302:
               window.location = this.cas.casServer + this.cas.casServer.login + "?url=" + window.localtion + this.casServer + "&version=" + version;
@@ -149,11 +146,8 @@
             _self.getLt(function (res) {
               switch (res.body.code) {
                 case 200://如果已经在线则退出并重新获取lt再登陆
-                  console.log(5);
                   var params = {'service': Object.assign({}, _self.cas.casClient)+'/login'};
-                  console.log(params);
                   _self.$http.jsonp(_self.cas.casServer.host + _self.cas.casServer.logout, {params:params}).then(function(res){
-                    console.log(6);
                     _self.getLt(function (res) {
                       _self.casLogin(res);
                     });
@@ -163,7 +157,6 @@
                   });
                   break;
                 default:
-                  console.log(7);
                   _self.casLogin(res);
               }
             });
@@ -172,14 +165,10 @@
       },
       casLogin(ltres){
         var _self = this;
-        console.log(8);
-        console.log(ltres.body);
         switch (ltres.body.code) {
           case 301:
-            console.log(9);
             //获取lt成功并且没有登陆到本应用
             var parms = Object.assign({}, this.ruleForm);
-            console.log(ltres.data.data.lt);
             parms['lt'] = ltres.data.data.lt;
             parms['execution'] = ltres.data.data.execution;
             parms['service'] = ltres.data.service;
@@ -189,8 +178,6 @@
 
             //像认证服务器发起认证
             _self.$http.jsonp(_self.cas.casServer.host + _self.cas.casServer.login + "?service=" + _self.casServer,{params:parms,jsonpCallback:"jsonp"}).then(function(authres){
-              console.log(10);
-              console.log(authres);
               switch (authres.body.code) {
                 case 200:
                   //认证服务器认证通过，像应用服务器发起认证
@@ -198,9 +185,7 @@
                     'ticket': authres.body.data,
                     'forward': 'true'
                   };
-                  console.log(params);
                   this.$api.get(_self.urlMinusUri() + "/proxy" + _self.cas.casClient.login, params,res => {
-                    console.log(111);
                     switch (res.data.code) {
                       //应用服务器认证不通过，提示结果
                       case 422:
@@ -208,7 +193,8 @@
                         _self.$Message.error(res.data.desc);
                         break;
                       case 200:
-                        console.log(12);
+                        sessionStorage.removeItem('topMenu');
+                        sessionStorage.removeItem('leftMenu');
                         _self.$Message.success('登录成功，正在执行跳转，请稍后!');
                         setTimeout("window.location = '/';", 1000);
                         break;

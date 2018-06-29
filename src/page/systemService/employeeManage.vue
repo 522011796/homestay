@@ -6,17 +6,22 @@
       <span>人员管理</span>
     </div>
     <div class="line-title"></div>
-    <div class="padding-top0-top25 margin-top15">
+    <div class="padding-top0-top25 margin-top15" style="position: relative">
+      <Spin fix v-if="showLoading" class="table-loading">
+        <Icon type="load-c" size=25 class="demo-spin-icon-load text-green"></Icon>
+        <div class="text-green">Loading</div>
+      </Spin>
       <div>
         <Button type="success" icon="plus" @click="show()">
           添加保洁员
         </Button>
-        <Input placeholder="请输入房间号" class="w180"></Input>
-        <Button type="info">搜索</Button>
+        <Input placeholder="请输入房间号" class="w180" v-model="searchName"></Input>
+        <Button type="info" @click="search">搜索</Button>
       </div>
       <div>
         <Table :columns="columns" :data="data" class="margin-top10"></Table>
       </div>
+      <Page v-if="totalCount!=0" class="margin-top10 margin-bottom10 text-right" :total="totalCount" :current="current" :page-size="pageNum"	 size="small" @on-change="init($event)" show-total></Page>
     </div>
   </div>
 </template>
@@ -26,11 +31,17 @@
     name: 'employeeManage',
     data () {
       return {
+        pageNum:12,
+        current:1,
+        roomList:[],
+        totalCount:0,
+        showLoading:false,
+        searchName:"",
         columns: [
           {
             title: '姓名',
             align: 'center',
-            key: 'username'
+            key: 'name'
           },
           {
             title: '手机号',
@@ -40,7 +51,7 @@
           {
             title: '管理房间',
             align: 'center',
-            key: 'rooms'
+            key: 'room_num'
           },
           {
             title: '开门密码',
@@ -99,14 +110,33 @@
             }
           }
         ],
-        data: [
-          {
-            username: 'John Brown',
-            phone: 18,
-            rooms:'大床房'
-          }
-        ]
+        data: []
       }
+    },
+    created(){
+      this.init();
+    },
+    methods:{
+      search(){
+        this.init();
+      },
+      init(page){
+        page = page ? page : 1;
+        var params = {
+          page:page,
+          num:this.pageNum,
+          name:this.searchName
+        };
+        //console.log(this.$utils.clearData(params));
+        this.showLoading = true;
+        this.$api.get("/proxy/user/employee/page", this.$utils.clearData(params) ,res => {
+          var data = Object.assign({}, res.data.data);
+          console.log(data);
+          this.data = data.list;
+          this.totalCount = data.totalCount;
+          this.showLoading = false;
+        });
+      },
     }
   }
 </script>

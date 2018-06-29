@@ -4,6 +4,9 @@ import Home from '@/page/home'
 import RoomManage from '@/page/systemService/roomManage'
 import EmployeeManage from '@/page/systemService/employeeManage'
 import AllOrderManage from '@/page/orderService/allOrderManage'
+import NowInOrderManage from '@/page/orderService/nowInOrderManage'
+import PreInOrderManage from '@/page/orderService/preInOrderManage'
+import PreOutOrderManage from '@/page/orderService/preOutOrderManage'
 import BasicManage from '@/page/systemService/basicManage'
 import Layout from '@/page/layout'
 import Login from '@/page/Login'
@@ -47,6 +50,21 @@ export default new Router({
               path: '/layout/allOrderManage',
               name: 'allOrderManage',
               component: AllOrderManage
+            },
+            {
+              path: '/layout/preInOrderManage',
+              name: 'preInOrderManage',
+              component: PreInOrderManage
+            },
+            {
+              path: '/layout/nowInOrderManage',
+              name: 'nowInOrderManage',
+              component: NowInOrderManage
+            },
+            {
+              path: '/layout/preOutOrderManage',
+              name: 'preOutOrderManage',
+              component: PreOutOrderManage
             },
             {
               path: '/layout/basicManage',
