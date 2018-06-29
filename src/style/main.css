@@ -279,9 +279,14 @@ tr:hover{
   color:#434343;
 }
 .basic-edit-btn{
-  position: absolute;
-  left:300px;
-  z-index:9999;
+  /*position: absolute;
+  left:330px;
+  z-index:9999;*/
+}
+.basic-edit-btn-cancel{
+  /*position: absolute;
+  left:390px;
+  z-index:9999;*/
 }
 .padding-top0-lr25{
   padding:0px 25px;
