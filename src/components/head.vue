@@ -56,20 +56,20 @@
       activeMenu(event,name){
         this.active = name;
         this.setLeftFirstMenu(name);
-        sessionStorage.setItem('topMenu',name);
-        sessionStorage.removeItem('leftMenu');
+        localStorage.setItem('topMenu',name);
+        localStorage.removeItem('leftMenu');
       },
       logout(){
         this.$api.get("/proxy/cas/logout", {} ,res => {
-          sessionStorage.removeItem('topMenu');
-          sessionStorage.removeItem('leftMenu');
+          localStorage.removeItem('topMenu');
+          localStorage.removeItem('leftMenu');
           window.location = "#/login";
         });
       }
     },
     mounted(){
-      this.active = sessionStorage.getItem('topMenu') ? sessionStorage.getItem('topMenu') : 'home';
-      this.setLeftFirstMenu(sessionStorage.getItem('topMenu'));
+      this.active = localStorage.getItem('topMenu') ? localStorage.getItem('topMenu') : 'home';
+      this.setLeftFirstMenu(localStorage.getItem('topMenu'));
     }
   }
 </script>
