@@ -110,6 +110,8 @@
                       switch (res.data.code) {
                         //已经是登陆成功的，跳转路由页
                         case 200:
+                          localStorage.removeItem('topMenu');
+                          localStorage.removeItem('leftMenu');
                           window.location = "/";
                           break;
                         case 422:
@@ -193,8 +195,8 @@
                         _self.$Message.error(res.data.desc);
                         break;
                       case 200:
-                        sessionStorage.removeItem('topMenu');
-                        sessionStorage.removeItem('leftMenu');
+                        localStorage.removeItem('topMenu');
+                        localStorage.removeItem('leftMenu');
                         _self.$Message.success('登录成功，正在执行跳转，请稍后!');
                         setTimeout("window.location = '/';", 1000);
                         break;
