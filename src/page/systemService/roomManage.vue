@@ -726,7 +726,7 @@
             this.ruleForm.roomTagIds = (ids.substring(ids.length-1)==',')?ids.substring(0,ids.length-1):ids;
             var params = Object.assign({}, data);
             var url = "";
-            if(this.ruleForm.id != ""){
+            if(this.ruleForm.id){
               url = "/proxy/room/update";
             }else{
               url = "/proxy/room/add";
@@ -746,7 +746,7 @@
           if (valid) {
             var data = this.ruleTypeForm;
             var url = "";
-            if(this.ruleTypeForm.id != ""){
+            if(this.ruleTypeForm.id){
               url = "/proxy/room/type/update";
             }else{
               url = "/proxy/room/type/add";
@@ -765,7 +765,7 @@
           if (valid) {
             var data = this.ruleTagsForm;
             var url = "";
-            if(this.ruleTagsForm.id != ""){
+            if(this.ruleTagsForm.id){
               url = "/proxy/room/tag/update";
             }else{
               url = "/proxy/room/tag/add";
@@ -784,7 +784,7 @@
           if (valid) {
             var data = this.ruleGroupForm;
             var url = "";
-            if(this.ruleGroupForm.id != ""){
+            if(this.ruleGroupForm.id){
               url = "/proxy/room/group/update";
             }else{
               url = "/proxy/room/group/add";

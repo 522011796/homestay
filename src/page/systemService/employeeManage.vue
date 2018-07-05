@@ -125,6 +125,7 @@
   const delCardTips = "确定删除门卡";
   const sendMmsTips_1 = "开门密码将以短信方式发送至保洁员";
   const sendMmsTips_2 = "是否发送？";
+  const delTips = "确定删除信息？";
   export default {
     name: 'employeeManage',
     data () {
@@ -231,7 +232,7 @@
                   },
                   on: {
                     click: () => {
-                      this.remove(params.index)
+                      this.remove(params)
                     }
                   }
                 }, '删除')
@@ -399,9 +400,9 @@
         this.$refs[name].validate((valid) => {
           if (valid) {
             var data = this.ruleForm;
-            console.log(data);
+            console.log(this.ruleForm.id);
             var url = "";
-            if(this.ruleForm.id != ""){
+            if(this.ruleForm.id){
               url = "/proxy/user/employee/update";
             }else {
               url = "/proxy/user/employee/add";
@@ -414,6 +415,22 @@
             },res => {
               this.$Message.error(res.data.desc);
             },{"Content-Type":'application/x-www-form-urlencoded; charset=UTF-8'});
+          }
+        });
+      },
+      remove(item){
+        var _self = this;
+        this.$Modal.confirm({
+          title: '删除信息',
+          content: "<div class='font-15'>" + delTips +"</div>",
+          onOk: () => {
+            var data = {
+              userId: item.row.id
+            };
+            _self.$api.postQs("/proxy/user/employee/delete", this.$utils.clearData(data) ,res => {
+              this.$Message.success(res.data.desc);
+              this.init();
+            },null,{"Content-Type":'application/x-www-form-urlencoded; charset=UTF-8'});
           }
         });
       },
@@ -488,7 +505,7 @@
             }
             //console.log(data);
             this.ruleForm = {
-              id:res.data.id,
+              id:data.id,
               name:data.name,
               phone:data.phone,
               cardId:data.cardId,
@@ -498,7 +515,8 @@
               //needPass:false,
               needPassGroup:'暂不生成',
             };
-            this.cardNameText = data.cardName=="" ? '暂不分配' : data.cardName;
+            console.log(data.cardName);
+            this.cardNameText = !data.cardName ? '暂不分配' : data.cardName;
             this.targetKeys = rooms;
 
             if(data.passId){
