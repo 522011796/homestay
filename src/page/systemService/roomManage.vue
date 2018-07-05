@@ -7,7 +7,7 @@
     <Tabs @on-click="clkTab($event)">
       <TabPane label="房间列表" name="roomList">
         <div class="padding-top0-lr25">
-          <Button type="success" icon="plus" @click="show()">
+          <Button type="success" icon="plus" @click="show('roomList')">
             添加房间
           </Button>
           <Dropdown trigger="click" class="margin-top0-lr8">
@@ -60,7 +60,7 @@
       <!--分组管理-->
       <TabPane label="分组管理" name="groupList">
         <div class="padding-tb10-lr25">
-          <Card class="room-card-block">
+          <Card class="room-card-block" @click.native="show('groupList')">
             <div class="room-card-info">
               <div>
                 <a href="javascript:;">
@@ -82,10 +82,10 @@
               <div class="room-card-list-opr">
                 <row>
                   <Col span="12" style="text-align: center">
-                  <a href="javascript:;">编辑</a>
+                  <a href="javascript:;" @click="edit(item,'groupList')">编辑</a>
                   </Col>
                   <Col span="12" style="text-align: center">
-                  <a href="javascript:;">删除</a>
+                  <a href="javascript:;" @click="delGroup(item)">删除</a>
                   </Col>
                 </row>
               </div>
@@ -96,7 +96,7 @@
       <!--房间类型-->
       <TabPane label="房间类型" name="typeList">
         <div class="padding-tb10-lr25">
-          <Card class="room-card-block">
+          <Card class="room-card-block" @click.native="show('typeList')">
             <div class="room-card-info">
               <a href="javascript:;">
                 <div>
@@ -120,10 +120,10 @@
               <div class="room-card-list-opr">
                 <row>
                   <Col span="12" style="text-align: center">
-                  <a href="javascript:;">编辑</a>
+                  <a href="javascript:;" @click="edit(item,'typeList')">编辑</a>
                   </Col>
                   <Col span="12" style="text-align: center">
-                  <a href="javascript:;">删除</a>
+                  <a href="javascript:;" @click="delType(item)">删除</a>
                   </Col>
                 </row>
               </div>
@@ -132,10 +132,11 @@
           <div style="clear:both;"></div>
         </div>
       </TabPane>
+
       <!--房间特性-->
       <TabPane label="房间特性" name="tagsList">
         <div class="padding-tb10-lr25">
-          <Button type="success" icon="plus">
+          <Button type="success" icon="plus" @click="show('tagsList')">
             添加特性
           </Button>
           <Tag type="dot" closable color="green" v-for="(item,index) in tags" :key="index" @on-close="delTags(item.id,item.tag)" style="position: relative;">
@@ -145,6 +146,7 @@
       </TabPane>
     </Tabs>
 
+    <!--添加房间-->
     <Modal
       :styles="{top: '65px'}"
       v-model="addModal"
@@ -211,12 +213,76 @@
         <Button type="ghost" @click="handleReset('ruleForm')">取消</Button>
       </div>
     </Modal>
+
+    <!--添加分组-->
+    <Modal
+      :styles="{top: '65px'}"
+      v-model="addGroupModal"
+      title=""
+      @on-visible-change = "chgModal">
+      <div slot="header" class="modalTitle">
+        <h3>{{modalTitle}}</h3>
+      </div>
+      <Form :model="ruleGroupForm" ref="ruleGroupForm" :label-width="80" style="width: 60%;margin:0 auto;">
+        <FormItem label="组名" prop="name" :rules="$filter_rules({required:true})">
+          <Input v-model="ruleGroupForm.name" placeholder="" class="w200"></Input>
+        </FormItem>
+      </Form>
+      <div slot="footer">
+        <Button type="success" :loading="modal_loading" @click="saveGroup('ruleGroupForm')">保存</Button>
+        <Button type="ghost" @click="handleReset('ruleGroupForm')">取消</Button>
+      </div>
+    </Modal>
+
+    <!--添加房型-->
+    <Modal
+      :styles="{top: '65px'}"
+      v-model="addTypeModal"
+      title=""
+      @on-visible-change = "chgModal">
+      <div slot="header" class="modalTitle">
+        <h3>{{modalTitle}}</h3>
+      </div>
+      <Form :model="ruleTypeForm" ref="ruleTypeForm" :label-width="80" style="width: 60%;margin:0 auto;">
+        <FormItem label="房间类型" prop="name" :rules="$filter_rules({required:true})">
+          <Input v-model="ruleTypeForm.name" placeholder="" class="w200"></Input>
+        </FormItem>
+      </Form>
+      <div slot="footer">
+        <Button type="success" :loading="modal_loading" @click="saveType('ruleTypeForm')">保存</Button>
+        <Button type="ghost" @click="handleReset('ruleTypeForm')">取消</Button>
+      </div>
+    </Modal>
+
+    <!--添加特性-->
+    <Modal
+      :styles="{top: '65px'}"
+      v-model="addTagsModal"
+      title=""
+      @on-visible-change = "chgModal">
+      <div slot="header" class="modalTitle">
+        <h3>{{modalTitle}}</h3>
+      </div>
+      <Form :model="ruleTagsForm" ref="ruleTagsForm" :label-width="80" style="width: 60%;margin:0 auto;">
+        <FormItem label="房间特性" prop="tag" :rules="$filter_rules({required:true})">
+          <Input v-model="ruleTagsForm.tag" placeholder="" class="w200"></Input>
+        </FormItem>
+      </Form>
+      <div slot="footer">
+        <Button type="success" :loading="modal_loading" @click="saveTags('ruleTagsForm')">保存</Button>
+        <Button type="ghost" @click="handleReset('ruleTagsForm')">取消</Button>
+      </div>
+    </Modal>
   </div>
 </template>
 
 <script>
   const delTagsTips = "你确定要删除特性";
   const delRoomTips = "你确定要删除房间";
+  const delTypeTips_1 = "删除房型将会强制删除当前房型下的";
+  const delTypeTips_2 = "个房间，确认删除当前房型";
+  const delGroupTips_1 = "删除房型将会强制删除当前分组下的";
+  const delGroupTips_2 = "个房间，确认删除当前房型";
   export default {
     name: 'roomManage',
     data () {
@@ -270,14 +336,15 @@
             align: 'center',
             //key: 'room_tags'
             render: (h, params) => {
-              var data = JSON.parse(params.row.room_tags);
-              var list = this.tags;
+              var _self = this;
+              let data = JSON.parse(params.row.room_tags);
+              let list = this.tags;
               if(data.length == 0){
                 return h('span','--');
               }else{
                 return h('span',list.map(function (list,indexList) {
-                  return h('span',data.map(function (data,index) {
-                    if(data == list.id){
+                  return h('span',data.map(function (item,index) {
+                    if(item == list.id){
                       return h(
                         'label',
                         {
@@ -285,7 +352,13 @@
                         },
                         list.tag.length <= 4 ? list.tag : list.tag.substring(0,4)+'...'
                       )
-                    }
+                    }/*else if(item == list.id && index > 2){
+                      let data = JSON.parse(params.row.room_tags);
+                      let list = _self.tags;
+                      return h('Poptip',{attrs:{ placement:"right"}},[
+                        h('i',{class: {'fa': true, 'fa-info-circle': true},style: {'margin-left': '2px'}}),
+                      ]);
+                    }*/
                   }))
                 }))
               }
@@ -326,8 +399,7 @@
                 }
               }
             }
-          }
-          ,
+          },
           {
             title: '操作',
             width: 150,
@@ -344,7 +416,7 @@
                   },
                   on: {
                     click: () => {
-                      this.edit(params)
+                      this.edit(params,'roomList')
                     }
                   }
                 }, '编辑'),
@@ -365,6 +437,9 @@
         ],
         data: [],
         addModal: false,
+        addTypeModal:false,
+        addTagsModal:false,
+        addGroupModal:false,
         ruleForm: {
           id:'',
           roomNo: '',
@@ -376,6 +451,19 @@
           roomTags: [],
           roomTagIds: '',
           roomTagNames:[]
+        },
+        ruleTypeForm: {
+          id:'',
+          name: ''
+        },
+        ruleTagsForm: {
+          id:'',
+          tag: ''
+        },
+        ruleGroupForm: {
+          id:'',
+          name: '',
+          parentId:0
         },
         tags:[],
         types:[],
@@ -454,7 +542,34 @@
             _self.$api.postQs("/proxy/room/tag/delete", _self.$utils.clearData(params) ,res => {
               this.$Message.success(res.data.desc);
               _self.getTagList();
-              //this.$Modal.remove()
+            },null,{"Content-Type":'application/x-www-form-urlencoded; charset=UTF-8'});
+          }
+        });
+      },
+      delType(item){
+        var _self = this;
+        this.$Modal.confirm({
+          title: '删除信息',
+          content: "<div class='font-15'>"+delTypeTips_1+ "<span class='custom-font-ffa044'>"+item.room_num+"</span>" + delTypeTips_2 + "<span class='text-green'>["+item.name+"]</span>" + "</div>",
+          onOk: () => {
+            var params = {id:item.id};
+            _self.$api.postQs("/proxy/room/type/delete", _self.$utils.clearData(params) ,res => {
+              this.$Message.success(res.data.desc);
+              _self.getTypeList();
+            },null,{"Content-Type":'application/x-www-form-urlencoded; charset=UTF-8'});
+          }
+        });
+      },
+      delGroup(item){
+        var _self = this;
+        this.$Modal.confirm({
+          title: '删除信息',
+          content: "<div class='font-15'>"+delGroupTips_1+ "<span class='custom-font-ffa044'>"+item.room_num+"</span>" + delGroupTips_2 + "<span class='text-green'>["+item.name+"]</span>" + "</div>",
+          onOk: () => {
+            var params = {id:item.id};
+            _self.$api.postQs("/proxy/room/group/delete", _self.$utils.clearData(params) ,res => {
+              this.$Message.success(res.data.desc);
+              _self.getGroupList();
             },null,{"Content-Type":'application/x-www-form-urlencoded; charset=UTF-8'});
           }
         });
@@ -475,43 +590,90 @@
           this.showLoading = false;
         });
       },
-      show (index) {
-        this.modalTitle = "添加房间";
-        this.addModal = true;
-        this.ruleForm = this.ruleForm;
+      show (type) {
+        if(type == 'roomList'){
+          this.modalTitle = "添加房间";
+          this.addModal = true;
+          this.ruleForm = this.ruleForm;
+        }
+        if(type == 'typeList'){
+          this.modalTitle = "添加房型";
+          this.addTypeModal = true;
+          this.ruleTypeForm = this.ruleTypeForm;
+        }
+        if(type == 'tagsList'){
+          this.modalTitle = "添加特性";
+          this.addTagsModal = true;
+          this.ruleTagsForm = this.ruleTagsForm;
+        }
+        if(type == 'groupList'){
+          this.modalTitle = "添加分组";
+          this.addGroupModal = true;
+          this.ruleGroupForm = this.ruleGroupForm;
+        }
       },
-      edit (params) {
-        this.modalTitle = "编辑房间";
-        this.allCheckBox = [];
-        this.ruleForm.roomTags = [];
-        this.ruleForm = {
-          id:params.row.id,
-          roomNo: params.row.room_no,
-          roomType: params.row.room_type,
-          roomTypeId: params.row.room_type_id,
-          groupLevel1Id: params.row.group_level1_id,
-          groupLevel2Id: 0,
-          groupLevel1Name:params.row.group_level1_name,
-          roomTags: JSON.parse(params.row.room_tags),
-          roomTagIds: '',
-          roomTagNames:[]
-        };
-        this.roomGroupText = params.row.group_level1_name;
-        this.roomTypeText = params.row.room_type;
+      edit (params,type) {
+        if(type == 'roomList'){
+          this.modalTitle = "编辑房间";
+          this.allCheckBox = [];
+          this.ruleForm.roomTags = [];
+          this.ruleForm = {
+            id:params.row.id,
+            roomNo: params.row.room_no,
+            roomType: params.row.room_type,
+            roomTypeId: params.row.room_type_id,
+            groupLevel1Id: params.row.group_level1_id,
+            groupLevel2Id: 0,
+            groupLevel1Name:params.row.group_level1_name,
+            roomTags: JSON.parse(params.row.room_tags),
+            roomTagIds: '',
+            roomTagNames:[]
+          };
+          this.roomGroupText = params.row.group_level1_name;
+          this.roomTypeText = params.row.room_type;
 
-        var roomTags = JSON.parse(params.row.room_tags);
-        for(var i=0;i<this.tags.length;i++){
-          for(var k=0;k<roomTags.length;k++){
-            if(this.tags[i].id == roomTags[k] && k < 2){
-              this.ruleForm.roomTagNames.push(this.tags[i].tag);
-            }
-            if(this.tags[i].id == roomTags[k]){
-              this.allCheckBox.push(this.tags[i].tag);
+          var roomTags = JSON.parse(params.row.room_tags);
+          for(var i=0;i<this.tags.length;i++){
+            for(var k=0;k<roomTags.length;k++){
+              if(this.tags[i].id == roomTags[k] && k < 2){
+                this.ruleForm.roomTagNames.push(this.tags[i].tag);
+              }
+              if(this.tags[i].id == roomTags[k]){
+                this.allCheckBox.push(this.tags[i].tag);
+              }
             }
           }
+          this.roomTagsText = this.ruleForm.roomTagNames == 0 ? this.roomTagsText : this.ruleForm.roomTagNames;
+          this.addModal = true;
         }
-        this.roomTagsText = this.ruleForm.roomTagNames == 0 ? this.roomTagsText : this.ruleForm.roomTagNames;
-        this.addModal = true;
+
+        if(type == "typeList"){
+          this.modalTitle = "编辑房型";
+          this.ruleTypeForm = {
+            id : params.id,
+            name : params.name
+          };
+          this.addTypeModal = true;
+        }
+
+        if(type == "tagsList"){
+          this.modalTitle = "编辑特性";
+          this.ruleTagsForm = {
+            id : params.id,
+            tag : params.tag
+          };
+          this.addTagsModal = true;
+        }
+
+        if(type == "groupList"){
+          this.modalTitle = "编辑分组";
+          this.ruleGroupForm = {
+            id : params.id,
+            name : params.name,
+            parentId : 0
+          };
+          this.addGroupModal = true;
+        }
       },
       remove (event) {
         var _self = this;
@@ -535,7 +697,9 @@
         this.$Message.info('Clicked cancel');
       },
       chgModal(status) {
-        //console.log(status);
+        if(!status){
+          this.closeModal();
+        };
       },
       selRoomType(event){
         this.ruleForm.roomTypeId = event.currentTarget.getAttribute("data-name");
@@ -561,7 +725,6 @@
             this.ruleForm.roomTags = JSON.stringify(this.ruleForm.roomTags);
             this.ruleForm.roomTagIds = (ids.substring(ids.length-1)==',')?ids.substring(0,ids.length-1):ids;
             var params = Object.assign({}, data);
-            console.log(params);
             var url = "";
             if(this.ruleForm.id != ""){
               url = "/proxy/room/update";
@@ -577,6 +740,63 @@
             },null,{"Content-Type":'application/x-www-form-urlencoded; charset=UTF-8'});
           }
         })
+      },
+      saveType(name){
+        this.$refs[name].validate((valid) => {
+          if (valid) {
+            var data = this.ruleTypeForm;
+            var url = "";
+            if(this.ruleTypeForm.id != ""){
+              url = "/proxy/room/type/update";
+            }else{
+              url = "/proxy/room/type/add";
+            }
+            this.$api.postQs(url, this.$utils.clearData(data) ,res => {
+              this.$Message.success(res.data.desc);
+              this.$refs[name].resetFields();
+              this.addTypeModal = false;
+              this.getTypeList();
+            },null,{"Content-Type":'application/x-www-form-urlencoded; charset=UTF-8'});
+          }
+        });
+      },
+      saveTags(name){
+        this.$refs[name].validate((valid) => {
+          if (valid) {
+            var data = this.ruleTagsForm;
+            var url = "";
+            if(this.ruleTagsForm.id != ""){
+              url = "/proxy/room/tag/update";
+            }else{
+              url = "/proxy/room/tag/add";
+            }
+            this.$api.postQs(url, this.$utils.clearData(data) ,res => {
+              this.$Message.success(res.data.desc);
+              this.$refs[name].resetFields();
+              this.addTagsModal = false;
+              this.getTagList();
+            },null,{"Content-Type":'application/x-www-form-urlencoded; charset=UTF-8'});
+          }
+        });
+      },
+      saveGroup(name){
+        this.$refs[name].validate((valid) => {
+          if (valid) {
+            var data = this.ruleGroupForm;
+            var url = "";
+            if(this.ruleGroupForm.id != ""){
+              url = "/proxy/room/group/update";
+            }else{
+              url = "/proxy/room/group/add";
+            }
+            this.$api.postQs(url, this.$utils.clearData(data) ,res => {
+              this.$Message.success(res.data.desc);
+              this.$refs[name].resetFields();
+              this.addGroupModal = false;
+              this.getGroupList();
+            },null,{"Content-Type":'application/x-www-form-urlencoded; charset=UTF-8'});
+          }
+        });
       },
       selGroup(event,id){
         this.groupId = id;
@@ -623,6 +843,7 @@
       handleReset (name) {
         this.$refs[name].resetFields();
         this.addModal = false;
+        this.addTypeModal = false;
         this.closeModal();
       },
       handleOpenGroup(){
@@ -670,6 +891,19 @@
           roomTags: [],
           roomTagIds: '',
           roomTagNames:[]
+        };
+        this.ruleTypeForm = {
+          id:'',
+          name: ''
+        };
+        this.ruleTagsForm = {
+          id:'',
+          tag: ''
+        }
+        this.ruleGroupForm = {
+          id:'',
+          name: '',
+          parentId:0
         }
       }
     }
