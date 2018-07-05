@@ -46,17 +46,17 @@
       :styles="{top: '65px'}"
       v-model="addModal"
       title=""
-      width="600"
+      width="590"
       @on-visible-change = "chgModal">
       <div slot="header" class="modalTitle">
         <h3>{{modalTitle}}</h3>
       </div>
       <Form :model="ruleForm" ref="ruleForm" :label-width="80" style="width: 90%;margin:0 auto;">
         <FormItem label="姓名" prop="name" :rules="$filter_rules({required:true})">
-          <Input v-model="ruleForm.name" placeholder=""></Input>
+          <Input v-model="ruleForm.name" placeholder="" class="w100-full"></Input>
         </FormItem>
         <FormItem label="手机号" prop="phone" :rules="$filter_rules({required:true,type:'phone'})">
-          <Input v-model="ruleForm.phone" placeholder=""></Input>
+          <Input v-model="ruleForm.phone" placeholder="" class="w100-full"></Input>
         </FormItem>
         <FormItem label="分配门卡">
           <Dropdown trigger="click" class="w100-full" style="position: relative">
@@ -86,6 +86,7 @@
             :target-keys="targetKeys"
             :render-format="renderTrans"
             :titles="titles"
+            :list-style="listStyle"
             @on-change="handleChange"></Transfer>
         </FormItem>
       </Form>
@@ -122,6 +123,8 @@
 
 <script>
   const delCardTips = "确定删除门卡";
+  const sendMmsTips_1 = "开门密码将以短信方式发送至保洁员";
+  const sendMmsTips_2 = "是否发送？";
   export default {
     name: 'employeeManage',
     data () {
@@ -177,22 +180,28 @@
             title: '开门密码',
             align: 'center',
             render: (h, params) => {
-              return h('div', [
-                h('a', {
-                  props: {
-                    type: 'primary',
-                    size: 'small'
-                  },
-                  style: {
-                    marginRight: '5px'
-                  },
-                  on: {
-                    click: (index) => {
-
+              if(params.row.pass_id){
+                return h('div', [
+                  h('a', {
+                    props: {
+                      type: 'primary',
+                      size: 'small'
+                    },
+                    style: {
+                      marginRight: '5px'
+                    },
+                    on: {
+                      click: (index) => {
+                        this.sendMms(params)
+                      }
                     }
-                  }
-                }, '发送密码'),
-              ]);
+                  }, '发送密码'),
+                ]);
+              }else{
+                return h('div', [
+                  h('span', '未分配'),
+                ]);
+              }
             }
           },
           {
@@ -280,7 +289,10 @@
         dataCard: [],
         dataCardList:[],
         dataRoom: [],
-        targetKeys:[]
+        targetKeys:[],
+        listStyle: {
+          width: '180px',
+        }
       }
     },
     created(){
@@ -500,6 +512,22 @@
             this.addModal = true;
           },null,{"Content-Type":'application/x-www-form-urlencoded; charset=UTF-8'});
         }
+      },
+      sendMms(params){
+        var _self = this;
+        this.$Modal.confirm({
+          title: '发送信息',
+          content: "<div class='font-15'>" + sendMmsTips_1 + "<span class='text-green'>["+params.row.name+"]</span>" + sendMmsTips_2 + "</div>",
+          onOk: () => {
+            var data = {
+              userId: params.row.id
+            };
+            _self.$api.postQs("/proxy/user/employee/pass/send", this.$utils.clearData(data) ,res => {
+              this.$Message.success(res.data.desc);
+              this.initCard();
+            },null,{"Content-Type":'application/x-www-form-urlencoded; charset=UTF-8'});
+          }
+        });
       },
       handleChange(newTargetKeys, direction, moveKeys) {
         console.log(newTargetKeys);
