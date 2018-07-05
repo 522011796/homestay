@@ -13,7 +13,7 @@
       </Spin>
 
       <div class="pull-left" style="position: relative">
-        <div style="position: absolute;left:350px;z-index: 9999">
+        <div style="position: absolute;left:350px;z-index: 2">
           <Button type="success" class="basic-edit-btn" v-if="!editStatus" @click="edit()">编辑</Button>
           <Button type="success" class="basic-edit-btn" v-if="editStatus" :loading="loading" @click="save('ruleForm')">
             <span v-if="!loading">保存</span>
@@ -45,6 +45,17 @@
           </FormItem>
         </Form>
 
+        <Form :label-width="120" :model="ruleTimeForm" ref="ruleTimeForm" style="position: relative">
+          <FormItem label="默认退房时间:">
+            <span v-if="!editTimeStatus">{{ruleTimeForm.defaultOutTime}}</span>
+            <TimePicker v-if="editTimeStatus" format="HH:mm" :steps="[1, 5]" type="time" placeholder="Select time" @on-change="selTime($event)" :value="ruleTimeForm.defaultOutTime" style="width: 80px"></TimePicker>
+            <Button type="success" v-if="!editTimeStatus" @click="editTime()">编辑</Button>
+            <Button type="success" v-if="editTimeStatus" @click="saveTime()">保存</Button>
+            <Button type="ghost" v-if="editTimeStatus" @click="cancelTime()">取消</Button>
+            <!--<Input v-if="editStatus" v-model="ruleForm.defaultOutTime" placeholder="" style="width: 200px"></Input>-->
+          </FormItem>
+        </Form>
+
         <Form v-if="setCaptcha" :label-width="120" :model="ruleCaptchaForm" ref="ruleCaptchaForm" style="position: relative">
           <FormItem label="管理员开锁密码:" prop="captcha" :rules="$filter_rules({required:true})">
             <Button type="success" v-if="!chgPwd" @click="chgLockPwd()">更换</Button>
@@ -56,11 +67,12 @@
                   <span>接收到的验证码</span>
                 </div>
               </div>
-              <div>
-                <Input v-model="ruleCaptchaForm.captcha" placeholder="" style="width: 200px"></Input>
-                <Button v-if="!showTime" type="ghost" @click="getCaptcha()">获取验证码</Button>
-                <Button v-if="showTime" disabled>{{count}}s</Button>
+              <div style="position: relative">
+                <Input v-model="ruleCaptchaForm.captcha" placeholder="" style="width: 200px;"></Input>
+                <Button v-if="!showTime" size="small" type="ghost" @click="getCaptcha()" style="position: absolute;right:128px;top:5px;z-index:2;">获取验证码</Button>
+                <Button v-if="showTime" size="small" disabled style="position: absolute;right:128px;top:5px;z-index:2;">{{count}}s</Button>
                 <Button type="success" @click="subCaptcha('ruleCaptchaForm')">提交</Button>
+                <Button type="ghost" @click="cancelCaptcha('ruleCaptchaForm')">取消</Button>
               </div>
             </div>
           </FormItem>
@@ -82,6 +94,7 @@
                     </Button>
                     <DropdownMenu slot="list" style="width: 100%">
                       <DropdownItem @click.native="selCard($event,'')">暂不分配</DropdownItem>
+                      <DropdownItem v-for="(item,index) in cardList" :key="index"  @click.native="selCard($event,item.id)">{{item.name}}</DropdownItem>
                     </DropdownMenu>
                   </Dropdown>
                 </div>
@@ -102,15 +115,6 @@
           </FormItem>
         </Form>
       </div>
-      <!--<div class="pull-left" style="margin-left:15px;">
-        <Button type="success" class="basic-edit-btn" v-if="!editStatus" @click="edit()">编辑</Button>
-        <Button type="success" class="basic-edit-btn" v-if="editStatus" :loading="loading" @click="save('ruleForm')">
-          <span v-if="!loading">保存</span>
-          <span v-else></span>
-        </Button>
-
-        <Button type="ghost" class="basic-edit-btn-cancel" v-if="editStatus" @click="cancel('ruleForm')">取消</Button>
-      </div>-->
       <div class="clearfix"></div>
     </div>
   </div>
@@ -130,6 +134,7 @@
         adminPhone:'',
         cardText:'暂不分配',
         showTime:false,
+        editTimeStatus:false,
         int:120,
         count: '',
         timer: null,
@@ -146,86 +151,19 @@
         },
         rulePwdForm: {
           lockAdminPass: '',
-          selPwdRoom:''
+          ppsIds:''
         },
-        columns: [
-          {
-            title: '姓名',
-            align: 'center',
-            key: 'username'
-          },
-          {
-            title: '手机号',
-            align: 'center',
-            key: 'phone'
-          },
-          {
-            title: '管理房间',
-            align: 'center',
-            key: 'rooms'
-          },
-          {
-            title: '开门密码',
-            align: 'center',
-            render: (h, params) => {
-              return h('div', [
-                h('a', {
-                  props: {
-                    type: 'primary',
-                    size: 'small'
-                  },
-                  style: {
-                    marginRight: '5px'
-                  },
-                  on: {
-                    click: (index) => {
-
-                    }
-                  }
-                }, '发送密码'),
-              ]);
-            }
-          },
-          {
-            title: '操作',
-            width: 150,
-            align: 'center',
-            render: (h, params) => {
-              return h('div', [
-                h('a', {
-                  props: {
-                    type: 'primary',
-                    size: 'small'
-                  },
-                  style: {
-                    marginRight: '5px'
-                  },
-                  on: {
-                    click: () => {
-                      this.show(params.index)
-                    }
-                  }
-                }, '编辑'),
-                h('a', {
-                  props: {
-                    type: 'error',
-                    size: 'small'
-                  },
-                  on: {
-                    click: () => {
-                      this.remove(params.index)
-                    }
-                  }
-                }, '删除')
-              ]);
-            }
-          }
-        ],
-        data: []
+        ruleTimeForm:{
+          franchiseeId:'',
+          defaultOutTime:'12:00'
+        },
+        data: [],
+        cardList:[]
       }
     },
     created(){
       this.init();
+      this.getCards();
     },
     methods:{
       init(){
@@ -238,11 +176,45 @@
           this.ruleForm.phone= data.phone;
           this.ruleForm.franchiseeId = data.franchiseeId;
           this.adminPhone = data.phone.replace(/^(\d{3})\d{4}(\d+)/,"$1****$2");
+          this.ruleTimeForm.defaultOutTime = data.defaultOutTime;
+          this.ruleTimeForm.franchiseeId = data.franchiseeId;
           this.showLoading = false;
         },null,{"Content-Type":'application/x-www-form-urlencoded; charset=UTF-8'});
       },
+      getCards(){
+        var data = {page:1,num:10000};
+        this.$api.get("/proxy/passport/card/list", {} ,res => {
+          var data = Object.assign({}, res.data.data);
+          console.log(data);
+          this.cardList = data
+        });
+      },
+      selTime(event){
+        this.ruleTimeForm.defaultOutTime = event;
+      },
+      saveTime(){
+        var params = Object.assign({}, this.ruleTimeForm);
+        this.$api.postQs("/proxy/franchisee/outTime/update", params ,res => {
+          this.$Message.success(res.data.desc);
+          this.init();
+          this.loading = false;
+          this.editStatus = false;
+          this.editTimeStatus = false;
+          this.cancelPwd(formName);
+        },null,{"Content-Type":'application/x-www-form-urlencoded; charset=UTF-8'});
+      },
+      selCard(event,id){
+        this.cardText = event.target.innerText;
+        this.rulePwdForm.ppsIds = id;
+      },
       edit(){
         this.editStatus = true;
+      },
+      editTime(){
+        this.editTimeStatus = true;
+      },
+      cancelTime(){
+        this.editTimeStatus = false;
       },
       save(formName){
         this.$refs[formName].validate((valid) => {
@@ -291,31 +263,32 @@
             var params = {
               captcha : this.ruleCaptchaForm.captcha
             };
-            this.setPwd = true;
-            this.setCaptcha = false;
-            this.$refs[formName].resetFields();
-            /*this.$api.postQs("/proxy/captcha/updLockAdminPassSms/check", params ,res => {
-              console.log(res);
+            this.$api.postQs("/proxy/captcha/updLockAdminPassSms/check", params ,res => {
               this.setPwd = true;
               this.setCaptcha = false;
               this.$refs[formName].resetFields();
-            },null,{"Content-Type":'application/x-www-form-urlencoded; charset=UTF-8'});*/
+            },res => {
+              this.$Message.error(res.data.desc);
+            },{"Content-Type":'application/x-www-form-urlencoded; charset=UTF-8'});
           }
         });
+      },
+      cancelCaptcha(formName){
+        this.chgPwd = false;
+        this.$refs[formName].resetFields();
       },
       subPwd(formName){
         this.$refs[formName].validate((valid) => {
           if (valid) {
             var params = {
               lockAdminPass : this.rulePwdForm.lockAdminPass,
-              selPwdRoom : this.rulePwdForm.selPwdRoom
+              ppsIds : this.rulePwdForm.ppsIds
             };
-            console.log(params);
-            /*this.$api.postQs("/proxy/captcha/updLockAdminPassSms/check", params ,res => {
-              console.log(res);
+            this.$api.postQs("/proxy/franchisee/update/lockadminpass", params ,res => {
+              this.$Message.success(res.data.desc);
               this.setPwd = true;
               this.chgPwd = false;
-            },null,{"Content-Type":'application/x-www-form-urlencoded; charset=UTF-8'});*/
+            },null,{"Content-Type":'application/x-www-form-urlencoded; charset=UTF-8'});
           }
         });
       },
@@ -324,6 +297,17 @@
         this.setPwd = false;
         this.chgPwd = false;
         this.setCaptcha = true;
+        this.ruleCaptchaForm = {
+          captcha: ''
+        };
+        this.rulePwdForm = {
+          lockAdminPass: '',
+            ppsIds:''
+        };
+        this.ruleTimeForm = {
+          defaultOutTime: '',
+          franchiseeId:''
+        };
       }
     }
   }

@@ -481,3 +481,6 @@ tr:hover{
   left:30px;
   top:-10px;
 }
+.w100-full{
+  width: 100% !important;
+}
