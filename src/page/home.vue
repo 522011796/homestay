@@ -9,7 +9,7 @@
         <div>
           <span class="home-title">房间筛选</span>
         </div>
-        <div style="margin-top:10px;">
+        <div style="margin-top:10px;position: relative">
           <Dropdown trigger="click" class="w200">
             <a class="text-gray" href="javascript:void(0)">
               {{searchRoomGroup}}
@@ -19,8 +19,9 @@
               <DropdownItem v-for="(item,index) in groupList.list" :key="index" :data-name="item.name" @click.native="selGroup($event,item.id)">{{item.name}}</DropdownItem>
             </DropdownMenu>
           </Dropdown>
+          <i v-if="groupClose" class="fa fa-close custom-font-ffa044" style="position: absolute;top:0px;right:5px;" @click="closeGroup()"></i>
         </div>
-        <div class="margin-top15">
+        <div class="margin-top15" style="position: relative">
           <Dropdown trigger="click" class="w200">
             <a class="text-gray" href="javascript:void(0)">
               {{searchRoomType}}
@@ -30,8 +31,9 @@
               <DropdownItem v-for="(item,index) in typeList" :key="index" :data-name="item.name" @click.native="selType($event,item.id)">{{item.name}}</DropdownItem>
             </DropdownMenu>
           </Dropdown>
+          <i v-if="typeClose" class="fa fa-close custom-font-ffa044" style="position: absolute;top:0px;right:5px;" @click="closeType()"></i>
         </div>
-        <div class="margin-top15">
+        <div class="margin-top15" style="position: relative">
           <Dropdown trigger="click" class="w200">
             <a class="text-gray" href="javascript:void(0)">
               {{searchRoomTags}}
@@ -41,6 +43,7 @@
               <DropdownItem v-for="(item,index) in tagList" :key="index" :data-name="item.tag" @click.native="selTag($event,item.id)">{{item.tag}}</DropdownItem>
             </DropdownMenu>
           </Dropdown>
+          <i v-if="tagsClose" class="fa fa-close custom-font-ffa044" style="position: absolute;top:0px;right:5px;" @click="closeTag()"></i>
         </div>
       </div>
       <div class="margin-top15-left20">
@@ -597,6 +600,9 @@
     data () {
       return {
         roomId:'',
+        tagsClose:false,
+        groupClose:false,
+        typeClose:false,
         visible:false,
         currentView: MyComponent,
         searchRoomNo:'',
@@ -725,16 +731,37 @@
       selGroup(event,id){
         this.groupLevel1Id = id;
         this.searchRoomGroup = event.currentTarget.getAttribute("data-name");
+        this.groupClose = true;
+        this.getRoomList();
+      },
+      closeGroup(){
+        this.groupClose = false;
+        this.groupLevel1Id = '';
+        this.searchRoomGroup = '分组';
         this.getRoomList();
       },
       selType(event,id){
         this.roomTypeId = id;
         this.searchRoomType = event.currentTarget.getAttribute("data-name");
+        this.typeClose = true;
+        this.getRoomList();
+      },
+      closeType(){
+        this.typeClose = false;
+        this.roomTypeId = '';
+        this.searchRoomType = '房型';
         this.getRoomList();
       },
       selTag(event,id){
         this.roomTagId = id;
         this.searchRoomTags = event.currentTarget.getAttribute("data-name");
+        this.tagsClose = true;
+        this.getRoomList();
+      },
+      closeTag(){
+        this.tagsClose = false;
+        this.roomTagId = '';
+        this.searchRoomTags = '房态';
         this.getRoomList();
       },
       getRoomList(){
