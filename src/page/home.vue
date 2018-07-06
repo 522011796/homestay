@@ -319,7 +319,7 @@
                   <div v-if="item.use_status == 3">
                     <Button type="ghost" size="small" @click="setLogut(item.live_order_id,item.room_no,item.name)">退房</Button>
                     <Button type="ghost" size="small" @click="setLong(item.live_order_id,item.live_real_name,item.live_start_time,item.live_end_time)">延住</Button>
-                    <Button type="ghost" size="small">换房</Button>
+                    <Button type="ghost" size="small" @click="setChgRoom(item.live_order_id,item.room_no,item.group_level1_name,item.live_real_name,item.live_start_time,item.live_end_time)">换房</Button>
                     <Button type="ghost" size="small" @click="setZang(item.id)">置脏</Button>
                     <Button type="ghost" size="small" v-if="item.fix_des" @click="clearFault(item.id)">清除故障</Button>
                     <Button type="warning" size="small"v-else @click="show('fault',item.id,item.room_no,item.name)">故障</Button>
@@ -330,7 +330,7 @@
                   <div v-if="item.use_status == 4">
                     <Button type="ghost" size="small" @click="setLogut(item.live_order_id,item.room_no,item.name)">退房</Button>
                     <Button type="ghost" size="small" @click="setLong(item.live_order_id,item.live_real_name,item.live_start_time,item.live_end_time)">延住</Button>
-                    <Button type="ghost" size="small">换房</Button>
+                    <Button type="ghost" size="small" @click="setChgRoom(item.live_order_id,item.room_no,item.group_level1_name,item.live_real_name,item.live_start_time,item.live_end_time)">换房</Button>
                     <Button type="ghost" size="small" @click="setJing(item.id)">置净</Button>
                     <Button type="ghost" size="small" v-if="item.fix_des" @click="clearFault(item.id)">清除故障</Button>
                     <Button type="warning" size="small" v-else @click="show('fault',item.id,item.room_no,item.name)">故障</Button>
@@ -429,7 +429,8 @@
       :styles="{top: '65px'}"
       v-model="addModal"
       title=""
-      @on-visible-change = "chgModal" class="home-textarea">
+      @on-visible-change="chgModal"
+      class="home-textarea">
       <div slot="header" class="modalTitle">
         <h3>{{modalTitle}}</h3>
       </div>
@@ -480,6 +481,75 @@
       <div slot="footer">
         <Button type="success" @click="saveLong('ruleLongForm')">保存</Button>
         <Button type="ghost" @click="handleReset('ruleLongForm')">取消</Button>
+      </div>
+    </Modal>
+
+    <!--更换房间-->
+    <Modal
+      :styles="{top: '65px'}"
+      v-model="addChgModal"
+      title=""
+      @on-visible-change = "chgModal" class="home-textarea">
+      <div slot="header" class="modalTitle">
+        <h3>{{modalTitle}}</h3>
+      </div>
+      <Form :model="ruleChgForm" ref="ruleChgForm" :label-width="160" style="width: 100%;margin:0 auto;">
+        <FormItem label="房间号" class="margin-bottom0">
+          <span>{{ruleChgForm.roomNoText}}</span>
+        </FormItem>
+        <FormItem label="客人" class="margin-bottom0">
+          <span>{{ruleChgForm.realName}}</span>
+        </FormItem>
+        <FormItem label="入住时间" class="margin-bottom0">
+          <span>{{ruleChgForm.inTime}}</span>
+        </FormItem>
+        <FormItem label="离店时间" class="margin-bottom0">
+          <span>{{ruleChgForm.outTime}}</span>
+        </FormItem>
+        <FormItem label="房型选择" class="margin-bottom10">
+          <Dropdown trigger="click" class="w200">
+            <Button type="default" class="dropdown-align-100">
+              {{roomTypeText}}
+              <Icon type="arrow-down-b" class="dropdown-icon-align-2"></Icon>
+            </Button>
+            <DropdownMenu slot="list">
+              <DropdownItem v-for="(item,index) in typeList" :key="index" :data-name="item.name" @click.native="selRoomType($event,item.id)">{{item.name}}</DropdownItem>
+            </DropdownMenu>
+          </Dropdown>
+        </FormItem>
+        <FormItem label="房间特性" class="margin-bottom10">
+          <Dropdown trigger="click" class="w200">
+            <Button type="default" class="dropdown-align-100">
+              {{roomTagText}}
+              <Icon type="arrow-down-b" class="dropdown-icon-align-2"></Icon>
+            </Button>
+            <DropdownMenu slot="list">
+              <DropdownItem v-for="(item,index) in tagList" :key="index" :data-name="item.tag" @click.native="selRoomTag($event,item.id)">{{item.tag}}</DropdownItem>
+            </DropdownMenu>
+          </Dropdown>
+        </FormItem>
+        <FormItem label="房态筛选" class="margin-bottom0">
+          <RadioGroup v-model="ruleChgForm.statusRadio">
+            <Radio label="空净"></Radio>
+            <Radio label="空脏"></Radio>
+          </RadioGroup>
+        </FormItem>
+        <FormItem label="选择房间" class="margin-bottom0" prop="groupLevel1Name" :rules="$filter_rules({required:true})">
+          <Input v-model="ruleChgForm.groupLevel1Name" style="display: none"></Input>
+          <Dropdown trigger="click" class="w200">
+            <Button type="default" class="dropdown-align-100">
+              {{roomRoomText}}
+              <Icon type="arrow-down-b" class="dropdown-icon-align-2"></Icon>
+            </Button>
+            <DropdownMenu slot="list">
+              <DropdownItem v-for="(item,index) in roomSearchList" :key="index" :data-name="item.id" @click.native="selRoomList($event,item.id,item.group_level1_name)">{{item.room_no}}({{item.group_level1_name}})</DropdownItem>
+            </DropdownMenu>
+          </Dropdown>
+        </FormItem>
+      </Form>
+      <div slot="footer">
+        <Button type="success" @click="saveChgRoom('ruleChgForm')">保存</Button>
+        <Button type="ghost" @click="handleReset('ruleChgForm')">取消</Button>
       </div>
     </Modal>
   </div>
@@ -535,6 +605,7 @@
         allTagList:[],
         statusList:[],
         roomList:[],
+        roomSearchList:[],
         roomNo:"",
         roomArea:"",
         roomType:"",
@@ -553,11 +624,16 @@
         searchRoomGroup:"分组",
         searchRoomType:"房型",
         searchRoomTags:"房态",
+        roomTypeText:'请选择',
+        roomTagText:'请选择',
+        roomRoomText:'请选择',
         addModal: false,
         addLongModal:false,
+        addChgModal:false,
         loading: false,
         modal_loading: false,
         modalTitle: '',
+        formName:'',
         setType:'',
         ruleForm: {
           enableDes: '',
@@ -570,6 +646,22 @@
           outTime:"",
           orderId:'',
           checkOutTime:''
+        },
+        ruleChgForm: {
+          liveOrderId:'',
+          roomNo:'',
+          roomNoText:'',
+          realName:"",
+          inTime:"",
+          outTime:"",
+          orderId:'',
+          roomId:'',
+          tagId:'',
+          statusRadio:'空净',
+          roomTypeId:'',
+          roomTagIds:'',
+          status:'',
+          groupLevel1Name:''
         },
         styleMenuObject: {
           height: '',
@@ -661,6 +753,24 @@
           this.showLoading = false;
         },null,{"Content-Type":'application/x-www-form-urlencoded; charset=UTF-8'});
       },
+      getRoomSearchList(){
+        var params = {
+          page:1,
+          num:10000,
+          roomTypeId:this.ruleChgForm.roomTypeId,
+          startTime:this.ruleChgForm.inTime,
+          endTime:this.ruleChgForm.outTime,
+          roomNo:this.ruleChgForm.roomNo,
+          roomTagIds:this.ruleChgForm.roomTagIds,
+          status:this.ruleChgForm.status
+        };
+        console.log(params);
+        this.$api.get("/proxy/room/remains", this.$utils.clearData(params) ,res => {
+          var data = Object.assign({}, res.data.data);
+          console.log(data);
+          this.roomSearchList = data;
+        });
+      },
       getOrderList(id){
         this.liveUserId = null;
         var params = {id:id};
@@ -691,7 +801,9 @@
         });
       },
       chgModal(status) {
-        console.log(status);
+        if(!status){
+          this.handleReset(""+this.formName);
+        };
       },
       setZang(id){
         var params = {
@@ -814,8 +926,8 @@
         });
       },
       setLong(liveOrderId,realName,inTime,outTime){
-        console.log(liveOrderId+"--"+realName+"--"+inTime+"--"+outTime);
         this.modalTitle = "延长住店时间";
+        this.formName = 'ruleLongForm';
         this.ruleLongForm.liveOrderId = liveOrderId;
         this.ruleLongForm.realName = realName;
         this.ruleLongForm.inTime = inTime;
@@ -827,6 +939,18 @@
           }
         };
         this.addLongModal = true;
+      },
+      setChgRoom(liveOrderId,roomNo,groupName,realName,inTime,outTime){
+        this.modalTitle = "更换房间";
+        this.formName = 'ruleChgForm';
+        this.ruleChgForm.liveOrderId = liveOrderId;
+        this.ruleChgForm.roomNoText = roomNo+"("+groupName+")";
+        this.ruleChgForm.realName = realName;
+        this.ruleChgForm.inTime = this.$moment.unix(inTime/1000).format("YYYY-MM-DD HH:mm");
+        this.ruleChgForm.outTime = this.$moment.unix(outTime/1000).format("YYYY-MM-DD HH:mm");
+        this.ruleChgForm.orderId = liveOrderId;
+        this.getRoomSearchList();
+        this.addChgModal = true;
       },
       selEndTime(event){
         this.ruleLongForm.checkOutTime = event;
@@ -845,10 +969,42 @@
           }
         });
       },
+      saveChgRoom(formName){
+        this.$refs[formName].validate((valid) => {
+          if (valid) {
+            this.loading = true;
+            var params = Object.assign({}, this.ruleChgForm);
+            this.$api.postQs("/proxy/order/room/exchange", this.$utils.clearData(params) ,res => {
+              this.$Message.success(res.data.desc);
+              this.getRoomList();
+              this.handleReset(formName);
+              this.loading = false;
+            },null,{"Content-Type":'application/x-www-form-urlencoded; charset=UTF-8'});
+          }
+        });
+      },
+      selRoomType(event,id){
+        this.ruleChgForm.roomId = id;
+        this.roomTypeText = event.currentTarget.innerText;
+        this.ruleChgForm.roomTypeId = id;
+        this.getRoomSearchList();
+      },
+      selRoomTag(event,id){
+        this.ruleChgForm.tagId = id;
+        this.roomTagText = event.currentTarget.innerText;
+        this.ruleChgForm.roomTagIds = id;
+        this.getRoomSearchList();
+      },
+      selRoomList(event,id,groupLevel1Name){
+        this.ruleChgForm.roomId = id;
+        this.ruleChgForm.groupLevel1Name = groupLevel1Name;
+        this.roomRoomText = event.currentTarget.innerText;
+      },
       handleReset (name) {
         this.$refs[name].resetFields();
         this.addModal = false;
         this.addLongModal = false;
+        this.addChgModal = false;
         this.ruleForm= {
           enableDes: '',
           fixDes:''
@@ -861,6 +1017,22 @@
           orderId:'',
           checkOutTime:''
         };
+        this.ruleChgForm= {
+          liveOrderId:'',
+          roomNo:'',
+          roomNoText:'',
+          realName:"",
+          inTime:"",
+          outTime:"",
+          orderId:'',
+          roomId:'',
+          tagId:'',
+          statusRadio:'空净',
+          roomTypeId:'',
+          roomTagIds:'',
+          status:'',
+          groupLevel1Name:''
+        }
       }
     },
     mounted () {
