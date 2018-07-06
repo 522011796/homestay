@@ -144,7 +144,7 @@
         addModal:false,
         modalTitle:'',
         cardNameText:'暂不分配',
-        titles:['全部房间','已选房间'],
+        titles:['可选房间','已选房间'],
         ruleCardForm:{
           id:'',
           name:'',
