@@ -513,6 +513,7 @@
               <Icon type="arrow-down-b" class="dropdown-icon-align-2"></Icon>
             </Button>
             <DropdownMenu slot="list">
+              <DropdownItem :data-name="全部" @click.native="selRoomType($event,'')">全部</DropdownItem>
               <DropdownItem v-for="(item,index) in typeList" :key="index" :data-name="item.name" @click.native="selRoomType($event,item.id)">{{item.name}}</DropdownItem>
             </DropdownMenu>
           </Dropdown>
@@ -524,6 +525,7 @@
               <Icon type="arrow-down-b" class="dropdown-icon-align-2"></Icon>
             </Button>
             <DropdownMenu slot="list">
+              <DropdownItem :data-name="全部" @click.native="selRoomTag($event,'')">全部</DropdownItem>
               <DropdownItem v-for="(item,index) in tagList" :key="index" :data-name="item.tag" @click.native="selRoomTag($event,item.id)">{{item.tag}}</DropdownItem>
             </DropdownMenu>
           </Dropdown>
