@@ -188,7 +188,7 @@
             </div>
           </div>
 
-          <Poptip class="margin-bottom10 home-pop" placement="bottom" width="280" v-for="(item,index) in item.list" :key="index" @on-popper-show="getOrderList(item.id)" style="position: relative">
+          <Poptip class="margin-bottom10 home-pop" placement="bottom" width="310" v-for="(item,index) in item.list" :key="index" @on-popper-show="getOrderList(item.id)" style="position: relative">
             <Card class="home-card-border home-card-content">
               <div class="home-card-block">
                 <div class="home-card-title font-15">{{item.room_no}}</div>
@@ -263,17 +263,13 @@
                   </div>
                 </div>
               </div>
-              <div v-if="item.use_status == 99">
-                <div v-if="item.enable_des">
-                  <span class="custom-font-ffa044">停用:</span>
-                  <span class="custom-font-ffa044">{{item.enable_des}}</span>
-                </div>
+              <div v-if="item.enable_des">
+                <span class="custom-font-ffa044">停用:</span>
+                <span class="custom-font-ffa044">{{item.enable_des}}</span>
               </div>
-              <div v-else>
-                <div v-if="item.fix_des">
-                  <span class="custom-font-ffa044">故障:</span>
-                  <span class="custom-font-ffa044">{{item.fix_des}}</span>
-                </div>
+              <div v-if="item.fix_des">
+                <span class="custom-font-ffa044">故障:</span>
+                <span class="custom-font-ffa044">{{item.fix_des}}</span>
               </div>
               <div class="margin-top10">
                 <template>
@@ -290,12 +286,17 @@
                         <Button type="success" size="small">入住</Button>
                         <Button type="ghost" size="small" @click="setZang(item.id)">置脏</Button>
                         <Button type="ghost" size="small" v-if="item.fix_des" @click="clearFault(item.id)">清除故障</Button>
-                        <Button type="warning" size="small" v-else @click="show('fault',item.id,item.room_no,item.name)">故障</Button>
-                        <Button type="error" size="small" v-if="item.book_status != 1" @click="show('stop',item.id,item.room_no,item.name)">停用</Button>
                       </div>
                     </div>
+                    <div v-else>
+                      <Button type="success" size="small">入住</Button>
+                      <Button type="ghost" size="small" @click="setZang(item.id)">置脏</Button>
+                      <Button type="ghost" size="small" v-if="item.fix_des" @click="clearFault(item.id)">清除故障</Button>
+                      <Button type="warning" size="small" v-else @click="show('fault',item.id,item.room_no,item.name)">故障</Button>
+                      <Button type="error" size="small" v-if="item.book_status != 1" @click="show('stop',item.id,item.room_no,item.name)">停用</Button>
+                    </div>
                   </div>
-                  <div  v-if="item.use_status == 1 && !item.iotdeviceId">
+                  <div v-if="item.use_status == 1 && !item.iotdeviceId">
                     <Button type="success" size="small" disabled>入住</Button>
                     <Button type="ghost" size="small" @click="setZang(item.id)">置脏</Button>
                     <Button type="ghost" size="small" v-if="item.fix_des" @click="clearFault(item.id)">清除故障</Button>
@@ -317,7 +318,7 @@
                 <template>
                   <div v-if="item.use_status == 3">
                     <Button type="ghost" size="small" @click="setLogut(item.live_order_id,item.room_no,item.name)">退房</Button>
-                    <Button type="ghost" size="small">延住</Button>
+                    <Button type="ghost" size="small" @click="setLong(item.live_order_id,item.live_real_name,item.live_start_time,item.live_end_time)">延住</Button>
                     <Button type="ghost" size="small">换房</Button>
                     <Button type="ghost" size="small" @click="setZang(item.id)">置脏</Button>
                     <Button type="ghost" size="small" v-if="item.fix_des" @click="clearFault(item.id)">清除故障</Button>
@@ -328,7 +329,7 @@
                 <template>
                   <div v-if="item.use_status == 4">
                     <Button type="ghost" size="small" @click="setLogut(item.live_order_id,item.room_no,item.name)">退房</Button>
-                    <Button type="ghost" size="small">延住</Button>
+                    <Button type="ghost" size="small" @click="setLong(item.live_order_id,item.live_real_name,item.live_start_time,item.live_end_time)">延住</Button>
                     <Button type="ghost" size="small">换房</Button>
                     <Button type="ghost" size="small" @click="setJing(item.id)">置净</Button>
                     <Button type="ghost" size="small" v-if="item.fix_des" @click="clearFault(item.id)">清除故障</Button>
@@ -345,7 +346,7 @@
                 </template>
               </div>
               <div>
-                <Card class="margin-top15 home-roomlist-status border-green" v-if="liveUserId">
+                <Card class="margin-top15 home-roomlist-status border-green" v-if="item.live_user_id">
                   <div>
                     <Row>
                       <Col span="12">
@@ -360,11 +361,11 @@
                     <Row>
                       <Col span="12">
                       <span class="small-text text-green">入住</span>
-                      <span class="small-text text-green">{{inTime}}</span>
+                      <span class="small-text text-green">{{$moment.unix(inTime/1000).format("YYYY-MM-DD HH:mm")}}</span>
                       </Col>
                       <Col span="12">
                       <span class="small-text text-green">离店</span>
-                      <span class="small-text text-green">{{outTime}}</span>
+                      <span class="small-text text-green">{{$moment.unix(outTime/1000).format("YYYY-MM-DD HH:mm")}}</span>
                       </Col>
                     </Row>
                   </div>
@@ -423,7 +424,7 @@
     </div>
     <div style="clear: both"></div>
 
-    <!--暂时不显示和处理-->
+    <!--停用和故障-->
     <Modal
       :styles="{top: '65px'}"
       v-model="addModal"
@@ -450,6 +451,35 @@
           <span v-else>Loading...</span>
         </Button>
         <Button type="ghost" @click="handleReset('ruleForm')">取消</Button>
+      </div>
+    </Modal>
+
+    <!--延长住店时间-->
+    <Modal
+      :styles="{top: '65px'}"
+      v-model="addLongModal"
+      title=""
+      @on-visible-change = "chgModal" class="home-textarea">
+      <div slot="header" class="modalTitle">
+        <h3>{{modalTitle}}</h3>
+      </div>
+      <Form :model="ruleLongForm" ref="ruleLongForm" :label-width="160" style="width: 100%;margin:0 auto;">
+        <FormItem label="客人" class="margin-bottom0">
+          <span>{{ruleLongForm.realName}}</span>
+        </FormItem>
+        <FormItem label="入住时间" class="margin-bottom0">
+          <span>{{$moment.unix(ruleLongForm.inTime/1000).format("YYYY-MM-DD HH:mm")}}</span>
+        </FormItem>
+        <FormItem label="离店时间" class="margin-bottom0">
+          <span>{{$moment.unix(ruleLongForm.outTime/1000).format("YYYY-MM-DD HH:mm")}}</span>
+        </FormItem>
+        <FormItem label="延长离店时间至" prop="checkOutTime" :rules="$filter_rules({required:true})" class="margin-bottom0">
+          <DatePicker type="datetime" v-model="ruleLongForm.checkOutTime" format="yyyy-MM-dd HH:mm" placeholder="请选择时间" :options="optionsEnd" @on-change="selEndTime($event)" style="width: 150px"></DatePicker>
+        </FormItem>
+      </Form>
+      <div slot="footer">
+        <Button type="success" @click="saveLong('ruleLongForm')">保存</Button>
+        <Button type="ghost" @click="handleReset('ruleLongForm')">取消</Button>
       </div>
     </Modal>
   </div>
@@ -524,6 +554,7 @@
         searchRoomType:"房型",
         searchRoomTags:"房态",
         addModal: false,
+        addLongModal:false,
         loading: false,
         modal_loading: false,
         modalTitle: '',
@@ -532,10 +563,23 @@
           enableDes: '',
           fixDes:''
         },
+        ruleLongForm: {
+          liveOrderId:'',
+          realName:"",
+          inTime:"",
+          outTime:"",
+          orderId:'',
+          checkOutTime:''
+        },
         styleMenuObject: {
           height: '',
           'overflow-y':'auto',
         },
+        optionsEnd: {
+          disabledDate (date) {
+            return false;
+          }
+        }
       }
     },
     created(){
@@ -769,9 +813,54 @@
           }
         });
       },
+      setLong(liveOrderId,realName,inTime,outTime){
+        console.log(liveOrderId+"--"+realName+"--"+inTime+"--"+outTime);
+        this.modalTitle = "延长住店时间";
+        this.ruleLongForm.liveOrderId = liveOrderId;
+        this.ruleLongForm.realName = realName;
+        this.ruleLongForm.inTime = inTime;
+        this.ruleLongForm.outTime = outTime;
+        this.ruleLongForm.orderId = liveOrderId;
+        this.optionsEnd = {
+          disabledDate(date){
+            return date && date.valueOf() < outTime;
+          }
+        };
+        this.addLongModal = true;
+      },
+      selEndTime(event){
+        this.ruleLongForm.checkOutTime = event;
+      },
+      saveLong(formName){
+        this.$refs[formName].validate((valid) => {
+          if (valid) {
+            this.loading = true;
+            var params = Object.assign({}, this.ruleLongForm);
+            this.$api.postQs("/proxy/order/continue", this.$utils.clearData(params) ,res => {
+              this.$Message.success(res.data.desc);
+              this.getRoomList();
+              this.handleReset(formName);
+              this.loading = false;
+            },null,{"Content-Type":'application/x-www-form-urlencoded; charset=UTF-8'});
+          }
+        });
+      },
       handleReset (name) {
         this.$refs[name].resetFields();
         this.addModal = false;
+        this.addLongModal = false;
+        this.ruleForm= {
+          enableDes: '',
+          fixDes:''
+        };
+        this.ruleLongForm= {
+          liveOrderId:'',
+          realName:"",
+          inTime:"",
+          outTime:"",
+          orderId:'',
+          checkOutTime:''
+        };
       }
     },
     mounted () {
