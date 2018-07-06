@@ -16,6 +16,11 @@
             基础信息
           </div>
         </router-link>
+        <router-link to="/layout/logManage" @click.native="activeSliderMenu('logManage')">
+          <div :class="{'menu-active-green':menu=='logManage'}" style="height:35px;line-height:35px;text-align: center;border-radius: 5px;margin-top:10px;">
+            系统日志
+          </div>
+        </router-link>
     </div>
 
     <div id="orderService" :class="{'hidden':getLeftFirstMenu!='orderService'}" style="padding:15px 35px;">

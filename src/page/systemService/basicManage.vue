@@ -185,7 +185,6 @@
         var data = {page:1,num:10000};
         this.$api.get("/proxy/passport/card/list", {} ,res => {
           var data = Object.assign({}, res.data.data);
-          console.log(data);
           this.cardList = data
         });
       },

@@ -8,6 +8,7 @@ import NowInOrderManage from '@/page/orderService/nowInOrderManage'
 import PreInOrderManage from '@/page/orderService/preInOrderManage'
 import PreOutOrderManage from '@/page/orderService/preOutOrderManage'
 import BasicManage from '@/page/systemService/basicManage'
+import LogManage from '@/page/systemService/logManage'
 import Layout from '@/page/layout'
 import Login from '@/page/Login'
 import Dash from '@/page/dash'
@@ -70,6 +71,11 @@ export default new Router({
               path: '/layout/basicManage',
               name: 'basicManage',
               component: BasicManage
+            },
+            {
+              path: '/layout/logManage',
+              name: 'logManage',
+              component: LogManage
             }
           ]
         }
