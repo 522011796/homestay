@@ -249,7 +249,15 @@
           {
             title: '备注',
             align: 'center',
-            key: 'remarks'
+            //key: 'remarks'
+            render: (h, params) => {
+              var remarks = params.row.remarks;
+              console.log(remarks.length);
+              if(remarks.length >= 50){
+                remarks = remarks.substring(0,50) + '...';
+              }
+              return h('div', remarks);
+            }
           },
           {
             title: '操作',

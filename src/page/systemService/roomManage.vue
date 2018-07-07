@@ -24,7 +24,7 @@
               {{searchRoomType}}
               <Icon type="arrow-down-b"></Icon>
             </Button>
-            <DropdownMenu slot="list">
+            <DropdownMenu slot="list" style="width: 100%;height:120px;overflow-y: auto">
               <DropdownItem v-for="(item,index) in types" :key="index" :data-name="item.name" @click.native="selType($event,item.id)">{{item.name}}</DropdownItem>
             </DropdownMenu>
           </Dropdown>
@@ -33,7 +33,7 @@
               {{searchRoomTags}}
               <Icon type="arrow-down-b"></Icon>
             </Button>
-            <DropdownMenu slot="list">
+            <DropdownMenu slot="list" style="width: 100%;height:120px;overflow-y: auto">
               <DropdownItem v-for="(item,index) in tags" :key="index" :data-name="item.name" @click.native="selTag($event,item.id)">{{item.tag}}</DropdownItem>
             </DropdownMenu>
           </Dropdown>
@@ -42,7 +42,7 @@
               {{searchRoomLocks}}
               <Icon type="arrow-down-b"></Icon>
             </Button>
-            <DropdownMenu slot="list">
+            <DropdownMenu slot="list" style="width: 100%;height:120px;overflow-y: auto">
               <DropdownItem  @click.native="selLocks($event,'online')">正常</DropdownItem>
               <DropdownItem  @click.native="selLocks($event,'offline')">异常</DropdownItem>
               <DropdownItem  @click.native="selLocks($event,'lowpwr')">电量低</DropdownItem>
@@ -168,6 +168,15 @@
             </Button>
             <DropdownMenu slot="list" style="width: 100%">
               <DropdownItem v-for="(item,index) in groups.list" :key="index" :data-name="item.id" :data-text="item.name" @click.native="selRoomGroup($event)">{{item.name}}</DropdownItem>
+              <div class="line margin-top0-lr8"></div>
+              <div class="padding-tb0-lr10">
+                <div v-if="editGroup">
+                  <Input size="small" placeholder="" style="width: 100px" v-model="ruleForm.addGroupName"></Input>
+                  <Button type="success" size="small" class="text-left" style="font-size:10px !important;" @click="addGroupName()">保存</Button>
+                  <Button type="ghost" size="small" class="text-left" style="font-size:10px !important;" @click="addGroup(false)">取消</Button>
+                </div>
+                <Button v-if="!editGroup" type="dashed" long size="small" icon="plus-round" class="text-left" @click="addGroup(true)">添加分组</Button>
+              </div>
             </DropdownMenu>
           </Dropdown>
         </FormItem>
@@ -180,6 +189,15 @@
             </Button>
             <DropdownMenu slot="list" style="width: 100%">
               <DropdownItem v-for="(item,index) in types" :key="index" :data-name="item.id" :data-text="item.name" @click.native="selRoomType($event)">{{item.name}}</DropdownItem>
+              <div class="line margin-top0-lr8"></div>
+              <div class="padding-tb0-lr10">
+                <div v-if="editType">
+                  <Input size="small" placeholder="" style="width: 100px" v-model="ruleForm.addTypeName"></Input>
+                  <Button type="success" size="small" class="text-left" style="font-size:10px !important;" @click="addTypeName()">保存</Button>
+                  <Button type="ghost" size="small" class="text-left" style="font-size:10px !important;" @click="addType(false)">取消</Button>
+                </div>
+                <Button v-if="!editType" type="dashed" long size="small" icon="plus-round" class="text-left" @click="addType(true)">添加房型</Button>
+              </div>
             </DropdownMenu>
           </Dropdown>
         </FormItem>
@@ -202,8 +220,8 @@
                 <div class="line"></div>
                 <div>
                   <div v-if="editTags">
-                    <Input size="small" placeholder="" style="width: 100px"></Input>
-                    <Button type="success" size="small" class="text-left" style="font-size:10px !important;">保存</Button>
+                    <Input size="small" placeholder="" style="width: 100px" v-model="ruleForm.addTagsName"></Input>
+                    <Button type="success" size="small" class="text-left" style="font-size:10px !important;" @click="addTagsName()">保存</Button>
                     <Button type="ghost" size="small" class="text-left" style="font-size:10px !important;" @click="addTags(false)">取消</Button>
                   </div>
                   <Button v-if="!editTags" type="dashed" long size="small" icon="plus-round" class="text-left" @click="addTags(true)">添加特性</Button>
@@ -378,33 +396,63 @@
             //key: 'locks'
             render: (h, params) => {
               var locks = params.row.locks;
+              var html = "";
               if(locks.length == 0){
                 return h('span',{style:{color:'#f16a6a'}},'未安装门锁');
               }else{
-                for(var i=0;i<locks.length;i++){
-                  var battery = JSON.parse(locks[i].battery);
-                  if(locks[i].status != 0){
-                    return h('span',{style:{color:'#f16a6a'}},
-                      异常
-                    );
+                return h('div',locks.map(function (list,indexList) {
+                  var battery = JSON.parse(list.battery);
+                  if(list.status != 0){
+                    return h('div',
+                      list.identify
+                    )
                   }else{
-                    if(locks[i].olStatus != 0){
+                    if(list.olStatus != 0){
                       return h('div',{style:{color:'#f16a6a'}},
-                        网络异常
+                        list.identify + '(网络异常)'
                       );
                     }else{
                       if(battery.percent <= 10){
                         return h('div',{style:{color:'#f16a6a'}},
-                          locks[i].identify + "("+ "电量:" +battery.percent+ "%" +")"
+                          list.identify + "("+ "电量:" +battery.percent+ "%" +")"
                         );
                       }else{
                         return h('div',
-                          locks[i].identify + "("+ "电量:" +battery.percent+ "%" +")"
+                          list.identify + "("+ "电量:" +battery.percent+ "%" +")"
                         );
                       }
                     }
                   }
-                }
+                }));
+                /*for(var i=0;i<locks.length;i++){
+                  var battery = JSON.parse(locks[i].battery);
+                  if(locks[i].status != 0){
+                    html += "<div>"+locks[i].identify + '(异常)'+"</div>";
+                    /!*return h('span',{style:{color:'#f16a6a'}},
+                      locks[i].identify + '(异常)'
+                    );*!/
+                  }else{
+                    if(locks[i].olStatus != 0){
+                      html += "<div>"+locks[i].identify + '(网络异常)'+"</div>";
+                      /!*return h('div',{style:{color:'#f16a6a'}},
+                        locks[i].identify + '(网络异常)'
+                      );*!/
+                    }else{
+                      if(battery.percent <= 10){
+                        html += "<div>"+locks[i].identify + "("+ "电量:" +battery.percent+ "%" +")"+"</div>";
+                        /!*return h('div',{style:{color:'#f16a6a'}},
+                          locks[i].identify + "("+ "电量:" +battery.percent+ "%" +")"
+                        );*!/
+                      }else{
+                        html += '<div>'+locks[i].identify + "("+ "电量:" +battery.percent+ "%" +")"+'</div>'
+                        /!*return h('div',
+                          locks[i].identify + "("+ "电量:" +battery.percent+ "%" +")"
+                        );*!/
+                      }
+                    }
+                  }
+                  //return h('div',html);
+                }*/
               }
             }
           },
@@ -458,7 +506,11 @@
           groupLevel1Name:'',
           roomTags: [],
           roomTagIds: '',
-          roomTagNames:[]
+          roomTagNames:[],
+          addGroupData:'',
+          addGroupName:'',//用于添加单个组
+          addTypeName:'',//用于添加单个房型
+          addTagsName:'',//用于添加单个房态
         },
         ruleTypeForm: {
           id:'',
@@ -524,6 +576,24 @@
       },
       search(){
         this.init();
+      },
+      getGroup(){
+        var params = {page:1,num:999};
+        this.$api.get("/proxy/room/group/page", params ,res => {
+          this.groups = res.data.data;
+        });
+      },
+      getType(){
+        var params = {page:1,num:999};
+        this.$api.get("/proxy/room/type/list", params ,res => {
+          this.types = res.data.data;
+        });
+      },
+      getTag(){
+        var params = {page:1,num:999};
+        this.$api.get("/proxy/room/tag/list", params ,res => {
+          this.tags = res.data.data;
+        });
       },
       getRoomTag(){
         var params = {page:1,num:999};
@@ -871,6 +941,12 @@
         this.visibleGroup = false;
         this.visibleTags = false;
         this.visibleType = false;
+        this.editTags = false;
+        this.editGroup = false;
+        this.editType = false;
+        this.ruleForm.addTypeName = "";
+        this.ruleForm.addGroupName = "";
+        this.ruleForm.addTagsName = "";
       },
       clearSearch(){
         this.roomTypeId = "";
@@ -886,6 +962,46 @@
       },
       addTags(status){
         this.editTags = status;
+      },
+      addType(status){
+        this.editType = status;
+      },
+      addGroup(status){
+        this.editGroup = status;
+      },
+      addGroupName(){
+        var data = {
+          name: this.ruleForm.addGroupName,
+          parentId: 0
+        };
+        this.$api.postQs('/proxy/room/group/add', this.$utils.clearData(data) ,res => {
+          this.getGroup();
+          this.ruleForm.addGroupName = "";
+        },res => {
+          this.$Message.success(res.data.desc);
+        },{"Content-Type":'application/x-www-form-urlencoded; charset=UTF-8'});
+      },
+      addTypeName(){
+        var data = {
+          name: this.ruleForm.addTypeName
+        };
+        this.$api.postQs('/proxy/room/type/add', this.$utils.clearData(data) ,res => {
+          this.getType();
+          this.ruleForm.addTypeName = "";
+        },res => {
+          this.$Message.success(res.data.desc);
+        },{"Content-Type":'application/x-www-form-urlencoded; charset=UTF-8'});
+      },
+      addTagsName(){
+        var data = {
+          tag: this.ruleForm.addTagsName
+        };
+        this.$api.postQs('/proxy/room/tag/add', this.$utils.clearData(data) ,res => {
+          this.getTag();
+          this.ruleForm.addTagsName = "";
+        },res => {
+          this.$Message.success(res.data.desc);
+        },{"Content-Type":'application/x-www-form-urlencoded; charset=UTF-8'});
       },
       closeModal(){
         this.roomGroupText = "请选择分组";
