@@ -71,6 +71,9 @@ tr:hover{
 .custom-font-ffa044{
   color:#ffa044 !important;
 }
+.custom-font-error{
+  color:#f00 !important;
+}
 .span-inline{
   display: inline-block;
 }
@@ -498,4 +501,10 @@ tr:hover{
 }
 .w83-full{
   width: 83% !important;
+}
+.errorTips-block{
+  font-size:10px;
+  display: block;
+  height:20px;
+  line-height:20px;
 }

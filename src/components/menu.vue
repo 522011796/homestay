@@ -81,9 +81,9 @@
       getNum(){
         this.$api.get("/proxy/order/static", {} ,res => {
           var data = Object.assign({}, res.data).data;
-          this.preInOrder = data.todayCheckIn;
-          this.preOutOrder = data.todayCheckOut;
-          this.nowInOrder = data.currentLive;
+          this.preInOrder = data.todayCheckIn == 0 ? 0 : data.todayCheckIn;
+          this.preOutOrder = data.todayCheckOut == 0 ? 0 : data.todayCheckOut;
+          this.nowInOrder = data.currentLive == 0 ? 0 : data.currentLive;
         });
       }
     }

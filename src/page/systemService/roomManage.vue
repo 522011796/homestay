@@ -166,7 +166,7 @@
               {{roomGroupText}}
               <Icon type="arrow-down-b" class="dropdown-icon-align-2"></Icon>
             </Button>
-            <DropdownMenu slot="list" style="width: 100%">
+            <DropdownMenu slot="list" style="width: 100%;">
               <DropdownItem v-for="(item,index) in groups.list" :key="index" :data-name="item.id" :data-text="item.name" @click.native="selRoomGroup($event)">{{item.name}}</DropdownItem>
               <div class="line margin-top0-lr8"></div>
               <div class="padding-tb0-lr10">
@@ -174,6 +174,7 @@
                   <Input size="small" placeholder="" style="width: 100px" v-model="ruleForm.addGroupName"></Input>
                   <Button type="success" size="small" class="text-left" style="font-size:10px !important;" @click="addGroupName()">保存</Button>
                   <Button type="ghost" size="small" class="text-left" style="font-size:10px !important;" @click="addGroup(false)">取消</Button>
+                  <span class="custom-font-error errorTips-block">{{errorTips}}</span>
                 </div>
                 <Button v-if="!editGroup" type="dashed" long size="small" icon="plus-round" class="text-left" @click="addGroup(true)">添加分组</Button>
               </div>
@@ -195,6 +196,7 @@
                   <Input size="small" placeholder="" style="width: 100px" v-model="ruleForm.addTypeName"></Input>
                   <Button type="success" size="small" class="text-left" style="font-size:10px !important;" @click="addTypeName()">保存</Button>
                   <Button type="ghost" size="small" class="text-left" style="font-size:10px !important;" @click="addType(false)">取消</Button>
+                  <span class="custom-font-error errorTips-block">{{errorTips}}</span>
                 </div>
                 <Button v-if="!editType" type="dashed" long size="small" icon="plus-round" class="text-left" @click="addType(true)">添加房型</Button>
               </div>
@@ -223,6 +225,7 @@
                     <Input size="small" placeholder="" style="width: 100px" v-model="ruleForm.addTagsName"></Input>
                     <Button type="success" size="small" class="text-left" style="font-size:10px !important;" @click="addTagsName()">保存</Button>
                     <Button type="ghost" size="small" class="text-left" style="font-size:10px !important;" @click="addTags(false)">取消</Button>
+                    <span class="custom-font-error errorTips-block">{{errorTips}}</span>
                   </div>
                   <Button v-if="!editTags" type="dashed" long size="small" icon="plus-round" class="text-left" @click="addTags(true)">添加特性</Button>
                 </div>
@@ -317,6 +320,7 @@
         editTags:false,
         editType:false,
         editGroup:false,
+        errorTips:'',
         allCheckBox:[],
         roomNo:'',
         groupId:'',
@@ -962,14 +966,22 @@
       },
       addTags(status){
         this.editTags = status;
+        this.errorTips = '';
       },
       addType(status){
         this.editType = status;
+        this.errorTips = '';
       },
       addGroup(status){
         this.editGroup = status;
+        this.errorTips = '';
       },
       addGroupName(){
+        this.errorTips = '';
+        if(this.ruleForm.addGroupName == ""){
+          this.errorTips = '请填写信息';
+          return;
+        };
         var data = {
           name: this.ruleForm.addGroupName,
           parentId: 0
@@ -982,6 +994,11 @@
         },{"Content-Type":'application/x-www-form-urlencoded; charset=UTF-8'});
       },
       addTypeName(){
+        this.errorTips = '';
+        if(this.ruleForm.addTypeName == ""){
+          this.errorTips = '请填写信息';
+          return;
+        };
         var data = {
           name: this.ruleForm.addTypeName
         };
@@ -993,6 +1010,11 @@
         },{"Content-Type":'application/x-www-form-urlencoded; charset=UTF-8'});
       },
       addTagsName(){
+        this.errorTips = '';
+        if(this.ruleForm.addTagsName == ""){
+          this.errorTips = '请填写信息';
+          return;
+        };
         var data = {
           tag: this.ruleForm.addTagsName
         };
@@ -1017,7 +1039,7 @@
           groupLevel1Name:'',
           roomTags: [],
           roomTagIds: '',
-          roomTagNames:[]
+          roomTagNames:[],
         };
         this.ruleTypeForm = {
           id:'',
@@ -1026,12 +1048,16 @@
         this.ruleTagsForm = {
           id:'',
           tag: ''
-        }
+        };
         this.ruleGroupForm = {
           id:'',
           name: '',
           parentId:0
-        }
+        };
+        this.errorTips = '';
+        this.ruleForm.addGroupName = "";
+        this.ruleForm.addTypeName = "";
+        this.ruleForm.addTagsName = "";
       }
     }
   }
