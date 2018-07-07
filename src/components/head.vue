@@ -19,10 +19,10 @@
         </router-link>
       </div>
     </div>
-    <div style="width:10%;float: left;height:100%;">
+    <div style="width:10%;float: left;height:100%;text-align: right">
       <Dropdown trigger="click" style="height:45px;line-height:45px;">
         <a href="javascript:void(0)" style="color:#ffffff;">
-          admin
+          {{manageText}}
           <Icon type="arrow-down-b"></Icon>
         </a>
         <DropdownMenu slot="list">
@@ -45,11 +45,12 @@
     data () {
       return {
         msg: '111',
-        active:'home'
+        active:'home',
+        manageText:'test'
       }
     },
     created(){
-
+      this.getSession();
     },
     methods:{
       ...mapMutations(['setLeftFirstMenu']),
@@ -64,6 +65,11 @@
           localStorage.removeItem('topMenu');
           localStorage.removeItem('leftMenu');
           window.location = "#/login";
+        });
+      },
+      getSession(){
+        this.$api.get("/proxy/home/logininfo?loginInfo=username,name,franchiseeId,defaultOutTime", {} ,res => {
+          this.manageText = res.data.loginInfo.username;
         });
       }
     },
