@@ -48,7 +48,7 @@
         <Form :label-width="120" :model="ruleTimeForm" ref="ruleTimeForm" style="position: relative">
           <FormItem label="默认退房时间:">
             <span v-if="!editTimeStatus">{{ruleTimeForm.defaultOutTime}}</span>
-            <TimePicker v-if="editTimeStatus" format="HH:mm" :steps="[1, 5]" type="time" placeholder="Select time" @on-change="selTime($event)" :value="ruleTimeForm.defaultOutTime" style="width: 80px"></TimePicker>
+            <TimePicker v-if="editTimeStatus" format="HH:mm" :steps="[1,100]" type="time" placeholder="Select time" @on-change="selTime($event)" :value="ruleTimeForm.defaultOutTime" style="width: 80px"></TimePicker>
             <Button type="success" v-if="!editTimeStatus" @click="editTime()">编辑</Button>
             <Button type="success" v-if="editTimeStatus" @click="saveTime()">保存</Button>
             <Button type="ghost" v-if="editTimeStatus" @click="cancelTime()">取消</Button>

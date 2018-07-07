@@ -157,11 +157,11 @@
       </div>
       <Form :model="ruleForm" ref="ruleForm" :label-width="80" style="width: 60%;margin:0 auto;">
         <FormItem label="房间号" prop="roomNo" :rules="$filter_rules({required:true})">
-          <Input v-model="ruleForm.roomNo" placeholder="" class="w200"></Input>
+          <Input v-model="ruleForm.roomNo" placeholder="" class="w220"></Input>
         </FormItem>
         <FormItem label="房间分组" prop="groupLevel1Name" :rules="$filter_rules({required:true})">
           <Input v-model="ruleForm.groupLevel1Name" style="display: none"></Input>
-          <Dropdown trigger="custom" :visible="visibleGroup" class="w200" @on-clickoutside="closeOutSide()">
+          <Dropdown trigger="custom" :visible="visibleGroup" class="w220" @on-clickoutside="closeOutSide()">
             <Button type="default" class="dropdown-align-100" @click="handleOpenGroup">
               {{roomGroupText}}
               <Icon type="arrow-down-b" class="dropdown-icon-align-2"></Icon>
@@ -173,7 +173,7 @@
         </FormItem>
         <FormItem label="房型" prop="roomType" :rules="$filter_rules({required:true})">
           <Input v-model="ruleForm.roomType" style="display: none"></Input>
-          <Dropdown trigger="custom" :visible="visibleType" class="w200" @on-clickoutside="closeOutSide()">
+          <Dropdown trigger="custom" :visible="visibleType" class="w220" @on-clickoutside="closeOutSide()">
             <Button type="default" class="dropdown-align-100" @click="handleOpenType">
               {{roomTypeText}}
               <Icon type="arrow-down-b" class="dropdown-icon-align-2"></Icon>
@@ -184,7 +184,7 @@
           </Dropdown>
         </FormItem>
         <FormItem label="房间特性" prop="roomTags">
-          <Dropdown trigger="custom" :visible="visibleTags" class="w200" @on-clickoutside="closeOutSide()">
+          <Dropdown trigger="custom" :visible="visibleTags" class="w220" @on-clickoutside="closeOutSide()">
             <Button type="default" class="dropdown-align-100" @click="handleOpenTags">
               {{roomTagsText}}
               <Icon type="arrow-down-b" class="dropdown-icon-align-2"></Icon>
@@ -201,7 +201,12 @@
                 </CheckboxGroup>
                 <div class="line"></div>
                 <div>
-                  <Button type="dashed" long size="small" icon="plus-round" class="text-left">添加特性</Button>
+                  <div v-if="editTags">
+                    <Input size="small" placeholder="" style="width: 100px"></Input>
+                    <Button type="success" size="small" class="text-left" style="font-size:10px !important;">保存</Button>
+                    <Button type="ghost" size="small" class="text-left" style="font-size:10px !important;" @click="addTags(false)">取消</Button>
+                  </div>
+                  <Button v-if="!editTags" type="dashed" long size="small" icon="plus-round" class="text-left" @click="addTags(true)">添加特性</Button>
                 </div>
               </DropdownItem>
             </DropdownMenu>
@@ -291,6 +296,9 @@
         visibleGroup: false,
         visibleType: false,
         visibleTags: false,
+        editTags:false,
+        editType:false,
+        editGroup:false,
         allCheckBox:[],
         roomNo:'',
         groupId:'',
@@ -875,6 +883,9 @@
         this.searchRoomTags = "请选择特性";
         this.searchRoomLocks = "请选择门锁状态";
         this.init();
+      },
+      addTags(status){
+        this.editTags = status;
       },
       closeModal(){
         this.roomGroupText = "请选择分组";
