@@ -12,6 +12,7 @@ import LogManage from '@/page/systemService/logManage'
 import Layout from '@/page/layout'
 import Login from '@/page/Login'
 import Dash from '@/page/dash'
+import Test from '@/page/test'
 
 Vue.use(Router)
 
@@ -21,6 +22,11 @@ export default new Router({
       path: '/login',
       name: 'Login',
       component: Login
+    },
+    {
+      path: '/test',
+      name: 'test',
+      component: Test
     },
     {
       path: '/',

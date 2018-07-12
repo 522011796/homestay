@@ -502,9 +502,22 @@ tr:hover{
 .w83-full{
   width: 83% !important;
 }
+.w96-full{
+  width: 96% !important;
+}
 .errorTips-block{
   font-size:10px;
   display: block;
   height:20px;
   line-height:20px;
+}
+.ivu-form-item-label{
+  font-weight: bold;
+}
+.orderCard .ivu-card-body{
+  padding:0;
+}
+.orderListBox{
+  position: relative;
+  top:35px;
 }

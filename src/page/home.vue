@@ -831,6 +831,7 @@
       },
       chgModal(status) {
         if(!status){
+          console.log(this.formName);
           this.handleReset(""+this.formName);
         };
       },
@@ -886,9 +887,11 @@
         this.setType = type;
         if(type == "stop"){
           this.modalTitle = roomNo + "("+ name +")"+"-停用";
+          this.formName = 'ruleForm';
         }
         if(type == "fault"){
           this.modalTitle = "("+ roomNo + "-" + name +")"+"-故障原因";
+          his.formName = 'ruleForm';
         }
         this.roomId = id;
         this.addModal = true;
