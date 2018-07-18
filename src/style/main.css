@@ -521,3 +521,22 @@ tr:hover{
   position: relative;
   top:35px;
 }
+.editOrder .ivu-input {
+  padding-right: 14px;
+}
+.editOrder .ivu-input-icon {
+  width: 14px;
+  font-size: 14px;
+  height: 14px;
+  line-height: 14px;
+  color: #80848f;
+  position: absolute;
+  right: 2px;
+  top:5px;
+  z-index: 3;
+}
+.editOrder .ivu-form-item {
+  display: inline-block;
+  margin-right: 0px;
+  vertical-align: top;
+}

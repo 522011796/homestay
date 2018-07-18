@@ -208,10 +208,12 @@
                 case 501:
                   this.$Message.success('验证码输入错误！');
                   this.changeImage();
+                  this.loading = false;
                   break;
                 default :
                   this.$Message.success(ltres.data.desc);
                   this.changeImage();
+                  this.loading = false;
                   break;
               }
             });

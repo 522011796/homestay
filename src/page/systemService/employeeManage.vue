@@ -26,7 +26,7 @@
           <div>
             <Poptip placement="bottom-start" width="100px">
               <Button type="success">添加门卡</Button>
-              <div class="api" slot="content" style="height:100px;width: 100px;text-align: center">
+              <div class="api" slot="content" style="text-align: center">
                 <img src="./../../assets/img/192.png" style="height:100px;width: 120px">
               </div>
             </Poptip>
