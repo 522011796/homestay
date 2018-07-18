@@ -163,26 +163,27 @@
         <div class="line"></div>
         <!--批量操作按钮组-->
         <div v-if="showEditOrder" class="margin-bottom10">
-          <Checkbox @on-change="selAllBox($event)"></Checkbox>
+          <Checkbox @on-change="selAllBox($event)" :value="chkAll"></Checkbox>
           <span v-if="goOutStatus">
-            <Button type="success" size="small">批量办理退房</Button>
+            <Button type="success" size="small" @click="setRoomStatus('outRoom')">批量办理退房</Button>
             <Button type="ghost" size="small" @click="cancelOrderOpr(false)">取消办理退房</Button>
           </span>
           <span v-if="goInStatus">
-            <Button type="success" size="small">批量办理入住</Button>
+            <Button type="success" size="small" @click="setRoomStatus('inRoom')">批量办理入住</Button>
             <Button type="ghost" size="small" @click="cancelOrderOpr(false)">取消办理入住</Button>
           </span>
           <span v-if="cancelOrderStatus">
-            <Button type="success" size="small">批量取消订单</Button>
+            <Button type="success" size="small" @click="setRoomStatus('cancelOrder')">批量取消订单</Button>
             <Button type="ghost" size="small" @click="cancelOrderOpr(false)">取消操作</Button>
           </span>
           <span v-if="sendPwdStatus">
-            <Button type="success" size="small">批量发送密码</Button>
+            <Button type="success" size="small" @click="setRoomStatus('sendPwd')">批量发送密码</Button>
             <Button type="ghost" size="small" @click="cancelOrderOpr(false)">取消发送密码</Button>
           </span>
+          <span class="custom-font-error">{{errorTips}}</span>
         </div>
         <div>
-          <Checkbox @change.native="selOnlyBox($event)" v-if="showEditOrder" class="pull-left orderListBox" :true-value="ruleForm.orderId" :value="true"></Checkbox>
+          <Checkbox @change.native="selOnlyBox($event,ruleForm.orderId,ruleForm.realName,ruleForm.phone,ruleForm.cardType,ruleForm.cardId,ruleForm.roomNo,ruleForm.groupName)" v-if="showEditOrder" class="pull-left orderListBox" :value="getCheck(ruleForm.orderId,ruleForm.status)" :true-value="ruleForm.orderId" :disabled="setDisabled(ruleForm.orderStatus)"></Checkbox>
           <Card class="orderCard pull-right" :class="{'w96-full':showEditOrder,'w100-full':!showEditOrder}">
             <div>
               <div>
@@ -239,7 +240,7 @@
             <span>关联房间</span>
           </div>
           <div v-for="(item,index) in ruleForm.relaOrderList" :key="index">
-            <Checkbox @on-change="selOnlyBox($event)" v-if="showEditOrder" class="pull-left orderListBox" :true-value="item.orderId" :value="true"></Checkbox>
+            <Checkbox @change.native="selOnlyBox($event,item.id,item.real_name,item.phone,item.card_type,item.card_id,item.room_no,item.room_group_name)" v-if="showEditOrder" class="pull-left orderListBox" :value="getCheck(item.id,item.order_status)" :true-value="item.id" :disabled="setDisabled(item.order_status)"></Checkbox>
             <Card class="orderCard pull-right" :class="{'w96-full':showEditOrder,'w100-full':!showEditOrder}">
               <div>
                 <div>
@@ -293,11 +294,11 @@
       </Form>
       <div slot="footer">
         <div v-if="!showEditOrder">
-          <Button v-if="ruleForm.status == 'livedIn'" type="success" @click="goOut('ruleForm')">办理退房</Button>
-          <Button v-if="ruleForm.status == 'livedIn'" type="ghost" @click="sendPwd('ruleForm')">发送密码</Button>
-          <Button v-if="ruleForm.status == 'notLiveIn'" type="ghost" @click="goIn('ruleForm')">办理入住</Button>
-          <Button v-if="ruleForm.status == 'notLiveIn'" type="ghost" @click="cancelOrder('ruleForm')">取消订单</Button>
-          <Button v-if="ruleForm.status == 'notLiveIn'" type="ghost" @click="updateOrder('ruleForm')">修改订单</Button>
+          <Button v-if="ruleForm.status == 'livedIn'" type="success" @click="goOut('ruleForm','outRoom',ruleForm.orderId,ruleForm.orderSn)">办理退房</Button>
+          <Button v-if="ruleForm.status == 'livedIn'" type="ghost" @click="sendPwd('ruleForm','sendPwd',ruleForm.orderId,ruleForm.orderSn)">发送密码</Button>
+          <Button v-if="ruleForm.status == 'notLiveIn'" type="ghost" @click="goIn('ruleForm','inRoom',ruleForm.orderId,ruleForm.orderSn)">办理入住</Button>
+          <Button v-if="ruleForm.status == 'notLiveIn'" type="ghost" @click="cancelOrder('ruleForm','cancelOrder',ruleForm.orderId,ruleForm.orderSn)">取消订单</Button>
+          <Button v-if="ruleForm.status == 'notLiveIn'" type="ghost" @click="updateOrder('ruleForm','chgOrder',ruleForm.orderId,ruleForm.orderSn)">修改订单</Button>
           <Button type="ghost" @click="handleReset('ruleForm')">关闭窗口</Button>
         </div>
       </div>
@@ -310,6 +311,7 @@
     name: 'allOrderManage',
     data () {
       return {
+        chkAll:false,
         showLoading:false,
         addDetailModal:false,
         goInStatus:false,
@@ -330,9 +332,15 @@
         totalCount:0,
         current:1,
         pageNum:12,
+        errorTips:'',
         orderList:[],
         orderDetailList:[],
-        checkList: [1,2],
+        orderUserInfo:[],
+        checkList: [],//选中的复选框
+        checkAllList:0,//所有复选框个数
+        oprType:'',//操作订单的类型
+        G_ORDERID:'',
+        G_ORDERSN:'',
         ruleForm:{
           orderSn:'',
           payType:'',
@@ -350,7 +358,9 @@
           orderType:'',
           status:'',
           relaOrderList:[],
-          orderId:''
+          orderId:'',
+          orderStatus:'',
+          groupName:''
         }
       }
     },
@@ -410,7 +420,6 @@
         };
         this.$api.postQs("/proxy/order/details2", this.$utils.clearData(params) ,res => {
           var data = Object.assign({}, res.data.data);
-          console.log(data);
           this.orderDetailList = data;
           this.ruleForm = {
             orderSn:data.order_sn,
@@ -429,8 +438,15 @@
             orderType:data.check_in_type,
             status:data.order_status,
             relaOrderList:data.relaOrderList,
-            orderId:data.id
+            orderId:data.id,
+            orderStatus:data.order_status,
+            groupName:data.room_group_name,
           };
+          var listLength = 1;
+          if(data.relaOrderList.length > 0){
+            listLength = data.relaOrderList.length + listLength;
+          }
+          this.checkAllList = listLength;
           this.addDetailModal = true;
         },null,{"Content-Type":'application/x-www-form-urlencoded; charset=UTF-8'});
       },
@@ -440,22 +456,35 @@
         this.closeModal();
       },
       closeModal() {
+        this.cancelOrderOpr(false);
       },
-      goOut(formName){
+      goOut(formName,type,orderId,orderSn){
         this.goOutStatus = true;
         this.showEditOrder = true;
+        this.oprType = type;
+        this.G_ORDERID = orderId;
+        this.G_ORDERSN = orderSn;
       },
-      goIn(formName){
+      goIn(formName,type,orderId,orderSn){
         this.goInStatus = true;
         this.showEditOrder = true;
+        this.oprType = type;
+        this.G_ORDERID = orderId;
+        this.G_ORDERSN = orderSn;
       },
-      sendPwd(formName){
+      sendPwd(formName,type,orderId,orderSn){
         this.sendPwdStatus = true;
         this.showEditOrder = true;
+        this.oprType = type;
+        this.G_ORDERID = orderId;
+        this.G_ORDERSN = orderSn;
       },
-      cancelOrder(formName){
+      cancelOrder(formName,type,orderId,orderSn){
         this.cancelOrderStatus = true;
         this.showEditOrder = true;
+        this.oprType = type;
+        this.G_ORDERID = orderId;
+        this.G_ORDERSN = orderSn;
       },
       cancelOrderOpr(status){
         this.goOutStatus = status;
@@ -467,22 +496,160 @@
         this.cancelOrderStatus = status;
         this.showEditOrder = status;
         this.checkedOrder = status;
+        this.oprType = '';
+        this.chkAll = false;
+        this.checkList = [];
+        this.G_ORDERID = "";
+        this.G_ORDERSN = "";
+        this.errorTips = "";
       },
       selAllBox(event){
         var _self = this;
-        this.checkedOrder = event;
-        this.checkList.push(_self.orderDetailList.id);
-        if(this.orderDetailList.relaOrderList.length > 0){
-          this.orderDetailList.relaOrderList.forEach(function(item, index) {
-            _self.checkList.push(item.id);
+        this.checkList = [];
+        this.orderUserInfo = [];
+        if(event){
+          this.chkAll = true;
+          this.checkList.push(_self.orderDetailList.id);
+          this.orderUserInfo.push({
+            realName:_self.orderDetailList.real_name,
+            phone:_self.orderDetailList.phone,
+            cardType:_self.orderDetailList.card_type,
+            cardId:_self.orderDetailList.card_id,
+            id:_self.orderDetailList.id,
+            groupName:_self.orderDetailList.room_group_name,
+            roomNo:_self.orderDetailList.room_no
           });
+          if(this.orderDetailList.relaOrderList.length > 0){
+            this.orderDetailList.relaOrderList.forEach(function(item, index) {
+              _self.checkList.push(item.id);
+              _self.orderUserInfo.push({
+                realName:item.real_name,
+                phone:item.phone,
+                cardType:item.card_type,
+                cardId:item.card_id,
+                id:item.id,
+                groupName:item.room_group_name,
+                roomNo:item.room_no
+              });
+            });
+          }
         }
-        //console.log(_self.checkList);
+        //console.log(this.orderUserInfo);
       },
-      selOnlyBox(event){
-        console.log(event);
-        //console.log(event.currentTarget.getAttribute("true-value"));
-        //this.checkedOrder = event;
+      selOnlyBox(event,val,realName,phone,cardType,cardId,roomNo,groupName){
+        if(event.target.checked){
+          this.checkList.push(val);
+          this.orderUserInfo.push({
+            realName:realName,
+            phone:phone,
+            cardType:cardType,
+            cardId:cardId,
+            id:val,
+            groupName:groupName,
+            roomNo:roomNo
+          });
+          if(this.checkList.length == this.checkAllList){
+            this.chkAll = true;
+          }
+        }else{
+          for(var i=0;i<this.checkList.length;i++){
+            if(this.checkList[i] == val){
+              this.checkList.splice(i,1);
+            }
+          }
+          for(var i=0;i<this.orderUserInfo.length;i++){
+            if(this.orderUserInfo[i].id == val){
+              this.orderUserInfo.splice(i,1);
+            }
+          }
+          this.chkAll = false;
+        }
+        //console.log(this.checkList);
+        //console.log(this.orderUserInfo);
+      },
+      getCheck(item,type){
+        if(this.oprType=='outRoom' && type == "livedIn"){
+          return this.checkList.includes(item) ? item : false;
+        }
+        if(this.oprType=='sendPwd' && (type == "notliveIn" && type == "livedIn")){
+          return this.checkList.includes(item) ? item : false;
+        }
+        if(this.oprType=='inRoom' && type != "notliveIn"){
+          return this.checkList.includes(item) ? item : false;
+        }
+        if(this.oprType=='cancelOrder' && type != "notliveIn"){
+          return this.checkList.includes(item) ? item : false;
+        }
+      },
+      setDisabled(item){
+        if(this.oprType=='outRoom' && item != "livedIn"){
+          return true;
+        }
+        if(this.oprType=='sendPwd' && (item != "notliveIn" && item != "livedIn")){
+          return true;
+        }
+        if(this.oprType=='inRoom' && item == "notliveIn"){
+          return true;
+        }
+        if(this.oprType=='cancelOrder' && item == "notliveIn"){
+          return true;
+        }
+      },
+      setRoomStatus(type){
+        var url = "";
+        var removeTips = "";
+        var params = {};
+        var postHeader_1 = {"Content-Type":'application/x-www-form-urlencoded; charset=UTF-8'};
+        var postHeader_2 = {"Content-Type":'application/json; charset=UTF-8'};
+        this.errorTips = "";
+        if(this.checkList.length == 0){
+          this.errorTips = "请选择需要操作的订单！";
+          return;
+        }
+        if(this.oprType=='outRoom'){
+          url = '/proxy/order/liveOut';
+          params = {id:JSON.stringify(this.checkList).replace(/\[|]/g,'')};
+          removeTips = "确定执行退房操作？";
+        }
+        if(this.oprType=='inRoom'){
+          url = '/proxy/order/liveIn';
+          params = {
+            list: this.orderUserInfo
+          };
+          var removeTips_1 = "开门密码将立即发送至客人手机，确认将房间";
+          var removeTips_2 = "置为入住？";
+          var room = "";
+          for(var i=0;i<this.orderUserInfo.length;i++){
+            room += this.orderUserInfo[i].roomNo + "("+this.orderUserInfo[i].groupName+")" + ",";
+          }
+          room=(room.substring(room.length-1)==',')?room.substring(0,room.length-1):room;
+          removeTips = "<div>"+removeTips_1+"</div>" + "<span class='custom-font-ffa044'>"+room+"</span>" + "<div>"+removeTips_2+"</div>";
+        }
+        if(this.oprType=='sendPwd'){
+          url = '/proxy/order/sendOrderPass';
+          params = {id:JSON.stringify(this.checkList).replace(/\[|]/g,'')};
+          removeTips = "确定发送密码吗？";
+        }
+        if(this.oprType=='cancelOrder'){
+          url = '/proxy/order/cancel';
+          params = {id:JSON.stringify(this.checkList).replace(/\[|]/g,'')};
+          removeTips = "确定取消该订单吗？";
+        }
+        var _self = this;
+        this.$Modal.confirm({
+          title: '批量操作信息',
+          content: "<div class='font-15'>" + removeTips + "</div>",
+          onOk: () => {
+            _self.$api.postQs(url, this.oprType=='inRoom' ? JSON.stringify(params) : params ,res => {
+              this.$Message.success(res.data.desc);
+              this.checkList = [];
+              this.detailOrder(this.G_ORDERID,this.G_ORDERSN);
+              this.chkAll = false;
+              this.showEditOrder =false;
+              this.cancelOrderOpr(false);
+            },null,this.oprType=='inRoom' ? postHeader_2 : postHeader_1);
+          }
+        });
       }
     },
     mounted () {
