@@ -274,9 +274,19 @@
                     {{ruleForm.roomNo}}({{ruleForm.roomGroupName}})
                   </FormItem>
                   <FormItem :label-width="70" label="特性:" class="margin-bottom0">
-                  <span v-for="(item,index) in ruleForm.tags">
-                    {{item.type}}
-                  </span>
+                    <span v-for="(item,index) in ruleForm.tags" :key="index">
+                      <span v-if="index < 1">
+                        {{item.type}}
+                      </span>
+                    </span>
+                    <Poptip placement="right" width="80">
+                      <span class="fa fa-info-circle"></span>
+                      <div class="api" slot="content">
+                        <div v-for="(itemTag,index) in ruleForm.tags" :key="index">
+                          {{itemTag.type}}
+                        </div>
+                      </div>
+                    </Poptip>
                   </FormItem>
                   <FormItem :label-width="70" label="入住:" class="margin-bottom0">
                     {{$moment.unix(ruleForm.inTime/1000).format("YYYY-MM-DD HH:mm")}}
@@ -287,12 +297,12 @@
                 </div>
                 <div v-if="updateStatus" class="editOrder">
                   <FormItem :label-width="50" label="房间:" class="margin-bottom0">
-                    <Select v-model="ruleForm.roomId" clearable size="small" style="width:100px">
+                    <Select v-model="ruleForm.roomId" clearable size="small" style="width:100px" @on-open-change="filterRoom($event,ruleForm.roomId,ruleForm.inTime,ruleForm.outTime,ruleForm.tags[0].id,ruleForm.roomTypeId,ruleForm)">
                       <Option v-for="(item,index) in roomList" :key="index" :value="item.id" @click.native="chgRoom($event,item.id,item.room_no,item.group_level1_name,item.group_level1_id)">{{item.room_no}}({{item.group_level1_name}})</Option>
                     </Select>
                   </FormItem>
                   <FormItem :label-width="50" label="特性:" class="margin-bottom0">
-                    <Select v-model="ruleForm.tags[0].id" clearable size="small" style="width:100px" @on-change="chgMainTag($event)" @on-clear="clearTag()">
+                    <Select v-model="ruleForm.tags[0].id" clearable size="small" style="width:100px" @on-change="chgMainTag($event,ruleForm)" @on-clear="clearTag()">
                       <Option v-for="(item,index) in tagList" :key="index" :value="item.id">{{item.tag}}</Option>
                     </Select>
                   </FormItem>
@@ -326,7 +336,7 @@
                 </div>
                 <div v-if="updateStatus">
                   <FormItem :label-width="50" label="房型:" class="margin-bottom0">
-                    <Select v-model="ruleForm.roomTypeId" clearable size="small" style="width:100px" @on-change="chgMainType($event)" @on-clear="clearRoomType()">
+                    <Select v-model="ruleForm.roomTypeId" clearable size="small" style="width:100px" @on-change="chgMainType($event,ruleForm)" @on-clear="clearRoomType()">
                       <Option v-for="(item,index) in typeList" :key="index" :value="item.id">{{item.name}}</Option>
                     </Select>
                   </FormItem>
@@ -350,7 +360,7 @@
           </div>
           <div v-for="(item,index) in ruleForm.relaOrderList" :key="index">
             <Checkbox @change.native="selOnlyBox($event,item.id,item.real_name,item.phone,item.card_type,item.card_id,item.room_no,item.room_group_name)" v-if="showEditOrder && updateStatus == false" class="pull-left orderListBox" :value="getCheck(item.id,item.order_status)" :true-value="item.id" :disabled="setDisabled(item.order_status)"></Checkbox>
-            <Card class="orderCard pull-right" :class="{'w96-full':showEditOrder,'w100-full':!showEditOrder}">
+            <Card class="orderCard pull-right margin-bottom10" :class="{'w96-full':showEditOrder,'w100-full':!showEditOrder}">
               <div>
                 <div>
                   <div v-if="updateStatus == false">
@@ -399,11 +409,19 @@
                       {{item.room_no}}({{item.room_group_name}})
                     </FormItem>
                     <FormItem :label-width="70" label="特性:" class="margin-bottom0">
-                    <span v-for="(item,index) in ruleForm.relaOrderList" :key="index">
-                      <span v-for="(item,index) in item.room_tags" :key="index">
-                        {{item.type}}
+                      <span v-for="(itemTag,index) in item.room_tags" :key="index">
+                        <span v-if="index < 1">{{itemTag.type}}</span>
                       </span>
-                    </span>
+                      <span>
+                        <Poptip placement="right" width="80">
+                          <span class="fa fa-info-circle"></span>
+                          <div class="api" slot="content">
+                            <div v-for="(itemTag,index) in item.room_tags" :key="index">
+                              {{itemTag.type}}
+                            </div>
+                          </div>
+                        </Poptip>
+                      </span>
                     </FormItem>
                     <FormItem :label-width="70" label="入住:" class="margin-bottom0">
                       {{$moment.unix(item.check_in_time/1000).format("YYYY-MM-DD HH:mm")}}
@@ -414,12 +432,12 @@
                   </div>
                   <div v-if="updateStatus" class="editOrder">
                     <FormItem :label-width="50" label="房间:" class="margin-bottom0">
-                      <Select v-model="item.room_id" clearable size="small" style="width:100px">
+                      <Select v-model="item.room_id" clearable size="small" style="width:100px" @on-open-change="filterRoom($event,item.room_id,item.check_in_time,item.check_out_time,item.room_tags[0].id,item.room_type_id,item,index)">
                         <Option v-for="(item,roomIndex) in roomList" :key="roomIndex" :value="item.id" @click.native="chgChildRoom($event,index,item.id,item.room_no,item.group_level1_name,item.group_level1_id)">{{item.room_no}}({{item.group_level1_name}})</Option>
                       </Select>
                     </FormItem>
                     <FormItem :label-width="50" label="特性:" class="margin-bottom0">
-                      <Select v-model="item.room_tags[0].id" clearable size="small" style="width:100px" @on-change="chgChildTag($event,index)" @on-clear="clearChildTag(index)">
+                      <Select v-model="item.room_tags[0].id" clearable size="small" style="width:100px" @on-change="chgChildTag($event,index,item)" @on-clear="clearChildTag(index)">
                         <Option v-for="(item,index) in tagList" :key="index" :value="item.id">{{item.tag}}</Option>
                       </Select>
                     </FormItem>
@@ -453,7 +471,7 @@
                   </div>
                   <div v-if="updateStatus">
                     <FormItem :label-width="50" label="房型:" class="margin-bottom0">
-                      <Select v-model="item.room_type_id" clearable size="small" style="width:100px" @on-change="chgChildType($event,index)" @on-clear="clearRoomChildType(index)">
+                      <Select v-model="item.room_type_id" clearable size="small" style="width:100px" @on-change="chgChildType($event,index,item)" @on-clear="clearRoomChildType(index)">
                         <Option v-for="(item,index) in typeList" :key="index" :value="item.id">{{item.name}}</Option>
                       </Select>
                     </FormItem>
@@ -467,6 +485,7 @@
                 </div>
               </div>
             </Card>
+            <div class="clearfix"></div>
           </div>
           <div class="clearfix"></div>
         </div>
@@ -481,6 +500,7 @@
           <Button type="ghost" @click="handleReset('ruleForm')">关闭窗口</Button>
         </div>
         <div v-if="!showEditOrder && updateStatus">
+          <span class="custom-font-error">{{errorTips}}</span>
           <Button type="success" @click="okUpdate('ruleForm','',ruleForm.orderId,ruleForm.orderSn)">确认</Button>
           <Button type="ghost" @click="cancelUpdate('ruleForm','',ruleForm.orderId,ruleForm.orderSn)">取消</Button>
         </div>
@@ -529,8 +549,10 @@
         checkAllList:0,//所有复选框个数
         oprType:'',//操作订单的类型
         allOrderId:'',//所有的orderid
+        roomArr:[],//过滤已经选择的房间
         G_ORDERID:'',
         G_ORDERSN:'',
+        errorTips:'',
         ruleForm:{
           orderSn:'',
           payType:'',
@@ -741,6 +763,45 @@
             liveNow:false
           });
         });
+        let phoneReg = /^13[0-9]{9}$|14[0-9]{9}$|15[0-9]{9}|16[0-9]{9}$|17[0-9]{9}$|18[0-9]{9}$/;
+        this.errorTips = '';
+        //验证主订单
+        if(this.ruleForm.realName == ""){
+          this.errorTips = '请填写姓名!';
+          return;
+        }
+        if(this.ruleForm.phone == ""){
+          this.errorTips = '请填写手机号!';
+          return;
+        }
+        if(!phoneReg.test(this.ruleForm.phone)){
+          this.errorTips = '请填写正确的手机号码!';
+          return;
+        }
+        if(!this.ruleForm.roomId){
+          this.errorTips = '请选择房间!';
+          return;
+        }
+        //验证关联订单
+        for(var i=0;i<this.ruleForm.relaOrderList.length;i++){
+          if(this.ruleForm.relaOrderList[i].real_name == ''){
+            this.errorTips = '关联订单中的姓名不能为空!';
+            break;
+          }
+          if(this.ruleForm.relaOrderList[i].phone == ''){
+            this.errorTips = '关联订单中的手机号不能为空!';
+            return;
+          }
+          if(!phoneReg.test(this.ruleForm.relaOrderList[i].phone)){
+            this.errorTips = '关联订单中的手机号填写有误!';
+            return;
+          }
+          if(!this.ruleForm.relaOrderList[i].room_id){
+            this.errorTips = '关联订单中的房间不能为空!!';
+            return;
+          }
+        }
+
         var params = {
           orders:orderArr
         };
@@ -757,6 +818,7 @@
         this.cancelOrderOpr(false);
       },
       goOut(formName,type,orderId,orderSn){
+        this.errorTips = '';
         this.goOutStatus = true;
         this.showEditOrder = true;
         this.oprType = type;
@@ -764,6 +826,7 @@
         this.G_ORDERSN = orderSn;
       },
       goIn(formName,type,orderId,orderSn){
+        this.errorTips = '';
         this.goInStatus = true;
         this.showEditOrder = true;
         this.oprType = type;
@@ -771,6 +834,7 @@
         this.G_ORDERSN = orderSn;
       },
       sendPwd(formName,type,orderId,orderSn){
+        this.errorTips = '';
         this.sendPwdStatus = true;
         this.showEditOrder = true;
         this.oprType = type;
@@ -778,6 +842,7 @@
         this.G_ORDERSN = orderSn;
       },
       cancelOrder(formName,type,orderId,orderSn){
+        this.errorTips = '';
         this.cancelOrderStatus = true;
         this.showEditOrder = true;
         this.oprType = type;
@@ -1047,7 +1112,7 @@
       },
       chgChildTime(event,index,type){
         if(type == 'inTime'){
-          this.ruleForm.relaOrderList.check_in_time = new Date(event).getTime();
+          this.ruleForm.relaOrderList[index].check_in_time = new Date(event).getTime();
           if(this.ruleForm.relaOrderList[index].check_in_type == 1){
             this.ruleForm.relaOrderList[index].check_out_time = new Date(event).getTime() + 86400000;
           }
@@ -1063,37 +1128,126 @@
           this.ruleForm.relaOrderList[index].check_out_time = new Date(event).getTime();
         }
       },
-      chgMainTag(event){
+      chgMainTag(event,obj){
         this.ruleForm.selTagId = event;
-        this.getRoomRemain(event,this.ruleForm.selTypeId);
+        this.getRoomRemain(event,this.ruleForm.selTypeId ? this.ruleForm.selTypeId : this.ruleForm.roomTypeId,null,obj);
       },
-      chgChildTag(event,index){
+      chgChildTag(event,index,obj){
         this.ruleForm.relaOrderList[index]['selTagId'] = event;
-        this.getRoomRemain(event,this.ruleForm.relaOrderList[index]['selTypeId'],index);
+        this.getRoomRemain(event,this.ruleForm.relaOrderList[index]['selTypeId'] ? this.ruleForm.relaOrderList[index]['selTypeId'] : this.ruleForm.relaOrderList[index].room_type_id,index,obj);
       },
-      chgMainType(event){
+      chgMainType(event,obj){
         this.ruleForm.selTypeId = event;
-        this.getRoomRemain(this.ruleForm.selTagId,event);
+        this.getRoomRemain(this.ruleForm.selTagId?this.ruleForm.selTagId:this.ruleForm.tags[0].id,event,null,obj);
       },
-      chgChildType(event,index){
+      chgChildType(event,index,obj){
         this.ruleForm.relaOrderList[index]['selTypeId'] = event;
-        this.getRoomRemain(this.ruleForm.relaOrderList[index]['selTagId'],event,index);
+        this.getRoomRemain(this.ruleForm.relaOrderList[index]['selTagId']?this.ruleForm.relaOrderList[index]['selTagId']:this.ruleForm.relaOrderList[index].room_tags[0].id,event,index,obj);
       },
-      getRoomRemain(tagId,typeId,index){
+      getRoomRemain(tagId,typeId,index,obj){
+        let startTime = "";
+        let endTime = "";
+        if(index>=0 && index != null){
+          startTime = this.$moment.unix(this.ruleForm.relaOrderList[index].check_in_time/1000).format('YYYY-MM-DD') + " " + this.ruleForm.relaOrderList[index].check_in_time_array[1];
+          endTime = this.$moment.unix(this.ruleForm.relaOrderList[index].check_out_time/1000).format('YYYY-MM-DD') + " " + this.ruleForm.relaOrderList[index].check_out_time_array[1];
+        }else{
+          startTime = this.$moment.unix(this.ruleForm.inTime/1000).format('YYYY-MM-DD') + " " + this.ruleForm.inTimeArr;
+          endTime = this.$moment.unix(this.ruleForm.outTime/1000).format('YYYY-MM-DD') + " " + this.ruleForm.outTimeArr;
+        }
         var params = {
           page:1,
           num:9999,
-          startTime:this.$moment.unix(this.ruleForm.inTime/1000).format('YYYY-MM-DD') + " " + this.ruleForm.inTimeArr,
-          endTime:this.$moment.unix(this.ruleForm.outTime/1000).format('YYYY-MM-DD') + " " + this.ruleForm.outTimeArr,
+          startTime:startTime,
+          endTime:endTime,
           roomTypeId:typeId,
           roomTagIds:tagId,
           notInIds:(this.allOrderId.substring(this.allOrderId.length-1)==',')?this.allOrderId.substring(0,this.allOrderId.length-1):this.allOrderId
         };
 
         this.$api.get("/proxy/room/remains", this.$utils.clearData(params) ,res => {
+          //过滤已经被选的房间
           var data = Object.assign({}, res.data);
-          this.roomList = data.data;
-          if(data.data.length > 0){
+          var arr = [];
+          for(var i=0;i<data.data.length;i++){
+            if(this.isInArray(this.roomArr,data.data[i].id) == false){
+              arr.push(data.data[i]);
+            }
+          }
+          this.roomList = arr;
+          console.log(this.roomList);
+          //默认选中第一个房间
+          if(obj){
+            if(index>=0 && index != null){
+              if(this.roomList.length == 0){
+                this.ruleForm.relaOrderList[index].room_id = '';
+              }
+              if(obj.roomId == this.roomList[0].id){
+                if(this.roomList.length > 0){
+                  this.ruleForm.relaOrderList[index].room_id = data.data[0].id;
+                  this.ruleForm.relaOrderList[index].room_no = data.data[0].room_no;
+                  this.ruleForm.relaOrderList[index].room_group_name = data.data[0].group_level1_name;
+                  this.ruleForm.relaOrderList[index].room_group_id = data.data[0].group_level1_id;
+                }else{
+                  this.ruleForm.relaOrderList[index].room_id = '';
+                }
+              }else {
+                if(this.roomList.length > 0){
+                  this.ruleForm.relaOrderList[index].room_id = data.data[0].id;
+                  this.ruleForm.relaOrderList[index].room_no = data.data[0].room_no;
+                  this.ruleForm.relaOrderList[index].room_group_name = data.data[0].group_level1_name;
+                  this.ruleForm.relaOrderList[index].room_group_id = data.data[0].group_level1_id;
+                }else{
+                  this.ruleForm.relaOrderList[index].room_id = '';
+                }
+              }
+            }else{
+              if(this.roomList.length == 0){
+                this.ruleForm.roomId = '';
+              }
+              if(obj.roomId == this.roomList[0].id){
+                if(this.roomList.length > 0){
+                  this.ruleForm.roomId = data.data[0].id;
+                  this.ruleForm.roomNo = data.data[0].room_no;
+                  this.ruleForm.groupName = data.data[0].group_level1_name;
+                  this.ruleForm.roomGroupId = data.data[0].group_level1_id;
+                }else{
+                  this.ruleForm.roomId = '';
+                }
+              }else {
+                if(this.roomList.length > 0){
+                  this.ruleForm.roomId = data.data[0].id;
+                  this.ruleForm.roomNo = data.data[0].room_no;
+                  this.ruleForm.groupName = data.data[0].group_level1_name;
+                  this.ruleForm.roomGroupId = data.data[0].group_level1_id;
+                }else{
+                  this.ruleForm.roomId = '';
+                }
+              }
+            }
+          }
+          /*if(this.roomList.length == 0){
+            if(index>=0){
+              this.ruleForm.relaOrderList[index].room_id = '';
+            }else{
+              this.ruleForm.roomId = '';
+            }
+          }else{
+            if(index>=0 && index!=null){
+
+            }else{
+              if(obj){
+                if(obj.roomId == this.roomList[0].id){
+                  console.log(1);
+                  /!*this.ruleForm.roomId = data.data[0].id;
+                  this.ruleForm.roomNo = data.data[0].room_no;
+                  this.ruleForm.groupName = data.data[0].group_level1_name;
+                  this.ruleForm.roomGroupId = data.data[0].group_level1_id;*!/
+                }else {
+                  console.log(2);
+                  this.ruleForm.roomId = '';
+                }
+              }
+            }
             if(index>=0){
               this.ruleForm.relaOrderList[index].room_id = data.data[0].id;
               this.ruleForm.relaOrderList[index].room_no = data.data[0].room_no;
@@ -1102,17 +1256,10 @@
             }else{
               this.ruleForm.roomId = data.data[0].id;
               this.ruleForm.roomNo = data.data[0].room_no;
-              console.log(data.data[0]);
               this.ruleForm.groupName = data.data[0].group_level1_name;
               this.ruleForm.roomGroupId = data.data[0].group_level1_id;
             }
-          }else{
-            if(index>=0){
-              this.ruleForm.relaOrderList[index].room_id = '';
-            }else{
-              this.ruleForm.roomId = '';
-            }
-          }
+          }*/
         });
       },
       selMainTime(event,type){
@@ -1153,6 +1300,51 @@
       },
       clearChildTag(index){
         this.ruleForm.relaOrderList[index].selTagId = '';
+      },
+      filterRoom(event,roomId,startTime,endTime,tagId,typeId,obj,index){//过滤已经选择的房间
+        if(event){
+          this.roomArr = [];
+          let startInTime = "";
+          let endOutTime = "";
+          let selfStartTime = startTime;
+          let selfEndTime = endTime;
+          let timeList = [];
+          timeList.push(this.ruleForm);
+          for(var i=0;i<this.ruleForm.relaOrderList.length;i++){
+            timeList.push(this.ruleForm.relaOrderList[i]);
+          }
+          for(var i=0;i<timeList.length;i++){
+            if(i==0){
+              if(obj != timeList[i]){
+                this.roomArr.push(timeList[i].roomId);
+              }
+              startInTime = timeList[i].inTime;
+              endOutTime = timeList[i].outTime;
+            }else{
+              if(obj != timeList[i]){
+                this.roomArr.push(timeList[i].room_id);
+              }
+              startInTime = timeList[i].check_in_time;
+              endOutTime = timeList[i].check_out_time;
+            }
+            if(obj != timeList[i]){
+              if((selfStartTime <= startInTime && selfEndTime > startInTime) || (selfStartTime >= startInTime && selfStartTime < endOutTime)){
+                this.roomArr = this.roomArr;
+              }else{
+                this.roomArr = [];
+              }
+            }
+          }
+          this.getRoomRemain(tagId,typeId,index,obj);
+        }
+      },
+      isInArray(arr,value){//判断数组中存在某个原素
+        for(var i = 0; i < arr.length; i++){
+          if(value === arr[i]){
+            return true;
+          }
+        }
+        return false;
       }
     },
     mounted () {

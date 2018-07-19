@@ -540,3 +540,22 @@ tr:hover{
   margin-right: 0px;
   vertical-align: top;
 }
+.orderFormValid .ivu-form-item-error-tip {
+  position: relative;
+  top: 0;
+  left: 0;
+  line-height: 1;
+  padding-top: 0px;
+  color: #ed3f14;
+}
+.orderCard .ivu-radio-wrapper-checked {
+  background: #fff;
+  border-color: #3ab573;
+  color: #3ab573;
+  box-shadow: -1px 0 0 0 #3ab573;
+  z-index: 1;
+}
+.orderCard .ivu-radio-wrapper-checked:first-child {
+  border-color: #3ab573;
+  box-shadow: none;
+}
