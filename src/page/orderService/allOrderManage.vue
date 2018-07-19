@@ -132,52 +132,93 @@
       :styles="{top: '65px'}"
       v-model="addDetailModal"
       :title="modalTitle"
+      :mask-closable="false"
       @on-visible-change = "chgModal"  width="760">
       <div slot="header" class="modalTitle">
         <h3>{{modalTitle}}</h3>
       </div>
-      <Form  ref="ruleForm" label-position="right" :label-width="100" inline style="width: 100%;margin:0 auto;">
-        <FormItem label="订单号:" class="margin-bottom0">
+      <Form ref="ruleForm" label-position="right" :label-width="100" inline style="width: 100%;margin:0 auto;">
+        <div v-if="updateStatus == false">
+          <FormItem label="订单号:" class="margin-bottom0">
             {{ruleForm.orderSn}}
-        </FormItem>
-        <FormItem label="支付类型:" class="margin-bottom0">
-          <span v-if="ruleForm.payType == null">--</span>
-          <span v-if="ruleForm.payType == '1'">到店现付</span>
-          <span v-if="ruleForm.payType == '2'">已担保</span>
-          <span v-if="ruleForm.payType == '3'">全额预付</span>
-          <span v-if="ruleForm.payType == '4'">部分预付</span>
-        </FormItem>
-        <FormItem label="渠道来源:" class="margin-bottom0">
-          <span v-if="ruleForm.payType == null">--</span>
-          <span v-if="ruleForm.payType == '1'">线下</span>
-          <span v-if="ruleForm.payType == '2'">携程</span>
-          <span v-if="ruleForm.payType == '3'">艺龙</span>
-          <span v-if="ruleForm.payType == '4'">去哪儿</span>
-          <span v-if="ruleForm.payType == '5'">飞猪</span>
-          <span v-if="ruleForm.payType == '99'">其他</span>
-        </FormItem>
-        <FormItem label="备注:" class="margin-bottom0">
-          <span v-if="ruleForm.remarks == ''">--</span>
-          <span v-else>{{ruleForm.remarks}}</span>
-        </FormItem>
+          </FormItem>
+          <FormItem label="支付类型:" class="margin-bottom0">
+            <span v-if="ruleForm.payType == null">--</span>
+            <span v-if="ruleForm.payType == '1'">到店现付</span>
+            <span v-if="ruleForm.payType == '2'">已担保</span>
+            <span v-if="ruleForm.payType == '3'">全额预付</span>
+            <span v-if="ruleForm.payType == '4'">部分预付</span>
+          </FormItem>
+          <FormItem label="渠道来源:" class="margin-bottom0">
+            <span v-if="ruleForm.payType == null">--</span>
+            <span v-if="ruleForm.payType == '1'">线下</span>
+            <span v-if="ruleForm.payType == '2'">携程</span>
+            <span v-if="ruleForm.payType == '3'">艺龙</span>
+            <span v-if="ruleForm.payType == '4'">去哪儿</span>
+            <span v-if="ruleForm.payType == '5'">飞猪</span>
+            <span v-if="ruleForm.payType == '99'">其他</span>
+          </FormItem>
+          <FormItem label="备注:" class="margin-bottom0">
+            <span v-if="ruleForm.remarks == ''">--</span>
+            <span v-else>{{ruleForm.remarks}}</span>
+          </FormItem>
+        </div>
+        <div v-if="updateStatus">
+          <FormItem label="订单号:" class="margin-bottom0">
+            {{ruleForm.orderSn}}
+          </FormItem>
+          <FormItem label="支付类型:" class="margin-bottom0">
+            <Select v-model="ruleForm.payType" style="width:100px" size="small">
+              <Option value="1">到店现付</Option>
+              <Option value="2">已担保</Option>
+              <Option value="3">全额预付</Option>
+              <Option value="4">部分预付</Option>
+            </Select>
+          </FormItem>
+          <FormItem label="渠道来源:" class="margin-bottom0">
+            <Select v-model="ruleForm.channel" style="width:100px" size="small">
+              <Option value="1">线下</Option>
+              <Option value="2">携程</Option>
+              <Option value="3">艺龙</Option>
+              <Option value="4">去哪儿</Option>
+              <Option value="5">飞猪</Option>
+              <Option value="99">其他</Option>
+            </Select>
+          </FormItem>
+          <FormItem label="备注:" class="margin-bottom0">
+            <Input v-model="ruleForm.remarks" type="textarea" style="width:604px"></Input>
+          </FormItem>
+        </div>
         <div class="line"></div>
         <!--批量操作按钮组-->
         <div v-if="showEditOrder" class="margin-bottom10">
           <Checkbox v-if="updateStatus == false" @on-change="selAllBox($event)" :value="chkAll"></Checkbox>
           <span v-if="goOutStatus">
-            <Button type="success" size="small" @click="setRoomStatus('outRoom')">批量办理退房</Button>
+            <Button type="success" :loading="loading" size="small" @click="setRoomStatus('outRoom')">
+              <span v-if="!loading">批量办理退房</span>
+              <span v-else>Loading...</span>
+            </Button>
             <Button type="ghost" size="small" @click="cancelOrderOpr(false)">取消办理退房</Button>
           </span>
           <span v-if="goInStatus">
-            <Button type="success" size="small" @click="setRoomStatus('inRoom')">批量办理入住</Button>
+            <Button type="success" :loading="loading" size="small" @click="setRoomStatus('inRoom')">
+              <span v-if="!loading">批量办理入住</span>
+              <span v-else>Loading...</span>
+            </Button>
             <Button type="ghost" size="small" @click="cancelOrderOpr(false)">取消办理入住</Button>
           </span>
           <span v-if="cancelOrderStatus">
-            <Button type="success" size="small" @click="setRoomStatus('cancelOrder')">批量取消订单</Button>
+            <Button type="success" :loading="loading" size="small" @click="setRoomStatus('cancelOrder')">
+              <span v-if="!loading">批量取消订单</span>
+              <span v-else>Loading...</span>
+            </Button>
             <Button type="ghost" size="small" @click="cancelOrderOpr(false)">取消操作</Button>
           </span>
           <span v-if="sendPwdStatus">
-            <Button type="success" size="small" @click="setRoomStatus('sendPwd')">批量发送密码</Button>
+            <Button type="success" :loading="loading" size="small" @click="setRoomStatus('sendPwd')">
+              <span v-if="!loading">批量发送密码</span>
+              <span v-else>Loading...</span>
+            </Button>
             <Button type="ghost" size="small" @click="cancelOrderOpr(false)">取消发送密码</Button>
           </span>
           <span class="custom-font-error">{{errorTips}}</span>
@@ -373,12 +414,12 @@
                   </div>
                   <div v-if="updateStatus" class="editOrder">
                     <FormItem :label-width="50" label="房间:" class="margin-bottom0">
-                      <Select v-model="item.room_id" size="small" style="width:100px">
-                        <Option v-for="(item,index) in roomList" :key="index" :value="item.id">{{item.room_no}}({{item.group_level1_name}})</Option>
+                      <Select v-model="item.room_id" clearable size="small" style="width:100px">
+                        <Option v-for="(item,roomIndex) in roomList" :key="roomIndex" :value="item.id" @click.native="chgChildRoom($event,index,item.id,item.room_no,item.group_level1_name,item.group_level1_id)">{{item.room_no}}({{item.group_level1_name}})</Option>
                       </Select>
                     </FormItem>
                     <FormItem :label-width="50" label="特性:" class="margin-bottom0">
-                      <Select v-model="item.room_tags[0].id" size="small" style="width:100px">
+                      <Select v-model="item.room_tags[0].id" clearable size="small" style="width:100px" @on-change="chgChildTag($event,index)" @on-clear="clearChildTag(index)">
                         <Option v-for="(item,index) in tagList" :key="index" :value="item.id">{{item.tag}}</Option>
                       </Select>
                     </FormItem>
@@ -411,6 +452,11 @@
                     </FormItem>
                   </div>
                   <div v-if="updateStatus">
+                    <FormItem :label-width="50" label="房型:" class="margin-bottom0">
+                      <Select v-model="item.room_type_id" clearable size="small" style="width:100px" @on-change="chgChildType($event,index)" @on-clear="clearRoomChildType(index)">
+                        <Option v-for="(item,index) in typeList" :key="index" :value="item.id">{{item.name}}</Option>
+                      </Select>
+                    </FormItem>
                     <FormItem :label-width="70" label="订单类型:" class="margin-bottom0">
                       <RadioGroup :value="''+item.check_in_type" size="small" type="button" @on-change="selTimeChildType($event,index)">
                         <Radio label=1>日租</Radio>
@@ -448,6 +494,7 @@
     name: 'allOrderManage',
     data () {
       return {
+        loading:false,
         chkAll:false,
         showLoading:false,
         addDetailModal:false,
@@ -636,10 +683,11 @@
           this.addDetailModal = true;
         },null,{"Content-Type":'application/x-www-form-urlencoded; charset=UTF-8'});
       },
-      handleReset (name) {
+      handleReset(name) {
         this.$refs[name].resetFields();
         this.addDetailModal = false;
         this.closeModal();
+        this.init();
       },
       cancelUpdate(formName,type,orderId,orderSn){
         this.$refs[formName].resetFields();
@@ -648,6 +696,7 @@
         this.showEditOrder = false;
       },
       okUpdate(formName,type,orderId,orderSn){
+        var _self = this;
         let orderArr = [];
         orderArr.push({
           realName:this.ruleForm.realName,
@@ -657,8 +706,8 @@
           roomGroupName:this.ruleForm.groupName,
           roomGroupId:this.ruleForm.roomGroupId,
           checkInType:this.ruleForm.orderType,
-          checkInTime:this.$moment.unix(this.ruleForm.inTime/1000).format('YYYY-MM-DD') + " " + this.ruleForm.inTimeArr,
-          checkOutTime:this.$moment.unix(this.ruleForm.outTime/1000).format('YYYY-MM-DD') + " " + this.ruleForm.outTimeArr,
+          checkInTime:this.$moment.unix(this.ruleForm.inTime/1000).format('YYYY-MM-DD') + "T" + this.ruleForm.inTimeArr,
+          checkOutTime:this.$moment.unix(this.ruleForm.outTime/1000).format('YYYY-MM-DD') + "T" + this.ruleForm.outTimeArr,
           channel:this.ruleForm.channel,
           cardId:this.ruleForm.cardId,
           cardType:this.ruleForm.cardType,
@@ -669,10 +718,40 @@
           subSn:this.ruleForm.subSn,
           liveNow:false
         });
-        /*this.ruleForm.forEach(function(item, index) {
 
-        });*/
-        console.log(orderArr);
+        this.ruleForm.relaOrderList.forEach(function(item, index) {
+          orderArr.push({
+            realName:item.real_name,
+            phone:item.phone,
+            roomId:item.room_id,
+            roomNo:item.room_no,
+            roomGroupName:item.room_group_name,
+            roomGroupId:item.room_group_id,
+            checkInType:item.check_in_type,
+            checkInTime:_self.$moment.unix(item.check_in_time/1000).format('YYYY-MM-DD') + "T" + item.check_in_time_array[1],
+            checkOutTime:_self.$moment.unix(item.check_out_time/1000).format('YYYY-MM-DD') + "T" + item.check_out_time_array[1],
+            channel:item.channel,
+            cardId:item.card_id,
+            cardType:item.card_type,
+            payType:item.pay_type,
+            remarks:item.remarks,
+            id:item.id,
+            orderSn:item.order_sn,
+            subSn:item.sub_sn,
+            liveNow:false
+          });
+        });
+        var params = {
+          orders:orderArr
+        };
+        var postHeader = {"Content-Type":'application/json; charset=UTF-8'};
+        this.$api.post('/proxy/order/multi-set', JSON.stringify(params) ,res => {
+          this.$Message.success(res.data.desc);
+          //this.detailOrder(orderId,orderSn);
+          this.chkAll = false;
+          this.showEditOrder =false;
+          this.handleReset('ruleForm');
+        },null,postHeader);
       },
       closeModal() {
         this.cancelOrderOpr(false);
@@ -706,6 +785,7 @@
         this.G_ORDERSN = orderSn;
       },
       cancelOrderOpr(status){
+        this.detailOrder(this.G_ORDERID,this.G_ORDERSN);
         this.goOutStatus = status;
         this.showEditOrder = status;
         this.goInStatus = status;
@@ -759,7 +839,7 @@
         }else if(event == 2){
           this.ruleForm.relaOrderList[index].check_in_type = 2;
           this.ruleForm.relaOrderList[index].check_in_time = this.ruleForm.relaOrderList[index].check_in_time;
-          this.ruleForm.relaOrderList[index].check_out_time = this.ruleForm.relaOrderList[index].check_out_time;
+          this.ruleForm.relaOrderList[index].check_out_time = this.ruleForm.relaOrderList[index].check_in_time;
           let time = this.$moment.unix(this.ruleForm.relaOrderList[index].check_in_time/1000).format('YYYY-MM-DD') + " " + this.ruleForm.relaOrderList[index].check_in_time_array[1];
           this.ruleForm.relaOrderList[index].check_in_time_array[1] = this.$moment.unix((new Date(time).getTime())/1000).format('HH:mm');
           this.ruleForm.relaOrderList[index].check_out_time_array[1] = this.$moment.unix((new Date(time).getTime() + 3600000)/1000).format('HH:mm');
@@ -826,14 +906,15 @@
           }
           this.chkAll = false;
         }
-        //console.log(this.checkList);
-        //console.log(this.orderUserInfo);
       },
       getCheck(item,type){
         if(this.oprType=='outRoom' && type == "livedIn"){
           return this.checkList.includes(item) ? item : false;
         }
-        if(this.oprType=='sendPwd' && (type == "notliveIn" && type == "livedIn")){
+        if(this.oprType=='sendPwd' && type == "livedIn"){
+          return this.checkList.includes(item) ? item : false;
+        }
+        if(this.oprType=='sendPwd' && type == "notliveIn"){
           return this.checkList.includes(item) ? item : false;
         }
         if(this.oprType=='inRoom' && type != "notliveIn"){
@@ -902,14 +983,34 @@
           title: '批量操作信息',
           content: "<div class='font-15'>" + removeTips + "</div>",
           onOk: () => {
-            _self.$api.postQs(url, this.oprType=='inRoom' ? JSON.stringify(params) : params ,res => {
-              this.$Message.success(res.data.desc);
-              this.checkList = [];
-              this.detailOrder(this.G_ORDERID,this.G_ORDERSN);
-              this.chkAll = false;
-              this.showEditOrder =false;
-              this.cancelOrderOpr(false);
-            },null,this.oprType=='inRoom' ? postHeader_2 : postHeader_1);
+            this.loading = true;
+            if(this.oprType=='inRoom'){
+              _self.$api.post(url, JSON.stringify(params) ,res => {
+                this.$Message.success(res.data.desc);
+                this.checkList = [];
+                this.detailOrder(this.G_ORDERID,this.G_ORDERSN);
+                this.chkAll = false;
+                this.showEditOrder =false;
+                this.cancelOrderOpr(false);
+                this.loading = false;
+              },res=>{
+                this.$Message.error(res.data.desc);
+                this.loading = false;
+              },postHeader_2);
+            }else{
+              _self.$api.postQs(url, params ,res => {
+                this.$Message.success(res.data.desc);
+                this.checkList = [];
+                this.detailOrder(this.G_ORDERID,this.G_ORDERSN);
+                this.chkAll = false;
+                this.showEditOrder =false;
+                this.cancelOrderOpr(false);
+                this.loading = false;
+              },res=>{
+                this.$Message.error(res.data.desc);
+                this.loading = false;
+              },postHeader_1);
+            }
           }
         });
       },
@@ -918,6 +1019,12 @@
         this.ruleForm.roomNo = roomNo;
         this.ruleForm.groupName = groupName;
         this.ruleForm.roomGroupId = groupId;
+      },
+      chgChildRoom($event,index,roomId,roomNo,groupName,groupId){
+        this.ruleForm.relaOrderList[index].room_id = roomId;
+        this.ruleForm.relaOrderList[index].room_no = roomNo;
+        this.ruleForm.relaOrderList[index].room_group_name = groupName;
+        this.ruleForm.relaOrderList[index].room_group_id = groupId;
       },
       chgCardType(event){
         this.ruleForm.cardType = event;
@@ -960,11 +1067,19 @@
         this.ruleForm.selTagId = event;
         this.getRoomRemain(event,this.ruleForm.selTypeId);
       },
+      chgChildTag(event,index){
+        this.ruleForm.relaOrderList[index]['selTagId'] = event;
+        this.getRoomRemain(event,this.ruleForm.relaOrderList[index]['selTypeId'],index);
+      },
       chgMainType(event){
         this.ruleForm.selTypeId = event;
         this.getRoomRemain(this.ruleForm.selTagId,event);
       },
-      getRoomRemain(tagId,typeId){
+      chgChildType(event,index){
+        this.ruleForm.relaOrderList[index]['selTypeId'] = event;
+        this.getRoomRemain(this.ruleForm.relaOrderList[index]['selTagId'],event,index);
+      },
+      getRoomRemain(tagId,typeId,index){
         var params = {
           page:1,
           num:9999,
@@ -974,13 +1089,29 @@
           roomTagIds:tagId,
           notInIds:(this.allOrderId.substring(this.allOrderId.length-1)==',')?this.allOrderId.substring(0,this.allOrderId.length-1):this.allOrderId
         };
+
         this.$api.get("/proxy/room/remains", this.$utils.clearData(params) ,res => {
           var data = Object.assign({}, res.data);
           this.roomList = data.data;
           if(data.data.length > 0){
-            this.ruleForm.roomId = data.data[0].id;
+            if(index>=0){
+              this.ruleForm.relaOrderList[index].room_id = data.data[0].id;
+              this.ruleForm.relaOrderList[index].room_no = data.data[0].room_no;
+              this.ruleForm.relaOrderList[index].room_group_name = data.data[0].group_level1_name;
+              this.ruleForm.relaOrderList[index].room_group_id = data.data[0].group_level1_id;
+            }else{
+              this.ruleForm.roomId = data.data[0].id;
+              this.ruleForm.roomNo = data.data[0].room_no;
+              console.log(data.data[0]);
+              this.ruleForm.groupName = data.data[0].group_level1_name;
+              this.ruleForm.roomGroupId = data.data[0].group_level1_id;
+            }
           }else{
-            this.ruleForm.roomId = '';
+            if(index>=0){
+              this.ruleForm.relaOrderList[index].room_id = '';
+            }else{
+              this.ruleForm.roomId = '';
+            }
           }
         });
       },
@@ -1016,6 +1147,12 @@
       },
       clearRoomType(){
         this.selTypeId = '';
+      },
+      clearRoomChildType(index){
+        this.ruleForm.relaOrderList[index].selTypeId = '';
+      },
+      clearChildTag(index){
+        this.ruleForm.relaOrderList[index].selTagId = '';
       }
     },
     mounted () {

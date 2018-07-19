@@ -482,7 +482,10 @@
         </FormItem>
       </Form>
       <div slot="footer">
-        <Button type="success" @click="saveLong('ruleLongForm')">保存</Button>
+        <Button type="success" :loading="loading" @click="saveLong('ruleLongForm')">
+          <span v-if="!loading">保存</span>
+          <span v-else>Loading...</span>
+        </Button>
         <Button type="ghost" @click="handleReset('ruleLongForm')">取消</Button>
       </div>
     </Modal>
@@ -553,7 +556,10 @@
         </FormItem>
       </Form>
       <div slot="footer">
-        <Button type="success" @click="saveChgRoom('ruleChgForm')">保存</Button>
+        <Button type="success" :loading="loading" @click="saveChgRoom('ruleChgForm')">
+          <span v-if="!loading">保存</span>
+          <span v-else>Loading...</span>
+        </Button>
         <Button type="ghost" @click="handleReset('ruleChgForm')">取消</Button>
       </div>
     </Modal>
@@ -891,7 +897,7 @@
         }
         if(type == "fault"){
           this.modalTitle = "("+ roomNo + "-" + name +")"+"-故障原因";
-          his.formName = 'ruleForm';
+          this.formName = 'ruleForm';
         }
         this.roomId = id;
         this.addModal = true;

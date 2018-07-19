@@ -79,8 +79,8 @@ export default {
   get: function (url, params, success, failure) {
     return apiAxios('GET', url, params, success, failure)
   },
-  post: function (url, params, success, failure) {
-    return apiAxios('POST', url, params, success, failure)
+  post: function (url, params, success, failure,header) {
+    return apiAxios('POST', url, params, success, failure,header)
   },
   postQs: function (url, params,success, failure, header) {
     return apiAxios('POST', url, qs.stringify(params), success, failure, header)
