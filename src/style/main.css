@@ -59,6 +59,7 @@ body{
   height:48px;
   text-align: center;
   border: 0;
+  font-size: 12px;
 }
 tr:hover{
   background: #ebf7ff;

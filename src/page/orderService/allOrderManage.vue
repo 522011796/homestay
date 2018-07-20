@@ -315,7 +315,7 @@
                   </FormItem>
                   <FormItem :label-width="50" label="离店:" class="margin-bottom0"><!--
                     <Input placeholder="" size="small" style="width:90px" v-model="$moment.unix(ruleForm.outTime/1000).format('YYYY-MM-DD')"></Input>-->
-                    <DatePicker size="small" type="date" placeholder="Select date" style="width: 90px" :value="$moment.unix(ruleForm.outTime/1000).format('YYYY-MM-DD')" @on-change="chgMainTime($event,'mainOutTime')"></DatePicker>
+                    <DatePicker size="small" type="date" placeholder="Select date" style="width: 90px" :value="$moment.unix(ruleForm.outTime/1000).format('YYYY-MM-DD')" :options="optionsEnd" @on-change="chgMainTime($event,'mainOutTime')" @on-open-change="openOutTime($event,null,'main')"></DatePicker>
                     <TimePicker v-show="timeType == 1" format="HH:mm" :steps="[1, 100]" size="small" placeholder="Select time" style="width:60px" :value="ruleForm.outTimeArr" @on-change="selMainTime($event,'mainOutTime')"></TimePicker>
                     <TimePicker v-show="timeType == 2" format="HH:mm" :steps="[1, 5]" size="small" placeholder="Select time" style="width:60px" :value="ruleForm.outTimeArr" @on-change="selMainTime($event,'mainOutTime')"></TimePicker>
                   </FormItem>
@@ -450,14 +450,14 @@
                     </FormItem>
                     <FormItem :label-width="50" label="离店:" class="margin-bottom0"><!--
                       <Input placeholder="" size="small" style="width:90px" v-model="$moment.unix(item.check_out_time/1000).format('YYYY-MM-DD')"></Input>-->
-                      <DatePicker size="small" type="date" placeholder="Select date" style="width: 90px" :value="$moment.unix(item.check_out_time/1000).format('YYYY-MM-DD')" @on-change="chgChildTime($event,index,'outTime')"></DatePicker>
+                      <DatePicker size="small" type="date" placeholder="Select date" style="width: 90px" :value="$moment.unix(item.check_out_time/1000).format('YYYY-MM-DD')" :options='optionsEndChild' @on-change="chgChildTime($event,index,'outTime')" @on-open-change="openOutTime($event,index,'child')"></DatePicker>
                       <TimePicker v-show="item.check_in_type == 1" format="HH:mm" :steps="[1, 100]" size="small" placeholder="Select time" style="width:60px" :value="item.check_out_time_array[1]" @on-change="selChildTime($event,index,'outTime')"></TimePicker>
                       <TimePicker v-show="item.check_in_type == 2" format="HH:mm" :steps="[1, 5]" size="small" placeholder="Select time" style="width:60px" :value="item.check_out_time_array[1]" @on-change="selChildTime($event,index,'outTime')"></TimePicker>
                     </FormItem>
                   </div>
                 </div>
                 <div>
-                  <div v-if="updateStatus == false || (updateStatus && item.order_status == 'livedIn')"">
+                  <div v-if="updateStatus == false || (updateStatus && item.order_status == 'livedIn')">
                     <FormItem :label-width="70" label="订单类型:" class="margin-bottom0">
                       <span v-if="item.check_in_type == '1'">日租</span>
                       <span v-if="item.check_in_type == '2'">时租</span>
@@ -584,6 +584,16 @@
           selTagId:'',//用于修改订单时候存主订单的tagid
           selTypeId:'',//用于修改订单时候存主订单的typeid
           roomTypeId:''
+        },
+        optionsEnd: {
+          disabledDate (date) {
+            return false;
+          }
+        },
+        optionsEndChild: {
+          disabledDate (date) {
+            return false;
+          }
         }
       }
     },
@@ -1127,6 +1137,7 @@
         }
       },
       chgChildTime(event,index,type){
+        var _self = this;
         if(type == 'inTime'){
           this.ruleForm.relaOrderList[index].check_in_time = new Date(event).getTime();
           if(this.ruleForm.relaOrderList[index].check_in_type == 1){
@@ -1142,6 +1153,30 @@
         }
         if(type == 'outTime'){
           this.ruleForm.relaOrderList[index].check_out_time = new Date(event).getTime();
+        }
+      },
+      openOutTime(event,index,type){//根据入住时间控制离店时间禁用时间段
+        var _self = this;
+        if(event){
+          if(type=='main'){
+            this.optionsEnd = {
+              disabledDate(date){
+                let time = _self.ruleForm.inTime;
+                let dateStart = new Date(_self.$moment.unix(time/1000).format('YYYY-MM-DD'));
+                return date && date.valueOf() < (dateStart);
+              }
+            };
+          }
+
+          if(type=='child'){
+            this.optionsEndChild = {
+              disabledDate(date){
+                let time = _self.ruleForm.relaOrderList[index].check_in_time;
+                let dateStart = new Date(_self.$moment.unix(time/1000).format('YYYY-MM-DD'));
+                return date && date.valueOf() < (dateStart);
+              }
+            };
+          }
         }
       },
       chgMainTag(event,obj){
