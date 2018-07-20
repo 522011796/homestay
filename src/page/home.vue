@@ -209,6 +209,20 @@
                     <component v-bind:my-data="item.room_tags" v-bind:my-list="allTagList" v-bind:is="currentView">
                       <!-- 组件在 vm.currentview 变化时改变！ -->
                     </component>
+                    <span v-if="JSON.parse(item.room_tags).length > 2">
+                      <Poptip trigger="hover" placement="right" width="80">
+                        <i class="fa fa-info-circle text-green"></i>
+                        <div class="api" slot="content">
+                          <div v-for="(itemTag,indexTag) in JSON.parse(item.room_tags)" :key="indexTag">
+                            <div v-for="(itemAll,indexAll) in allTagList" :key="indexAll">
+                              <div v-if="itemTag == itemAll.id">
+                                {{itemAll.tag}}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </Poptip>
+                    </span>
                   </span>
                 </div>
                 <div class="margin-top10">
@@ -581,22 +595,24 @@
       }
     },
     render: function (createElement) {
+      var _self = this;
       var data = JSON.parse(this.myData);
       var list = this.myList;
-      console.log(this.myList.length);
-      return createElement('span',list.map(function (list,indexList) {
-        return createElement('span',data.map(function (data,index) {
-          if(data == list.id && index < 2){
-            return createElement(
-              'label',
-              {
-                class:{roomTagName:true}
-              },
-              list.tag
-            )
+      var html = "";
+      for(var i=0;i<list.length;i++){
+        for(var j=0;j<data.length;j++){
+          if(data[j] == list[i].id && j < 2){
+            html += list[i].tag+","
           }
-        }))
-      }))
+        }
+      }
+      return createElement(
+        'label',
+        {
+          class:{roomTagName:true}
+        },
+        (html.substring(html.length-1)==',')?html.substring(0,html.length-1):html
+      )
     }
   };
   export default {
@@ -787,7 +803,6 @@
         };
         this.$api.postQs("/proxy/room/countList", this.$utils.clearData(params) ,res => {
           var data = Object.assign({}, res.data.data);
-          console.log(data);
           this.roomList = data;
           this.showLoading = false;
         },null,{"Content-Type":'application/x-www-form-urlencoded; charset=UTF-8'});
@@ -803,10 +818,8 @@
           roomTagIds:this.ruleChgForm.roomTagIds,
           status:this.ruleChgForm.status
         };
-        console.log(params);
         this.$api.get("/proxy/room/remains", this.$utils.clearData(params) ,res => {
           var data = Object.assign({}, res.data.data);
-          console.log(data);
           this.roomSearchList = data;
         });
       },
@@ -833,7 +846,6 @@
           for(var i=0;i<data.length;i++){
             for(var j=0;j<tagList.length;j++){
               if(data[i].id == tagList[j]){
-                console.log(data[i].tag);
               }
             }
           }
@@ -841,7 +853,6 @@
       },
       chgModal(status) {
         if(!status){
-          console.log(this.formName);
           this.handleReset(""+this.formName);
         };
       },

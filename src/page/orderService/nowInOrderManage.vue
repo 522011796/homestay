@@ -115,7 +115,7 @@
               <span v-if="item.pay_type == '4'">部分预付</span>
             </td>
             <td class="custom-td-value">
-              <Button type="text" @click="detailOrder(item.id,item.order_sn)">详情</Button>
+              <Button type="text" @click="detailOrder(item.id,item.order_sn)" class="text-green">详情</Button>
             </td>
           </tr>
           <tr v-if="totalCount==0">
