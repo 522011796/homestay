@@ -1,13 +1,22 @@
 <template>
   <div>
-    <div style="width: 300px;margin:50px auto;">
-      <div><Checkbox @on-change="checkAll($event)" :value="chkAll">all</Checkbox></div>
-      <hr>
-      <div>
-        <!--<Checkbox v-for="(item,index) in checkAllData" :key="index" @on-change="chk($event)" :value="getCheck(item.key)" :true-value="item.key" :false-value="item.key">{{item.str}}</Checkbox>-->
-        <Checkbox v-for="(item,index) in checkAllData" :key="index" @change.native="chk($event,item.key)" :value="getCheck(item.key,item.status)" :true-value="item.key" :disabled="setDisabled(item.status)">{{item.str}}</Checkbox>
-      </div>
-    </div>
+    <Button type="success" @click="show()">click</Button>
+    <Modal
+      v-model="showmodel"
+      title="Title"
+      ok-text="保存"
+      cancel-text="取消"
+      width="700"
+      >
+        <Form inline class="editOrder">
+          <FormItem label="姓名:" class="margin-bottom0" :label-width="70">
+            <Input type="text" size="small" style="width:100px" v-model="ruleForm.relaName" :maxlength="20"></Input>
+          </FormItem>
+          <FormItem label="手机:" class="margin-bottom0" :label-width="70">
+            <Input type="text" size="small" style="width:100px" v-model="ruleForm.phone" :maxlength="11"></Input>
+          </FormItem>
+        </Form>
+    </Modal>
   </div>
 </template>
 
@@ -16,56 +25,45 @@
     name: 'test',
     data () {
       return {
-        chkAll:false,
-        checkAllData:[
-          {key:'a',str:'a',status:'yes'},
-          {key:'b',str:'b',status:'no'},
-          {key:'c',str:'c',status:'yes'},
-          {key:'d',str:'d',status:'no'}
-        ],
-        checkList:[]
+        showmodel:false,
+        ruleForm:{
+          orderSn:'',
+          payType:'',
+          channel:'',
+          remarks:'',
+          realName:'',
+          roomId:'',
+          phone:'',
+          cardType:'',
+          cardId:'',
+          roomNo:'',
+          roomGroupName:'',
+          roomGroupId:'',
+          tags:[],
+          inTime:'',
+          outTime:'',
+          orderType:'',
+          status:'',
+          relaOrderList:[],
+          orderId:'',
+          orderStatus:'',
+          groupName:'',
+          inTimeArr:'',
+          outTimeArr:'',
+          subSn:'',
+          liveNowGl:false,
+          selTagId:'',//用于修改订单时候存主订单的tagid
+          selTypeId:'',//用于修改订单时候存主订单的typeid
+          roomTypeId:''
+        }
       }
     },
     created(){
 
     },
     methods:{
-      chk(event,val){
-        if(event.target.checked){
-          this.checkList.push(val);
-          if(this.checkList.length == this.checkAllData.length){
-            this.chkAll = true;
-          }
-        }else{
-          for(var i=0;i<this.checkList.length;i++){
-            if(this.checkList[i] == val){
-              this.checkList.splice(i,1);
-              this.chkAll = false;
-            }
-          }
-        }
-      },
-      getCheck(item,status){
-        if(status != "no"){
-          return this.checkList.includes(item) ? item : false;
-        }
-      },
-      checkAll(event){
-        this.checkList = [];
-        if(event){
-          this.chkAll = true;
-          for(var i=0;i<this.checkAllData.length;i++){
-            if(this.checkAllData[i].status != "no"){
-              this.checkList.push(this.checkAllData[i].key);
-            }
-          }
-        }
-        console.log(this.checkList);
-      },
-      setDisabled(item){
-        if(item == "no"){
-          return true;
-        }
+      show(){
+        this.showmodel = true;
       }
     }
   }

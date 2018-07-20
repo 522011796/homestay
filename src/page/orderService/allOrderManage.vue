@@ -8,7 +8,7 @@
     <div class="line-title"></div>
     <div class="padding-top0-top25 margin-top15" style="position: relative">
       <div>
-        <Input placeholder="请输入姓名或者手机号" v-model="userSearch" clearable @on-change="search()" class="w180" maxlength="20"></Input>
+        <Input placeholder="请输入姓名或者手机号" v-model="userSearch" clearable @on-change="search()" class="w180" :maxlength="20"></Input>
         <Button type="success" @click=search()>搜索</Button>
       </div>
       <div class="margin-top10">
@@ -187,7 +187,7 @@
             </Select>
           </FormItem>
           <FormItem label="备注:" class="margin-bottom0">
-            <Input v-model="ruleForm.remarks" type="textarea" style="width:604px" placeholder=""  maxlength="400"></Input>
+            <Input v-model="ruleForm.remarks" type="textarea" style="width:604px" placeholder=""  :maxlength="400"></Input>
           </FormItem>
         </div>
         <div class="line"></div>
@@ -245,10 +245,10 @@
                 </div>
                 <div v-if="updateStatus && ruleForm.orderStatus == 'notLiveIn'" class="editOrder">
                   <FormItem :label-width="50" label="姓名:" class="margin-bottom0">
-                    <Input placeholder="" size="small" style="width:100px" v-model="ruleForm.realName" maxlength="20"></Input>
+                    <Input placeholder="" size="small" style="width:100px" v-model="ruleForm.realName" :maxlength="20"></Input>
                   </FormItem>
                   <FormItem :label-width="50" label="手机:" class="margin-bottom0">
-                    <Input placeholder="" size="small" style="width:100px" v-model="ruleForm.phone" maxlength="11"></Input>
+                    <Input placeholder="" size="small" style="width:100px" v-model="ruleForm.phone" :maxlength="11"></Input>
                   </FormItem>
                   <FormItem :label-width="50" label="证件:" class="margin-bottom0">
                     <Select size="small" v-model="ruleForm.cardType" style="width:100px" @on-change="chgCardType($event)">
@@ -265,7 +265,7 @@
                     </Select>
                   </FormItem>
                   <FormItem :label-width="70" label="证件号码:" class="margin-bottom0">
-                    <Input placeholder="" size="small" style="width:187px"  v-model="ruleForm.cardId" maxlength="18"></Input>
+                    <Input placeholder="" size="small" style="width:187px"  v-model="ruleForm.cardId" :maxlength="18"></Input>
                   </FormItem>
                 </div>
               </div>
@@ -380,10 +380,10 @@
                   </div>
                   <div v-if="updateStatus && item.order_status == 'notLiveIn'" class="editOrder">
                     <FormItem :label-width="50" label="姓名:" class="margin-bottom0">
-                      <Input placeholder="" size="small" style="width:100px" v-model="item.real_name" maxlength="20"></Input>
+                      <Input placeholder="" size="small" style="width:100px" v-model="item.real_name" :maxlength="20"></Input>
                     </FormItem>
                     <FormItem :label-width="50" label="手机:" class="margin-bottom0">
-                      <Input placeholder="" size="small" style="width:100px" v-model="item.phone" maxlength="11"></Input>
+                      <Input placeholder="" size="small" style="width:100px" v-model="item.phone" :maxlength="11"></Input>
                     </FormItem>
                     <FormItem :label-width="50" label="证件:" class="margin-bottom0">
                       <Select size="small" v-model="item.card_type" style="width:100px">
@@ -400,7 +400,7 @@
                       </Select>
                     </FormItem>
                     <FormItem :label-width="70" label="证件号码:" class="margin-bottom0">
-                      <Input placeholder="" size="small" style="width:187px"  v-model="item.card_id" maxlength="18"></Input>
+                      <Input placeholder="" size="small" style="width:187px"  v-model="item.card_id" :maxlength="18"></Input>
                     </FormItem>
                   </div>
                 </div>

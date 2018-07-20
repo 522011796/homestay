@@ -26,22 +26,22 @@
           <FormItem label="组织名称:" prop="name" :rules="$filter_rules({required:true})">
             <span v-if="!editStatus && ruleForm.name == ''">暂无数据</span>
             <span v-else-if="!editStatus && ruleForm.name != ''">{{ruleForm.name}}</span>
-            <Input v-if="editStatus" v-model="ruleForm.name" placeholder="" style="width: 200px" maxlength="60"></Input>
+            <Input v-if="editStatus" v-model="ruleForm.name" placeholder="" style="width: 200px" :maxlength="60"></Input>
           </FormItem>
           <FormItem label="地址:" prop="address" :rules="$filter_rules({required:true})">
             <span v-if="!editStatus && ruleForm.address == ''">暂无数据</span>
             <span v-else-if="!editStatus && ruleForm.address != ''">{{ruleForm.address}}</span>
-            <Input v-if="editStatus" type="textarea" :rows="2" v-model="ruleForm.address" placeholder="" style="width: 200px" maxlength="60"></Input>
+            <Input v-if="editStatus" type="textarea" :rows="2" v-model="ruleForm.address" placeholder="" style="width: 200px" :maxlength="60"></Input>
           </FormItem>
           <FormItem label="联系人:" prop="contacts" :rules="$filter_rules({required:true})">
             <span v-if="!editStatus && ruleForm.contacts == ''">暂无数据</span>
             <span v-else-if="!editStatus && ruleForm.contacts != ''">{{ruleForm.contacts}}</span>
-            <Input v-if="editStatus" v-model="ruleForm.contacts" placeholder="" style="width: 200px" maxlength="20"></Input>
+            <Input v-if="editStatus" v-model="ruleForm.contacts" placeholder="" style="width: 200px" :maxlength="20"></Input>
           </FormItem>
           <FormItem label="联系电话:" prop="phone" :rules="$filter_rules({required:true})">
             <span v-if="!editStatus && ruleForm.phone == ''">暂无数据</span>
             <span v-else-if="!editStatus && ruleForm.phone != ''">{{ruleForm.phone}}</span>
-            <Input v-if="editStatus" v-model="ruleForm.phone" placeholder="" style="width: 200px" maxlength="11"></Input>
+            <Input v-if="editStatus" v-model="ruleForm.phone" placeholder="" style="width: 200px" :maxlength="11"></Input>
           </FormItem>
         </Form>
 
@@ -68,7 +68,7 @@
                 </div>
               </div>
               <div style="position: relative">
-                <Input v-model="ruleCaptchaForm.captcha" placeholder="" style="width: 200px;" maxlength="8"></Input>
+                <Input v-model="ruleCaptchaForm.captcha" placeholder="" style="width: 200px;" :maxlength="8"></Input>
                 <Button v-if="!showTime" size="small" type="ghost" @click="getCaptcha()" style="position: absolute;right:128px;top:5px;z-index:2;">获取验证码</Button>
                 <Button v-if="showTime" size="small" disabled style="position: absolute;right:128px;top:5px;z-index:2;">{{count}}s</Button>
                 <Button type="success" @click="subCaptcha('ruleCaptchaForm')">提交</Button>
@@ -103,7 +103,7 @@
               <div class="margin-bottom10">
                 <span class="pull-left w80">开门密码：</span>
                 <div class="margin-left10">
-                  <Input v-model="rulePwdForm.lockAdminPass" placeholder="" style="width: 100px" maxlength="10"></Input>
+                  <Input v-model="rulePwdForm.lockAdminPass" placeholder="" style="width: 100px" :maxlength="60"></Input>
                 </div>
                 <div class="clearfix"></div>
               </div>

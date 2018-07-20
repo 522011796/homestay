@@ -56,7 +56,7 @@
               <DropdownItem  @click.native="selLocks($event,'none')">未添加</DropdownItem>
             </DropdownMenu>
           </Dropdown>
-          <Input placeholder="请输入房间号" class="w100" v-model="roomNo" clearable @on-change="search()" maxlength="20"></Input>
+          <Input placeholder="请输入房间号" class="w100" v-model="roomNo" clearable @on-change="search()" :maxlength="20"></Input>
           <Button type="success" @click="search()">搜索</Button>
           <Button @click="clearSearch()">清除</Button>
 
@@ -164,7 +164,7 @@
       </div>
       <Form :model="ruleForm" ref="ruleForm" :label-width="80" style="width: 60%;margin:0 auto;">
         <FormItem label="房间号" prop="roomNo" :rules="$filter_rules({required:true})">
-          <Input v-model="ruleForm.roomNo" placeholder="" class="w220" maxlength="20"></Input>
+          <Input v-model="ruleForm.roomNo" placeholder="" class="w220" :maxlength="20"></Input>
         </FormItem>
         <FormItem label="房间分组" prop="groupLevel1Name" :rules="$filter_rules({required:true})">
           <Input v-model="ruleForm.groupLevel1Name" style="display: none"></Input>
@@ -178,7 +178,7 @@
               <div class="line margin-top0-lr8"></div>
               <div class="padding-tb0-lr10">
                 <div v-if="editGroup">
-                  <Input size="small" placeholder="" style="width: 100px" v-model="ruleForm.addGroupName" maxlength="20"></Input>
+                  <Input size="small" placeholder="" style="width: 100px" v-model="ruleForm.addGroupName" :maxlength="20"></Input>
                   <Button type="success" size="small" class="text-left" style="font-size:10px !important;" @click="addGroupName()">保存</Button>
                   <Button type="ghost" size="small" class="text-left" style="font-size:10px !important;" @click="addGroup(false)">取消</Button>
                   <span class="custom-font-error errorTips-block">{{errorTips}}</span>
@@ -200,7 +200,7 @@
               <div class="line margin-top0-lr8"></div>
               <div class="padding-tb0-lr10">
                 <div v-if="editType">
-                  <Input size="small" placeholder="" style="width: 100px" v-model="ruleForm.addTypeName" maxlength="20"></Input>
+                  <Input size="small" placeholder="" style="width: 100px" v-model="ruleForm.addTypeName" :maxlength="20"></Input>
                   <Button type="success" size="small" class="text-left" style="font-size:10px !important;" @click="addTypeName()">保存</Button>
                   <Button type="ghost" size="small" class="text-left" style="font-size:10px !important;" @click="addType(false)">取消</Button>
                   <span class="custom-font-error errorTips-block">{{errorTips}}</span>
@@ -229,7 +229,7 @@
                 <div class="line"></div>
                 <div>
                   <div v-if="editTags">
-                    <Input size="small" placeholder="" style="width: 100px" v-model="ruleForm.addTagsName" maxlength="20"></Input>
+                    <Input size="small" placeholder="" style="width: 100px" v-model="ruleForm.addTagsName" :maxlength="20"></Input>
                     <Button type="success" size="small" class="text-left" style="font-size:10px !important;" @click="addTagsName()">保存</Button>
                     <Button type="ghost" size="small" class="text-left" style="font-size:10px !important;" @click="addTags(false)">取消</Button>
                     <span class="custom-font-error errorTips-block">{{errorTips}}</span>
@@ -258,7 +258,7 @@
       </div>
       <Form :model="ruleGroupForm" ref="ruleGroupForm" :label-width="80" style="width: 60%;margin:0 auto;">
         <FormItem label="组名" prop="name" :rules="$filter_rules({required:true})">
-          <Input v-model="ruleGroupForm.name" placeholder="" class="w200" maxlength="20"></Input>
+          <Input v-model="ruleGroupForm.name" placeholder="" class="w200" :maxlength="20"></Input>
         </FormItem>
       </Form>
       <div slot="footer">
@@ -278,7 +278,7 @@
       </div>
       <Form :model="ruleTypeForm" ref="ruleTypeForm" :label-width="80" style="width: 60%;margin:0 auto;">
         <FormItem label="房间类型" prop="name" :rules="$filter_rules({required:true})">
-          <Input v-model="ruleTypeForm.name" placeholder="" class="w200" maxlength="20"></Input>
+          <Input v-model="ruleTypeForm.name" placeholder="" class="w200" :maxlength="20"></Input>
         </FormItem>
       </Form>
       <div slot="footer">
@@ -298,7 +298,7 @@
       </div>
       <Form :model="ruleTagsForm" ref="ruleTagsForm" :label-width="80" style="width: 60%;margin:0 auto;">
         <FormItem label="房间特性" prop="tag" :rules="$filter_rules({required:true})">
-          <Input v-model="ruleTagsForm.tag" placeholder="" class="w200" maxlength="20"></Input>
+          <Input v-model="ruleTagsForm.tag" placeholder="" class="w200" :maxlength="20"></Input>
         </FormItem>
       </Form>
       <div slot="footer">
