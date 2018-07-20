@@ -27,6 +27,7 @@
             <Poptip placement="bottom-start" width="100px">
               <Button type="success">添加门卡</Button>
               <div class="api" slot="content" style="text-align: center">
+                <div>请扫描二维码下载APP添加门卡</div>
                 <img src="./../../assets/img/192.png" style="height:100px;width: 120px">
               </div>
             </Poptip>
