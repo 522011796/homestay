@@ -8,7 +8,7 @@
     <div class="line-title"></div>
     <div class="padding-top0-top25 margin-top15" style="position: relative">
       <div>
-        <Input placeholder="请输入姓名或者手机号" v-model="userSearch" clearable @on-change="search()" class="w180"></Input>
+        <Input placeholder="请输入姓名或者手机号" v-model="userSearch" clearable @on-change="search()" class="w180" maxlength="20"></Input>
         <Button type="success" @click=search()>搜索</Button>
       </div>
       <div class="margin-top10">

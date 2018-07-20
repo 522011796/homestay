@@ -2,7 +2,7 @@
   <div class="main-content-bg">
     <div class="home-left-menu">
       <div class="home-left-menu-search">
-        <Input icon="ios-search" v-model="searchRoomNo" clearable @on-click="search" @on-change="search" placeholder="请输入房间号" style="width: 200px"></Input>
+        <Input icon="ios-search" v-model="searchRoomNo" clearable @on-click="search" @on-change="search" placeholder="请输入房间号" style="width: 200px" maxlength="20"></Input>
       </div>
       <!--快捷搜索-->
       <div class="margin-top15-left20">
@@ -457,10 +457,10 @@
       </div>
       <Form :model="ruleForm" ref="ruleForm" style="width: 100%;margin:0 auto;">
         <FormItem prop="enableDes" :rules="$filter_rules({required:true})" v-if="setType == 'stop'">
-          <Input v-model="ruleForm.enableDes" type="textarea" :autosize="{minRows: 2,maxRows: 10}" placeholder="Enter something..."></Input>
+          <Input v-model="ruleForm.enableDes" type="textarea" :autosize="{minRows: 2,maxRows: 10}" placeholder="请输入不超过400个字符长度的信息" maxlength="400"></Input>
         </FormItem>
         <FormItem prop="fixDes" :rules="$filter_rules({required:true})" v-if="setType == 'fault'">
-          <Input v-model="ruleForm.fixDes" type="textarea" :autosize="{minRows: 2,maxRows: 10}" placeholder="Enter something..."></Input>
+          <Input v-model="ruleForm.fixDes" type="textarea" :autosize="{minRows: 2,maxRows: 10}" placeholder="请输入不超过400个字符长度的信息" maxlength="400"></Input>
         </FormItem>
       </Form>
       <div slot="footer">
