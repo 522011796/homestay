@@ -599,7 +599,6 @@
           channel:this.orderChannel,
           payType:this.orderPayType
         };
-        console.log(this.$utils.clearData(params));
         this.showLoading = true;
         this.$api.get("/proxy/order/page", this.$utils.clearData(params) ,res => {
           var data = Object.assign({}, res.data.data);
@@ -665,7 +664,6 @@
         this.$api.postQs("/proxy/order/details2", this.$utils.clearData(params) ,res => {
           var data = Object.assign({}, res.data.data);
           this.orderDetailList = data;
-          console.log(data);
           this.ruleForm = {
             orderSn:data.order_sn,
             payType:data.pay_type,
@@ -1130,19 +1128,23 @@
       },
       chgMainTag(event,obj){
         this.ruleForm.selTagId = event;
-        this.getRoomRemain(event,this.ruleForm.selTypeId ? this.ruleForm.selTypeId : this.ruleForm.roomTypeId,null,obj);
+        this.setRoomRemain(obj.check_in_time,obj.check_out_time,this.ruleForm.selTagId?this.ruleForm.selTagId:event,this.ruleForm.selTypeId ? this.ruleForm.selTypeId : this.ruleForm.roomTypeId,obj,null);
+        //this.getRoomRemain(event,this.ruleForm.selTypeId ? this.ruleForm.selTypeId : this.ruleForm.roomTypeId,null,obj);
       },
       chgChildTag(event,index,obj){
         this.ruleForm.relaOrderList[index]['selTagId'] = event;
-        this.getRoomRemain(event,this.ruleForm.relaOrderList[index]['selTypeId'] ? this.ruleForm.relaOrderList[index]['selTypeId'] : this.ruleForm.relaOrderList[index].room_type_id,index,obj);
+        this.setRoomRemain(obj.check_in_time,obj.check_out_time,this.ruleForm.relaOrderList[index]['selTagId']?this.ruleForm.relaOrderList[index]['selTagId']:event,this.ruleForm.relaOrderList[index]['selTypeId'] ? this.ruleForm.relaOrderList[index]['selTypeId'] : this.ruleForm.relaOrderList[index].room_type_id,obj,index);
+        //this.getRoomRemain(event,this.ruleForm.relaOrderList[index]['selTypeId'] ? this.ruleForm.relaOrderList[index]['selTypeId'] : this.ruleForm.relaOrderList[index].room_type_id,index,obj);
       },
       chgMainType(event,obj){
         this.ruleForm.selTypeId = event;
-        this.getRoomRemain(this.ruleForm.selTagId?this.ruleForm.selTagId:this.ruleForm.tags[0].id,event,null,obj);
+        this.setRoomRemain(obj.check_in_time,obj.check_out_time,this.ruleForm.selTagId?this.ruleForm.selTagId:this.ruleForm.tags[0].id,this.ruleForm.selTypeId ? this.ruleForm.selTypeId : event,obj,null);
+        //this.getRoomRemain(this.ruleForm.selTagId?this.ruleForm.selTagId:this.ruleForm.tags[0].id,event,null,obj);
       },
       chgChildType(event,index,obj){
         this.ruleForm.relaOrderList[index]['selTypeId'] = event;
-        this.getRoomRemain(this.ruleForm.relaOrderList[index]['selTagId']?this.ruleForm.relaOrderList[index]['selTagId']:this.ruleForm.relaOrderList[index].room_tags[0].id,event,index,obj);
+        this.setRoomRemain(obj.check_in_time,obj.check_out_time,this.ruleForm.relaOrderList[index]['selTagId']?this.ruleForm.relaOrderList[index]['selTagId']:this.ruleForm.relaOrderList[index].room_tags[0].id,this.ruleForm.relaOrderList[index]['selTypeId'] ? this.ruleForm.relaOrderList[index]['selTypeId'] : event,obj,index);
+        //this.getRoomRemain(this.ruleForm.relaOrderList[index]['selTagId']?this.ruleForm.relaOrderList[index]['selTagId']:this.ruleForm.relaOrderList[index].room_tags[0].id,event,index,obj);
       },
       getRoomRemain(tagId,typeId,index,obj){
         let startTime = "";
@@ -1174,9 +1176,15 @@
             }
           }
           this.roomList = arr;
-          console.log(this.roomList);
+          if(this.roomList.length == 0){
+            if(index>=0 && index != null){
+              this.ruleForm.relaOrderList[index].room_id = '';
+            }else{
+              this.ruleForm.roomId = '';
+            }
+          }
           //默认选中第一个房间
-          if(obj){
+          /*if(obj){
             if(index>=0 && index != null){
               if(this.roomList.length == 0){
                 this.ruleForm.relaOrderList[index].room_id = '';
@@ -1224,41 +1232,6 @@
                 }
               }
             }
-          }
-          /*if(this.roomList.length == 0){
-            if(index>=0){
-              this.ruleForm.relaOrderList[index].room_id = '';
-            }else{
-              this.ruleForm.roomId = '';
-            }
-          }else{
-            if(index>=0 && index!=null){
-
-            }else{
-              if(obj){
-                if(obj.roomId == this.roomList[0].id){
-                  console.log(1);
-                  /!*this.ruleForm.roomId = data.data[0].id;
-                  this.ruleForm.roomNo = data.data[0].room_no;
-                  this.ruleForm.groupName = data.data[0].group_level1_name;
-                  this.ruleForm.roomGroupId = data.data[0].group_level1_id;*!/
-                }else {
-                  console.log(2);
-                  this.ruleForm.roomId = '';
-                }
-              }
-            }
-            if(index>=0){
-              this.ruleForm.relaOrderList[index].room_id = data.data[0].id;
-              this.ruleForm.relaOrderList[index].room_no = data.data[0].room_no;
-              this.ruleForm.relaOrderList[index].room_group_name = data.data[0].group_level1_name;
-              this.ruleForm.relaOrderList[index].room_group_id = data.data[0].group_level1_id;
-            }else{
-              this.ruleForm.roomId = data.data[0].id;
-              this.ruleForm.roomNo = data.data[0].room_no;
-              this.ruleForm.groupName = data.data[0].group_level1_name;
-              this.ruleForm.roomGroupId = data.data[0].group_level1_id;
-            }
           }*/
         });
       },
@@ -1303,40 +1276,43 @@
       },
       filterRoom(event,roomId,startTime,endTime,tagId,typeId,obj,index){//过滤已经选择的房间
         if(event){
-          this.roomArr = [];
-          let startInTime = "";
-          let endOutTime = "";
-          let selfStartTime = startTime;
-          let selfEndTime = endTime;
-          let timeList = [];
-          timeList.push(this.ruleForm);
-          for(var i=0;i<this.ruleForm.relaOrderList.length;i++){
-            timeList.push(this.ruleForm.relaOrderList[i]);
-          }
-          for(var i=0;i<timeList.length;i++){
-            if(i==0){
-              if(obj != timeList[i]){
-                this.roomArr.push(timeList[i].roomId);
-              }
-              startInTime = timeList[i].inTime;
-              endOutTime = timeList[i].outTime;
-            }else{
-              if(obj != timeList[i]){
-                this.roomArr.push(timeList[i].room_id);
-              }
-              startInTime = timeList[i].check_in_time;
-              endOutTime = timeList[i].check_out_time;
-            }
-            if(obj != timeList[i]){
-              if((selfStartTime <= startInTime && selfEndTime > startInTime) || (selfStartTime >= startInTime && selfStartTime < endOutTime)){
-                this.roomArr = this.roomArr;
-              }else{
-                this.roomArr = [];
-              }
-            }
-          }
-          this.getRoomRemain(tagId,typeId,index,obj);
+          this.setRoomRemain(startTime,endTime,tagId,typeId,obj,index);
         }
+      },
+      setRoomRemain(startTime,endTime,tagId,typeId,obj,index){
+        this.roomArr = [];
+        let startInTime = "";
+        let endOutTime = "";
+        let selfStartTime = startTime;
+        let selfEndTime = endTime;
+        let timeList = [];
+        timeList.push(this.ruleForm);
+        for(var i=0;i<this.ruleForm.relaOrderList.length;i++){
+          timeList.push(this.ruleForm.relaOrderList[i]);
+        }
+        for(var i=0;i<timeList.length;i++){
+          if(i==0){
+            if(obj != timeList[i]){
+              this.roomArr.push(timeList[i].roomId);
+            }
+            startInTime = timeList[i].inTime;
+            endOutTime = timeList[i].outTime;
+          }else{
+            if(obj != timeList[i]){
+              this.roomArr.push(timeList[i].room_id);
+            }
+            startInTime = timeList[i].check_in_time;
+            endOutTime = timeList[i].check_out_time;
+          }
+          if(obj != timeList[i]){
+            if((selfStartTime <= startInTime && selfEndTime > startInTime) || (selfStartTime >= startInTime && selfStartTime < endOutTime)){
+              this.roomArr = this.roomArr;
+            }else{
+              this.roomArr = [];
+            }
+          }
+        }
+        this.getRoomRemain(tagId,typeId,index,obj);
       },
       isInArray(arr,value){//判断数组中存在某个原素
         for(var i = 0; i < arr.length; i++){
@@ -1353,7 +1329,6 @@
     watch: {
       'checkList': {
         handler: function(val, oldVal) {
-          console.log(val);
           /*if (val.length === this.checkboxList.length) {
             this.checked = true;
           } else {
