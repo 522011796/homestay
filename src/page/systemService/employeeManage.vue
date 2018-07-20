@@ -11,7 +11,7 @@
             <Button type="success" icon="plus" @click="show(null,'userList')">
               添加保洁员
             </Button>
-            <Input placeholder="请输入房间号" class="w180" v-model="searchName"></Input>
+            <Input placeholder="请输入房间号" class="w180" v-model="searchName" clearable @on-change="search()"></Input>
             <Button type="success" @click="search">搜索</Button>
           </div>
           <div>
@@ -30,7 +30,7 @@
                 <img src="./../../assets/img/192.png" style="height:100px;width: 120px">
               </div>
             </Poptip>
-            <Input placeholder="请输入名称" class="w180" v-model="searchCardName"></Input>
+            <Input placeholder="请输入名称" class="w180" v-model="searchCardName" clearable @on-change="searchCard()"></Input>
             <Button type="success" @click="searchCard">搜索</Button>
           </div>
           <div>

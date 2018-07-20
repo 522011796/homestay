@@ -2,7 +2,7 @@
   <div class="main-content-bg">
     <div class="home-left-menu">
       <div class="home-left-menu-search">
-        <Input icon="ios-search" v-model="searchRoomNo" @on-click="search" placeholder="请输入房间号" style="width: 200px"></Input>
+        <Input icon="ios-search" v-model="searchRoomNo" clearable @on-click="search" @on-change="search" placeholder="请输入房间号" style="width: 200px"></Input>
       </div>
       <!--快捷搜索-->
       <div class="margin-top15-left20">

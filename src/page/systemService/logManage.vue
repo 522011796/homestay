@@ -47,7 +47,7 @@
       </Dropdown>
       <DatePicker type="datetime" format="yyyy-MM-dd HH:mm" placeholder="请选择开始时间" @on-change="selStartTime($event)" style="width: 150px"></DatePicker>
       <DatePicker type="datetime" format="yyyy-MM-dd HH:mm" placeholder="请选择结束时间" :options="optionsEnd" @on-change="selEndTime($event)" style="width: 150px"></DatePicker>
-      <Input placeholder="请输入姓名" v-model="searchData.key" class="w100"></Input>
+      <Input placeholder="请输入姓名" v-model="searchData.key" clearable @on-change="search()" class="w100"></Input>
       <Button type="success" @click=search()>搜索</Button>
       <div class="margin-top10">
         <Table :columns="columns" :data="data" class="margin-top10"></Table>

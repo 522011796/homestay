@@ -49,7 +49,7 @@
               <DropdownItem  @click.native="selLocks($event,'none')">未添加</DropdownItem>
             </DropdownMenu>
           </Dropdown>
-          <Input placeholder="请输入房间号" class="w150" v-model="roomNo"></Input>
+          <Input placeholder="请输入房间号" class="w150" v-model="roomNo" clearable @on-change="search()"></Input>
           <Button type="success" @click="search()">搜索</Button>
           <Button @click="clearSearch()">清除</Button>
 

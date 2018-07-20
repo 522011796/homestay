@@ -8,7 +8,7 @@
     <div class="line-title"></div>
     <div class="padding-top0-top25 margin-top15" style="position: relative">
       <div>
-        <Input placeholder="请输入姓名或者手机号" v-model="userSearch" class="w180"></Input>
+        <Input placeholder="请输入姓名或者手机号" v-model="userSearch" clearable @on-change="search()" class="w180"></Input>
         <Button type="success" @click=search()>搜索</Button>
       </div>
       <div class="margin-top10">
@@ -133,12 +133,13 @@
       v-model="addDetailModal"
       :title="modalTitle"
       :mask-closable="false"
+      :closable="false"
       @on-visible-change = "chgModal"  width="760">
       <div slot="header" class="modalTitle">
         <h3>{{modalTitle}}</h3>
       </div>
-      <Form  ref="ruleForm" label-position="right" :label-width="100" inline style="width: 100%;margin:0 auto;">
-        <div v-if="updateStatus == false">
+      <Form ref="ruleForm" label-position="right" :label-width="100" inline style="width: 100%;margin:0 auto;">
+        <div v-if="updateStatus == false || (updateStatus && ruleForm.orderStatus == 'livedIn')">
           <FormItem label="订单号:" class="margin-bottom0">
             {{ruleForm.orderSn}}
           </FormItem>
@@ -228,264 +229,284 @@
           <Card class="orderCard pull-right" :class="{'w96-full':showEditOrder,'w100-full':!showEditOrder}">
             <div>
               <div>
-                <div v-if="updateStatus == false">
-                  <FormItem :label-width="70" label="姓名:" class="margin-bottom0">
-                    {{ruleForm.realName}}
-                  </FormItem>
-                  <FormItem :label-width="70" label="手机:" class="margin-bottom0">
-                    {{ruleForm.phone}}
-                  </FormItem>
-                  <FormItem :label-width="70" label="证件:" class="margin-bottom0">
-                    <span v-if="ruleForm.cardType == 'idcard'">身份证</span>
-                  </FormItem>
-                  <FormItem :label-width="70" label="证件号码:" class="margin-bottom0">
-                    {{ruleForm.cardId}}
-                  </FormItem>
-                </div>
-                <div v-if="updateStatus" class="editOrder">
-                  <FormItem :label-width="50" label="姓名:" class="margin-bottom0">
-                    <Input placeholder="" size="small" style="width:100px" v-model="ruleForm.realName"></Input>
-                  </FormItem>
-                  <FormItem :label-width="50" label="手机:" class="margin-bottom0">
-                    <Input placeholder="" size="small" style="width:100px" v-model="ruleForm.phone"></Input>
-                  </FormItem>
-                  <FormItem :label-width="50" label="证件:" class="margin-bottom0">
-                    <Select size="small" v-model="ruleForm.cardType" style="width:100px" @on-change="chgCardType($event)">
-                      <Option value="idcard">身份证</Option>
-                      <Option value="residenceBooklet">户口簿</Option>
-                      <Option value="passportCard1">外交护照</Option>
-                      <Option value="passportCard2">普通护照</Option>
-                      <Option value="passportCard3">公务护照</Option>
-                      <Option value="officeCard">军官证</Option>
-                      <Option value="copCard">警官证</Option>
-                      <Option value="soldierCard">士兵证</Option>
-                      <Option value="passCard">能行证</Option>
-                      <Option value="otherCard">其他</Option>
-                    </Select>
-                  </FormItem>
-                  <FormItem :label-width="70" label="证件号码:" class="margin-bottom0">
-                    <Input placeholder="" size="small" style="width:187px"  v-model="ruleForm.cardId"></Input>
-                  </FormItem>
-                </div>
+                <div v-if="updateStatus == false || (updateStatus && ruleForm.orderStatus == 'livedIn')"">
+                <FormItem :label-width="70" label="姓名:" class="margin-bottom0">
+                  {{ruleForm.realName}}
+                </FormItem>
+                <FormItem :label-width="70" label="手机:" class="margin-bottom0">
+                  {{ruleForm.phone}}
+                </FormItem>
+                <FormItem :label-width="70" label="证件:" class="margin-bottom0">
+                  <span v-if="ruleForm.cardType == 'idcard'">身份证</span>
+                </FormItem>
+                <FormItem :label-width="70" label="证件号码:" class="margin-bottom0">
+                  {{ruleForm.cardId}}
+                </FormItem>
               </div>
-              <div>
-                <div v-if="updateStatus == false">
-                  <FormItem :label-width="70" label="房间:" class="margin-bottom0">
-                    {{ruleForm.roomNo}}({{ruleForm.roomGroupName}})
-                  </FormItem>
-                  <FormItem :label-width="70" label="特性:" class="margin-bottom0">
-                  <span v-for="(item,index) in ruleForm.tags">
-                    {{item.type}}
-                  </span>
-                  </FormItem>
-                  <FormItem :label-width="70" label="入住:" class="margin-bottom0">
-                    {{$moment.unix(ruleForm.inTime/1000).format("YYYY-MM-DD HH:mm")}}
-                  </FormItem>
-                  <FormItem :label-width="70" label="离店:" class="margin-bottom0">
-                    {{$moment.unix(ruleForm.outTime/1000).format("YYYY-MM-DD HH:mm")}}
-                  </FormItem>
-                </div>
-                <div v-if="updateStatus" class="editOrder">
-                  <FormItem :label-width="50" label="房间:" class="margin-bottom0">
-                    <Select v-model="ruleForm.roomId" clearable size="small" style="width:100px">
-                      <Option v-for="(item,index) in roomList" :key="index" :value="item.id" @click.native="chgRoom($event,item.id,item.room_no,item.group_level1_name,item.group_level1_id)">{{item.room_no}}({{item.group_level1_name}})</Option>
-                    </Select>
-                  </FormItem>
-                  <FormItem :label-width="50" label="特性:" class="margin-bottom0">
-                    <Select v-model="ruleForm.tags[0].id" clearable size="small" style="width:100px" @on-change="chgMainTag($event)" @on-clear="clearTag()">
-                      <Option v-for="(item,index) in tagList" :key="index" :value="item.id">{{item.tag}}</Option>
-                    </Select>
-                  </FormItem>
-                  <FormItem :label-width="50" label="入住:" class="margin-bottom0"><!--
-                    <Input placeholder="" size="small" style="width:90px;" v-model="$moment.unix(ruleForm.inTime/1000).format('YYYY-MM-DD')"></Input>-->
-                    <DatePicker size="small" type="date" placeholder="Select date" style="width: 90px" :value="$moment.unix(ruleForm.inTime/1000).format('YYYY-MM-DD')" @on-change="chgMainTime($event,'mainInTime')"></DatePicker>
-                    <TimePicker v-show="timeType == 1" format="HH:mm" :steps="[1, 100]" size="small" placeholder="Select time" style="width:60px" :value="ruleForm.inTimeArr" @on-change="selMainTime($event,'mainInTime')"></TimePicker>
-                    <TimePicker v-show="timeType == 2" format="HH:mm" :steps="[1, 5]" size="small" placeholder="Select time" style="width:60px" :value="ruleForm.inTimeArr" @on-change="selMainTime($event,'mainInTime')"></TimePicker>
-                  </FormItem>
-                  <FormItem :label-width="50" label="离店:" class="margin-bottom0"><!--
-                    <Input placeholder="" size="small" style="width:90px" v-model="$moment.unix(ruleForm.outTime/1000).format('YYYY-MM-DD')"></Input>-->
-                    <DatePicker size="small" type="date" placeholder="Select date" style="width: 90px" :value="$moment.unix(ruleForm.outTime/1000).format('YYYY-MM-DD')" @on-change="chgMainTime($event,'mainOutTime')"></DatePicker>
-                    <TimePicker v-show="timeType == 1" format="HH:mm" :steps="[1, 100]" size="small" placeholder="Select time" style="width:60px" :value="ruleForm.outTimeArr" @on-change="selMainTime($event,'mainOutTime')"></TimePicker>
-                    <TimePicker v-show="timeType == 2" format="HH:mm" :steps="[1, 5]" size="small" placeholder="Select time" style="width:60px" :value="ruleForm.outTimeArr" @on-change="selMainTime($event,'mainOutTime')"></TimePicker>
-                  </FormItem>
-                </div>
-              </div>
-              <div>
-                <div v-if="updateStatus == false">
-                  <FormItem :label-width="70" label="订单类型:" class="margin-bottom0">
-                    <span v-if="ruleForm.orderType == '1'">日租</span>
-                    <span v-if="ruleForm.orderType == '2'">时租</span>
-                  </FormItem>
-                  <FormItem :label-width="70" label="状态:" class="margin-bottom0">
-                    <span v-if="ruleForm.status == 'waitPlan'">待排房</span>
-                    <span v-if="ruleForm.status == 'notLiveIn'">未入住</span>
-                    <span v-if="ruleForm.status == 'livedIn'">已入住</span>
-                    <span v-if="ruleForm.status == 'levelOff'">已离店</span>
-                    <span v-if="ruleForm.status == 'cancel'">已取消</span>
-                  </FormItem>
-                </div>
-                <div v-if="updateStatus">
-                  <FormItem :label-width="50" label="房型:" class="margin-bottom0">
-                    <Select v-model="ruleForm.roomTypeId" clearable size="small" style="width:100px" @on-change="chgMainType($event)" @on-clear="clearRoomType()">
-                      <Option v-for="(item,index) in typeList" :key="index" :value="item.id">{{item.name}}</Option>
-                    </Select>
-                  </FormItem>
-                  <FormItem :label-width="70" label="订单类型:" class="margin-bottom0">
-                    <RadioGroup v-model="ruleForm.orderType" size="small" type="button" @on-change="selTimeType($event)">
-                      <Radio label="1">日租</Radio>
-                      <Radio label="2">时租</Radio>
-                    </RadioGroup>
-                  </FormItem>
-                </div>
+              <div v-if="updateStatus && ruleForm.orderStatus == 'notLiveIn'" class="editOrder">
+                <FormItem :label-width="50" label="姓名:" class="margin-bottom0">
+                  <Input placeholder="" size="small" style="width:100px" v-model="ruleForm.realName"></Input>
+                </FormItem>
+                <FormItem :label-width="50" label="手机:" class="margin-bottom0">
+                  <Input placeholder="" size="small" style="width:100px" v-model="ruleForm.phone"></Input>
+                </FormItem>
+                <FormItem :label-width="50" label="证件:" class="margin-bottom0">
+                  <Select size="small" v-model="ruleForm.cardType" style="width:100px" @on-change="chgCardType($event)">
+                    <Option value="idcard">身份证</Option>
+                    <Option value="residenceBooklet">户口簿</Option>
+                    <Option value="passportCard1">外交护照</Option>
+                    <Option value="passportCard2">普通护照</Option>
+                    <Option value="passportCard3">公务护照</Option>
+                    <Option value="officeCard">军官证</Option>
+                    <Option value="copCard">警官证</Option>
+                    <Option value="soldierCard">士兵证</Option>
+                    <Option value="passCard">能行证</Option>
+                    <Option value="otherCard">其他</Option>
+                  </Select>
+                </FormItem>
+                <FormItem :label-width="70" label="证件号码:" class="margin-bottom0">
+                  <Input placeholder="" size="small" style="width:187px"  v-model="ruleForm.cardId"></Input>
+                </FormItem>
               </div>
             </div>
-          </Card>
-          <div class="clearfix"></div>
-        </div>
-
-        <!--关联房间-->
-        <div v-if="ruleForm.relaOrderList.length > 0">
-          <div class="text-green" style="height:35px;line-height:35px;">
-            <span>关联房间</span>
-          </div>
-          <div v-for="(item,index) in ruleForm.relaOrderList" :key="index">
-            <Checkbox @change.native="selOnlyBox($event,item.id,item.real_name,item.phone,item.card_type,item.card_id,item.room_no,item.room_group_name)" v-if="showEditOrder && updateStatus == false" class="pull-left orderListBox" :value="getCheck(item.id,item.order_status)" :true-value="item.id" :disabled="setDisabled(item.order_status)"></Checkbox>
-            <Card class="orderCard pull-right" :class="{'w96-full':showEditOrder,'w100-full':!showEditOrder}">
-              <div>
-                <div>
-                  <div v-if="updateStatus == false">
-                    <FormItem :label-width="70" label="姓名:" class="margin-bottom0">
-                      {{item.real_name}}
-                    </FormItem>
-                    <FormItem :label-width="70" label="手机:" class="margin-bottom0">
-                      {{item.phone}}
-                    </FormItem>
-                    <FormItem :label-width="70" label="证件:" class="margin-bottom0">
-                      <span v-if="item.card_type == 'idcard'">身份证</span>
-                    </FormItem>
-                    <FormItem :label-width="70" label="证件号码:" class="margin-bottom0">
-                      {{item.card_id}}
-                    </FormItem>
-                  </div>
-                  <div v-if="updateStatus" class="editOrder">
-                    <FormItem :label-width="50" label="姓名:" class="margin-bottom0">
-                      <Input placeholder="" size="small" style="width:100px" v-model="item.real_name"></Input>
-                    </FormItem>
-                    <FormItem :label-width="50" label="手机:" class="margin-bottom0">
-                      <Input placeholder="" size="small" style="width:100px" v-model="item.phone"></Input>
-                    </FormItem>
-                    <FormItem :label-width="50" label="证件:" class="margin-bottom0">
-                      <Select size="small" v-model="item.card_type" style="width:100px">
-                        <Option value="idcard">身份证</Option>
-                        <Option value="residenceBooklet">户口簿</Option>
-                        <Option value="passportCard1">外交护照</Option>
-                        <Option value="passportCard2">普通护照</Option>
-                        <Option value="passportCard3">公务护照</Option>
-                        <Option value="officeCard">军官证</Option>
-                        <Option value="copCard">警官证</Option>
-                        <Option value="soldierCard">士兵证</Option>
-                        <Option value="passCard">能行证</Option>
-                        <Option value="otherCard">其他</Option>
-                      </Select>
-                    </FormItem>
-                    <FormItem :label-width="70" label="证件号码:" class="margin-bottom0">
-                      <Input placeholder="" size="small" style="width:187px"  v-model="item.card_id"></Input>
-                    </FormItem>
-                  </div>
-                </div>
-                <div>
-                  <div v-if="updateStatus == false">
-                    <FormItem :label-width="70" label="房间:" class="margin-bottom0">
-                      {{item.room_no}}({{item.room_group_name}})
-                    </FormItem>
-                    <FormItem :label-width="70" label="特性:" class="margin-bottom0">
-                    <span v-for="(item,index) in ruleForm.relaOrderList" :key="index">
-                      <span v-for="(item,index) in item.room_tags" :key="index">
+            <div>
+              <div v-if="updateStatus == false || (updateStatus && ruleForm.orderStatus == 'livedIn')"">
+              <FormItem :label-width="70" label="房间:" class="margin-bottom0">
+                {{ruleForm.roomNo}}({{ruleForm.roomGroupName}})
+              </FormItem>
+              <FormItem :label-width="70" label="特性:" class="margin-bottom0">
+                    <span v-for="(item,index) in ruleForm.tags" :key="index">
+                      <span v-if="index < 1">
                         {{item.type}}
                       </span>
                     </span>
-                    </FormItem>
-                    <FormItem :label-width="70" label="入住:" class="margin-bottom0">
-                      {{$moment.unix(item.check_in_time/1000).format("YYYY-MM-DD HH:mm")}}
-                    </FormItem>
-                    <FormItem :label-width="70" label="离店:" class="margin-bottom0">
-                      {{$moment.unix(item.check_out_time/1000).format("YYYY-MM-DD HH:mm")}}
-                    </FormItem>
+                <Poptip placement="right" width="80">
+                  <span class="fa fa-info-circle"></span>
+                  <div class="api" slot="content">
+                    <div v-for="(itemTag,index) in ruleForm.tags" :key="index">
+                      {{itemTag.type}}
+                    </div>
                   </div>
-                  <div v-if="updateStatus" class="editOrder">
-                    <FormItem :label-width="50" label="房间:" class="margin-bottom0">
-                      <Select v-model="item.room_id" clearable size="small" style="width:100px">
-                        <Option v-for="(item,roomIndex) in roomList" :key="roomIndex" :value="item.id" @click.native="chgChildRoom($event,index,item.id,item.room_no,item.group_level1_name,item.group_level1_id)">{{item.room_no}}({{item.group_level1_name}})</Option>
-                      </Select>
-                    </FormItem>
-                    <FormItem :label-width="50" label="特性:" class="margin-bottom0">
-                      <Select v-model="item.room_tags[0].id" clearable size="small" style="width:100px" @on-change="chgChildTag($event,index)" @on-clear="clearChildTag(index)">
-                        <Option v-for="(item,index) in tagList" :key="index" :value="item.id">{{item.tag}}</Option>
-                      </Select>
-                    </FormItem>
-                    <FormItem :label-width="50" label="入住:" class="margin-bottom0"><!--
-                      <Input placeholder="" size="small" style="width:90px;" v-model="$moment.unix(item.check_in_time/1000).format('YYYY-MM-DD')"></Input>-->
-                      <DatePicker size="small" type="date" placeholder="Select date" style="width: 90px" :value="$moment.unix(item.check_in_time/1000).format('YYYY-MM-DD')" @on-change="chgChildTime($event,index,'inTime')"></DatePicker>
-                      <TimePicker v-show="item.check_in_type == 1" format="HH:mm" :steps="[1, 100]" size="small" placeholder="Select time" style="width:60px" :value="item.check_in_time_array[1]" @on-change="selChildTime($event,index,'inTime')"></TimePicker>
-                      <TimePicker v-show="item.check_in_type == 2" format="HH:mm" :steps="[1, 5]" size="small" placeholder="Select time" style="width:60px" :value="item.check_in_time_array[1]" @on-change="selChildTime($event,index,'inTime')"></TimePicker>
-                    </FormItem>
-                    <FormItem :label-width="50" label="离店:" class="margin-bottom0"><!--
-                      <Input placeholder="" size="small" style="width:90px" v-model="$moment.unix(item.check_out_time/1000).format('YYYY-MM-DD')"></Input>-->
-                      <DatePicker size="small" type="date" placeholder="Select date" style="width: 90px" :value="$moment.unix(item.check_out_time/1000).format('YYYY-MM-DD')" @on-change="chgChildTime($event,index,'outTime')"></DatePicker>
-                      <TimePicker v-show="item.check_in_type == 1" format="HH:mm" :steps="[1, 100]" size="small" placeholder="Select time" style="width:60px" :value="item.check_out_time_array[1]" @on-change="selChildTime($event,index,'outTime')"></TimePicker>
-                      <TimePicker v-show="item.check_in_type == 2" format="HH:mm" :steps="[1, 5]" size="small" placeholder="Select time" style="width:60px" :value="item.check_out_time_array[1]" @on-change="selChildTime($event,index,'outTime')"></TimePicker>
-                    </FormItem>
-                  </div>
-                </div>
-                <div>
-                  <div v-if="updateStatus == false">
-                    <FormItem :label-width="70" label="订单类型:" class="margin-bottom0">
-                      <span v-if="item.check_in_type == '1'">日租</span>
-                      <span v-if="item.check_in_type == '2'">时租</span>
-                    </FormItem>
-                    <FormItem :label-width="70" label="状态:" class="margin-bottom0">
-                      <span v-if="item.order_status == 'waitPlan'">待排房</span>
-                      <span v-if="item.order_status == 'notLiveIn'">未入住</span>
-                      <span v-if="item.order_status == 'livedIn'">已入住</span>
-                      <span v-if="item.order_status == 'levelOff'">已离店</span>
-                      <span v-if="item.order_status == 'cancel'">已取消</span>
-                    </FormItem>
-                  </div>
-                  <div v-if="updateStatus">
-                    <FormItem :label-width="50" label="房型:" class="margin-bottom0">
-                      <Select v-model="item.room_type_id" clearable size="small" style="width:100px" @on-change="chgChildType($event,index)" @on-clear="clearRoomChildType(index)">
-                        <Option v-for="(item,index) in typeList" :key="index" :value="item.id">{{item.name}}</Option>
-                      </Select>
-                    </FormItem>
-                    <FormItem :label-width="70" label="订单类型:" class="margin-bottom0">
-                      <RadioGroup :value="''+item.check_in_type" size="small" type="button" @on-change="selTimeChildType($event,index)">
-                        <Radio label=1>日租</Radio>
-                        <Radio label=2>时租</Radio>
-                      </RadioGroup>
-                    </FormItem>
-                  </div>
-                </div>
-              </div>
-            </Card>
+                </Poptip>
+              </FormItem>
+              <FormItem :label-width="70" label="入住:" class="margin-bottom0">
+                {{$moment.unix(ruleForm.inTime/1000).format("YYYY-MM-DD HH:mm")}}
+              </FormItem>
+              <FormItem :label-width="70" label="离店:" class="margin-bottom0">
+                {{$moment.unix(ruleForm.outTime/1000).format("YYYY-MM-DD HH:mm")}}
+              </FormItem>
+            </div>
+            <div v-if="updateStatus && ruleForm.orderStatus == 'notLiveIn'" class="editOrder">
+              <FormItem :label-width="50" label="房间:" class="margin-bottom0">
+                <Select v-model="ruleForm.roomId" clearable size="small" style="width:100px" @on-open-change="filterRoom($event,ruleForm.roomId,ruleForm.inTime,ruleForm.outTime,ruleForm.tags[0].id,ruleForm.roomTypeId,ruleForm)">
+                  <Option v-for="(item,index) in roomList" :key="index" :value="item.id" @click.native="chgRoom($event,item.id,item.room_no,item.group_level1_name,item.group_level1_id)">{{item.room_no}}({{item.group_level1_name}})</Option>
+                </Select>
+              </FormItem>
+              <FormItem :label-width="50" label="特性:" class="margin-bottom0">
+                <Select v-model="ruleForm.tags[0].id" clearable size="small" style="width:100px" @on-change="chgMainTag($event,ruleForm)" @on-clear="clearTag()">
+                  <Option v-for="(item,index) in tagList" :key="index" :value="item.id">{{item.tag}}</Option>
+                </Select>
+              </FormItem>
+              <FormItem :label-width="50" label="入住:" class="margin-bottom0"><!--
+                    <Input placeholder="" size="small" style="width:90px;" v-model="$moment.unix(ruleForm.inTime/1000).format('YYYY-MM-DD')"></Input>-->
+                <DatePicker size="small" type="date" placeholder="Select date" style="width: 90px" :value="$moment.unix(ruleForm.inTime/1000).format('YYYY-MM-DD')" @on-change="chgMainTime($event,'mainInTime')"></DatePicker>
+                <TimePicker v-show="timeType == 1" format="HH:mm" :steps="[1, 100]" size="small" placeholder="Select time" style="width:60px" :value="ruleForm.inTimeArr" @on-change="selMainTime($event,'mainInTime')"></TimePicker>
+                <TimePicker v-show="timeType == 2" format="HH:mm" :steps="[1, 5]" size="small" placeholder="Select time" style="width:60px" :value="ruleForm.inTimeArr" @on-change="selMainTime($event,'mainInTime')"></TimePicker>
+              </FormItem>
+              <FormItem :label-width="50" label="离店:" class="margin-bottom0"><!--
+                    <Input placeholder="" size="small" style="width:90px" v-model="$moment.unix(ruleForm.outTime/1000).format('YYYY-MM-DD')"></Input>-->
+                <DatePicker size="small" type="date" placeholder="Select date" style="width: 90px" :value="$moment.unix(ruleForm.outTime/1000).format('YYYY-MM-DD')" @on-change="chgMainTime($event,'mainOutTime')"></DatePicker>
+                <TimePicker v-show="timeType == 1" format="HH:mm" :steps="[1, 100]" size="small" placeholder="Select time" style="width:60px" :value="ruleForm.outTimeArr" @on-change="selMainTime($event,'mainOutTime')"></TimePicker>
+                <TimePicker v-show="timeType == 2" format="HH:mm" :steps="[1, 5]" size="small" placeholder="Select time" style="width:60px" :value="ruleForm.outTimeArr" @on-change="selMainTime($event,'mainOutTime')"></TimePicker>
+              </FormItem>
+            </div>
+        </div>
+        <div>
+          <div v-if="updateStatus == false || (updateStatus && ruleForm.orderStatus == 'livedIn')"">
+          <FormItem :label-width="70" label="订单类型:" class="margin-bottom0">
+            <span v-if="ruleForm.orderType == '1'">日租</span>
+            <span v-if="ruleForm.orderType == '2'">时租</span>
+          </FormItem>
+          <FormItem :label-width="70" label="状态:" class="margin-bottom0">
+            <span v-if="ruleForm.status == 'waitPlan'">待排房</span>
+            <span v-if="ruleForm.status == 'notLiveIn'">未入住</span>
+            <span v-if="ruleForm.status == 'livedIn'">已入住</span>
+            <span v-if="ruleForm.status == 'levelOff'">已离店</span>
+            <span v-if="ruleForm.status == 'cancel'">已取消</span>
+          </FormItem>
+        </div>
+        <div v-if="updateStatus && ruleForm.orderStatus == 'notLiveIn'">
+          <FormItem :label-width="50" label="房型:" class="margin-bottom0">
+            <Select v-model="ruleForm.roomTypeId" clearable size="small" style="width:100px" @on-change="chgMainType($event,ruleForm)" @on-clear="clearRoomType()">
+              <Option v-for="(item,index) in typeList" :key="index" :value="item.id">{{item.name}}</Option>
+            </Select>
+          </FormItem>
+          <FormItem :label-width="70" label="订单类型:" class="margin-bottom0">
+            <RadioGroup v-model="ruleForm.orderType" size="small" type="button" @on-change="selTimeType($event)">
+              <Radio label="1">日租</Radio>
+              <Radio label="2">时租</Radio>
+            </RadioGroup>
+          </FormItem>
+        </div>
+  </div>
+  </div>
+  </Card>
+  <div class="clearfix"></div>
+  </div>
+
+  <!--关联房间-->
+  <div v-if="ruleForm.relaOrderList.length > 0">
+    <div class="text-green" style="height:35px;line-height:35px;">
+      <span>关联房间</span>
+    </div>
+    <div v-for="(item,index) in ruleForm.relaOrderList" :key="index">
+      <Checkbox @change.native="selOnlyBox($event,item.id,item.real_name,item.phone,item.card_type,item.card_id,item.room_no,item.room_group_name)" v-if="showEditOrder && updateStatus == false" class="pull-left orderListBox" :value="getCheck(item.id,item.order_status)" :true-value="item.id" :disabled="setDisabled(item.order_status)"></Checkbox>
+      <Card class="orderCard pull-right margin-bottom10" :class="{'w96-full':showEditOrder,'w100-full':!showEditOrder}">
+        <div>
+          <div>
+            <div v-if="updateStatus == false || (updateStatus && item.order_status == 'livedIn')">
+              <FormItem :label-width="70" label="姓名:" class="margin-bottom0">
+                {{item.real_name}}
+              </FormItem>
+              <FormItem :label-width="70" label="手机:" class="margin-bottom0">
+                {{item.phone}}
+              </FormItem>
+              <FormItem :label-width="70" label="证件:" class="margin-bottom0">
+                <span v-if="item.card_type == 'idcard'">身份证</span>
+              </FormItem>
+              <FormItem :label-width="70" label="证件号码:" class="margin-bottom0">
+                {{item.card_id}}
+              </FormItem>
+            </div>
+            <div v-if="updateStatus && item.order_status == 'notLiveIn'" class="editOrder">
+              <FormItem :label-width="50" label="姓名:" class="margin-bottom0">
+                <Input placeholder="" size="small" style="width:100px" v-model="item.real_name"></Input>
+              </FormItem>
+              <FormItem :label-width="50" label="手机:" class="margin-bottom0">
+                <Input placeholder="" size="small" style="width:100px" v-model="item.phone"></Input>
+              </FormItem>
+              <FormItem :label-width="50" label="证件:" class="margin-bottom0">
+                <Select size="small" v-model="item.card_type" style="width:100px">
+                  <Option value="idcard">身份证</Option>
+                  <Option value="residenceBooklet">户口簿</Option>
+                  <Option value="passportCard1">外交护照</Option>
+                  <Option value="passportCard2">普通护照</Option>
+                  <Option value="passportCard3">公务护照</Option>
+                  <Option value="officeCard">军官证</Option>
+                  <Option value="copCard">警官证</Option>
+                  <Option value="soldierCard">士兵证</Option>
+                  <Option value="passCard">能行证</Option>
+                  <Option value="otherCard">其他</Option>
+                </Select>
+              </FormItem>
+              <FormItem :label-width="70" label="证件号码:" class="margin-bottom0">
+                <Input placeholder="" size="small" style="width:187px"  v-model="item.card_id"></Input>
+              </FormItem>
+            </div>
           </div>
-          <div class="clearfix"></div>
+          <div>
+            <div v-if="updateStatus == false || (updateStatus && item.order_status == 'livedIn')">
+              <FormItem :label-width="70" label="房间:" class="margin-bottom0">
+                {{item.room_no}}({{item.room_group_name}})
+              </FormItem>
+              <FormItem :label-width="70" label="特性:" class="margin-bottom0">
+                      <span v-for="(itemTag,index) in item.room_tags" :key="index">
+                        <span v-if="index < 1">{{itemTag.type}}</span>
+                      </span>
+                <span>
+                        <Poptip placement="right" width="80">
+                          <span class="fa fa-info-circle"></span>
+                          <div class="api" slot="content">
+                            <div v-for="(itemTag,index) in item.room_tags" :key="index">
+                              {{itemTag.type}}
+                            </div>
+                          </div>
+                        </Poptip>
+                      </span>
+              </FormItem>
+              <FormItem :label-width="70" label="入住:" class="margin-bottom0">
+                {{$moment.unix(item.check_in_time/1000).format("YYYY-MM-DD HH:mm")}}
+              </FormItem>
+              <FormItem :label-width="70" label="离店:" class="margin-bottom0">
+                {{$moment.unix(item.check_out_time/1000).format("YYYY-MM-DD HH:mm")}}
+              </FormItem>
+            </div>
+            <div v-if="updateStatus && item.order_status == 'notLiveIn'"" class="editOrder">
+            <FormItem :label-width="50" label="房间:" class="margin-bottom0">
+              <Select v-model="item.room_id" clearable size="small" style="width:100px" @on-open-change="filterRoom($event,item.room_id,item.check_in_time,item.check_out_time,item.room_tags[0].id,item.room_type_id,item,index)">
+                <Option v-for="(item,roomIndex) in roomList" :key="roomIndex" :value="item.id" @click.native="chgChildRoom($event,index,item.id,item.room_no,item.group_level1_name,item.group_level1_id)">{{item.room_no}}({{item.group_level1_name}})</Option>
+              </Select>
+            </FormItem>
+            <FormItem :label-width="50" label="特性:" class="margin-bottom0">
+              <Select v-model="item.room_tags[0].id" clearable size="small" style="width:100px" @on-change="chgChildTag($event,index,item)" @on-clear="clearChildTag(index)">
+                <Option v-for="(item,index) in tagList" :key="index" :value="item.id">{{item.tag}}</Option>
+              </Select>
+            </FormItem>
+            <FormItem :label-width="50" label="入住:" class="margin-bottom0"><!--
+                      <Input placeholder="" size="small" style="width:90px;" v-model="$moment.unix(item.check_in_time/1000).format('YYYY-MM-DD')"></Input>-->
+              <DatePicker size="small" type="date" placeholder="Select date" style="width: 90px" :value="$moment.unix(item.check_in_time/1000).format('YYYY-MM-DD')" @on-change="chgChildTime($event,index,'inTime')"></DatePicker>
+              <TimePicker v-show="item.check_in_type == 1" format="HH:mm" :steps="[1, 100]" size="small" placeholder="Select time" style="width:60px" :value="item.check_in_time_array[1]" @on-change="selChildTime($event,index,'inTime')"></TimePicker>
+              <TimePicker v-show="item.check_in_type == 2" format="HH:mm" :steps="[1, 5]" size="small" placeholder="Select time" style="width:60px" :value="item.check_in_time_array[1]" @on-change="selChildTime($event,index,'inTime')"></TimePicker>
+            </FormItem>
+            <FormItem :label-width="50" label="离店:" class="margin-bottom0"><!--
+                      <Input placeholder="" size="small" style="width:90px" v-model="$moment.unix(item.check_out_time/1000).format('YYYY-MM-DD')"></Input>-->
+              <DatePicker size="small" type="date" placeholder="Select date" style="width: 90px" :value="$moment.unix(item.check_out_time/1000).format('YYYY-MM-DD')" @on-change="chgChildTime($event,index,'outTime')"></DatePicker>
+              <TimePicker v-show="item.check_in_type == 1" format="HH:mm" :steps="[1, 100]" size="small" placeholder="Select time" style="width:60px" :value="item.check_out_time_array[1]" @on-change="selChildTime($event,index,'outTime')"></TimePicker>
+              <TimePicker v-show="item.check_in_type == 2" format="HH:mm" :steps="[1, 5]" size="small" placeholder="Select time" style="width:60px" :value="item.check_out_time_array[1]" @on-change="selChildTime($event,index,'outTime')"></TimePicker>
+            </FormItem>
+          </div>
         </div>
-      </Form>
-      <div slot="footer">
-        <div v-if="!showEditOrder && updateStatus == false">
-          <Button v-if="ruleForm.status == 'livedIn'" type="success" @click="goOut('ruleForm','outRoom',ruleForm.orderId,ruleForm.orderSn)">办理退房</Button>
-          <Button v-if="ruleForm.status == 'livedIn'" type="ghost" @click="sendPwd('ruleForm','sendPwd',ruleForm.orderId,ruleForm.orderSn)">发送密码</Button>
-          <Button v-if="ruleForm.status == 'notLiveIn'" type="ghost" @click="goIn('ruleForm','inRoom',ruleForm.orderId,ruleForm.orderSn)">办理入住</Button>
-          <Button v-if="ruleForm.status == 'notLiveIn'" type="ghost" @click="cancelOrder('ruleForm','cancelOrder',ruleForm.orderId,ruleForm.orderSn)">取消订单</Button>
-          <Button v-if="ruleForm.status == 'notLiveIn'" type="ghost" @click="updateOrder('ruleForm','chgOrder',ruleForm.orderId,ruleForm.orderSn,ruleForm.orderType)">修改订单</Button>
-          <Button type="ghost" @click="handleReset('ruleForm')">关闭窗口</Button>
+        <div>
+          <div v-if="updateStatus == false || (updateStatus && item.order_status == 'livedIn')"">
+          <FormItem :label-width="70" label="订单类型:" class="margin-bottom0">
+            <span v-if="item.check_in_type == '1'">日租</span>
+            <span v-if="item.check_in_type == '2'">时租</span>
+          </FormItem>
+          <FormItem :label-width="70" label="状态:" class="margin-bottom0">
+            <span v-if="item.order_status == 'waitPlan'">待排房</span>
+            <span v-if="item.order_status == 'notLiveIn'">未入住</span>
+            <span v-if="item.order_status == 'livedIn'">已入住</span>
+            <span v-if="item.order_status == 'levelOff'">已离店</span>
+            <span v-if="item.order_status == 'cancel'">已取消</span>
+          </FormItem>
         </div>
-        <div v-if="!showEditOrder && updateStatus">
-          <Button type="success" @click="okUpdate('ruleForm','',ruleForm.orderId,ruleForm.orderSn)">确认</Button>
-          <Button type="ghost" @click="cancelUpdate('ruleForm','',ruleForm.orderId,ruleForm.orderSn)">取消</Button>
+        <div v-if="updateStatus && item.order_status == 'notLiveIn'">
+          <FormItem :label-width="50" label="房型:" class="margin-bottom0">
+            <Select v-model="item.room_type_id" clearable size="small" style="width:100px" @on-change="chgChildType($event,index,item)" @on-clear="clearRoomChildType(index)">
+              <Option v-for="(item,index) in typeList" :key="index" :value="item.id">{{item.name}}</Option>
+            </Select>
+          </FormItem>
+          <FormItem :label-width="70" label="订单类型:" class="margin-bottom0">
+            <RadioGroup :value="''+item.check_in_type" size="small" type="button" @on-change="selTimeChildType($event,index)">
+              <Radio label=1>日租</Radio>
+              <Radio label=2>时租</Radio>
+            </RadioGroup>
+          </FormItem>
         </div>
-      </div>
-    </Modal>
+    </div>
+  </div>
+  </Card>
+  <div class="clearfix"></div>
+  </div>
+  <div class="clearfix"></div>
+  </div>
+  </Form>
+  <div slot="footer">
+    <div v-if="!showEditOrder && updateStatus == false">
+      <Button v-if="ruleForm.status == 'livedIn'" type="success" @click="goOut('ruleForm','outRoom',ruleForm.orderId,ruleForm.orderSn)">办理退房</Button>
+      <Button v-if="ruleForm.status == 'livedIn'" type="ghost" @click="sendPwd('ruleForm','sendPwd',ruleForm.orderId,ruleForm.orderSn)">发送密码</Button>
+      <Button v-if="ruleForm.status == 'notLiveIn'" type="ghost" @click="goIn('ruleForm','inRoom',ruleForm.orderId,ruleForm.orderSn)">办理入住</Button>
+      <Button v-if="ruleForm.status == 'notLiveIn'" type="ghost" @click="cancelOrder('ruleForm','cancelOrder',ruleForm.orderId,ruleForm.orderSn)">取消订单</Button>
+      <Button v-if="ruleForm.status == 'notLiveIn'" type="ghost" @click="updateOrder('ruleForm','chgOrder',ruleForm.orderId,ruleForm.orderSn,ruleForm.orderType)">修改订单</Button>
+      <Button type="ghost" @click="handleReset('ruleForm')">关闭窗口</Button>
+    </div>
+    <div v-if="!showEditOrder && updateStatus">
+      <span class="custom-font-error">{{errorTips}}</span>
+      <Button type="success" @click="okUpdate('ruleForm','',ruleForm.orderId,ruleForm.orderSn)">确认</Button>
+      <Button type="ghost" @click="cancelUpdate('ruleForm','',ruleForm.orderId,ruleForm.orderSn)">取消</Button>
+    </div>
+  </div>
+  </Modal>
   </div>
 </template>
 
@@ -506,6 +527,7 @@
         checkedOrder:false,
         trueValue:true,
         updateStatus:false,
+        editStatus:false,
         timeType:1,
         modalTitle:'',
         userSearch:"",
@@ -529,8 +551,10 @@
         checkAllList:0,//所有复选框个数
         oprType:'',//操作订单的类型
         allOrderId:'',//所有的orderid
+        roomArr:[],//过滤已经选择的房间
         G_ORDERID:'',
         G_ORDERSN:'',
+        errorTips:'',
         ruleForm:{
           orderSn:'',
           payType:'',
@@ -578,7 +602,6 @@
           payType:this.orderPayType,
           filter:'currentLive'
         };
-        console.log(this.$utils.clearData(params));
         this.showLoading = true;
         this.$api.get("/proxy/order/page", this.$utils.clearData(params) ,res => {
           var data = Object.assign({}, res.data.data);
@@ -644,7 +667,6 @@
         this.$api.postQs("/proxy/order/details2", this.$utils.clearData(params) ,res => {
           var data = Object.assign({}, res.data.data);
           this.orderDetailList = data;
-          console.log(data);
           this.ruleForm = {
             orderSn:data.order_sn,
             payType:data.pay_type,
@@ -742,6 +764,45 @@
             liveNow:false
           });
         });
+        let phoneReg = /^13[0-9]{9}$|14[0-9]{9}$|15[0-9]{9}|16[0-9]{9}$|17[0-9]{9}$|18[0-9]{9}$/;
+        this.errorTips = '';
+        //验证主订单
+        if(this.ruleForm.realName == ""){
+          this.errorTips = '请填写姓名!';
+          return;
+        }
+        if(this.ruleForm.phone == ""){
+          this.errorTips = '请填写手机号!';
+          return;
+        }
+        if(!phoneReg.test(this.ruleForm.phone)){
+          this.errorTips = '请填写正确的手机号码!';
+          return;
+        }
+        if(!this.ruleForm.roomId){
+          this.errorTips = '请选择房间!';
+          return;
+        }
+        //验证关联订单
+        for(var i=0;i<this.ruleForm.relaOrderList.length;i++){
+          if(this.ruleForm.relaOrderList[i].real_name == ''){
+            this.errorTips = '关联订单中的姓名不能为空!';
+            break;
+          }
+          if(this.ruleForm.relaOrderList[i].phone == ''){
+            this.errorTips = '关联订单中的手机号不能为空!';
+            return;
+          }
+          if(!phoneReg.test(this.ruleForm.relaOrderList[i].phone)){
+            this.errorTips = '关联订单中的手机号填写有误!';
+            return;
+          }
+          if(!this.ruleForm.relaOrderList[i].room_id){
+            this.errorTips = '关联订单中的房间不能为空!!';
+            return;
+          }
+        }
+
         var params = {
           orders:orderArr
         };
@@ -758,6 +819,7 @@
         this.cancelOrderOpr(false);
       },
       goOut(formName,type,orderId,orderSn){
+        this.errorTips = '';
         this.goOutStatus = true;
         this.showEditOrder = true;
         this.oprType = type;
@@ -765,6 +827,7 @@
         this.G_ORDERSN = orderSn;
       },
       goIn(formName,type,orderId,orderSn){
+        this.errorTips = '';
         this.goInStatus = true;
         this.showEditOrder = true;
         this.oprType = type;
@@ -772,6 +835,7 @@
         this.G_ORDERSN = orderSn;
       },
       sendPwd(formName,type,orderId,orderSn){
+        this.errorTips = '';
         this.sendPwdStatus = true;
         this.showEditOrder = true;
         this.oprType = type;
@@ -779,13 +843,14 @@
         this.G_ORDERSN = orderSn;
       },
       cancelOrder(formName,type,orderId,orderSn){
+        this.errorTips = '';
         this.cancelOrderStatus = true;
         this.showEditOrder = true;
         this.oprType = type;
         this.G_ORDERID = orderId;
         this.G_ORDERSN = orderSn;
       },
-      cancelOrderOpr(status){
+      cancelOrderOpr(status,type){
         this.detailOrder(this.G_ORDERID,this.G_ORDERSN);
         this.goOutStatus = status;
         this.showEditOrder = status;
@@ -877,7 +942,7 @@
             });
           }
         }
-        //console.log(this.orderUserInfo);
+        //console.log(this.checkList);
       },
       selOnlyBox(event,val,realName,phone,cardType,cardId,roomNo,groupName){
         if(event.target.checked){
@@ -915,27 +980,43 @@
         if(this.oprType=='sendPwd' && type == "livedIn"){
           return this.checkList.includes(item) ? item : false;
         }
-        if(this.oprType=='sendPwd' && type == "notliveIn"){
+        if(this.oprType=='sendPwd' && type == "notLiveIn"){
           return this.checkList.includes(item) ? item : false;
         }
-        if(this.oprType=='inRoom' && type != "notliveIn"){
+        if(this.oprType=='inRoom' && type == "notLiveIn"){
           return this.checkList.includes(item) ? item : false;
         }
-        if(this.oprType=='cancelOrder' && type != "notliveIn"){
+        if(this.oprType=='cancelOrder' && (type != "livedIn" && type != "levelOff")){
           return this.checkList.includes(item) ? item : false;
+        }
+
+        //如果有被禁用的项，过滤掉
+        if(this.checkList.includes(item)){
+          for(var i=0;i<this.checkList.length;i++){
+            if(this.checkList[i] == item){
+              this.checkList.splice(i,1);
+            }
+          }
+          console.log(this.checkList);
         }
       },
       setDisabled(item){
         if(this.oprType=='outRoom' && item != "livedIn"){
           return true;
         }
-        if(this.oprType=='sendPwd' && (item != "notliveIn" && item != "livedIn")){
+        if(this.oprType=='sendPwd' && (item != "notLiveIn" && item != "livedIn")){
           return true;
         }
-        if(this.oprType=='inRoom' && item == "notliveIn"){
+        if(this.oprType=='inRoom' && item != "notLiveIn"){
           return true;
         }
-        if(this.oprType=='cancelOrder' && item == "notliveIn"){
+        if(this.oprType=='inRoom' && item == "livedIn"){
+          return true;
+        }
+        if(this.oprType=='cancelOrder' && item == "livedIn"){
+          return true;
+        }
+        if(this.oprType=='cancelOrder' && item == "levelOff"){
           return true;
         }
       },
@@ -1048,7 +1129,7 @@
       },
       chgChildTime(event,index,type){
         if(type == 'inTime'){
-          this.ruleForm.relaOrderList.check_in_time = new Date(event).getTime();
+          this.ruleForm.relaOrderList[index].check_in_time = new Date(event).getTime();
           if(this.ruleForm.relaOrderList[index].check_in_type == 1){
             this.ruleForm.relaOrderList[index].check_out_time = new Date(event).getTime() + 86400000;
           }
@@ -1064,56 +1145,113 @@
           this.ruleForm.relaOrderList[index].check_out_time = new Date(event).getTime();
         }
       },
-      chgMainTag(event){
+      chgMainTag(event,obj){
         this.ruleForm.selTagId = event;
-        this.getRoomRemain(event,this.ruleForm.selTypeId);
+        this.setRoomRemain(obj.check_in_time,obj.check_out_time,this.ruleForm.selTagId?this.ruleForm.selTagId:event,this.ruleForm.selTypeId ? this.ruleForm.selTypeId : this.ruleForm.roomTypeId,obj,null);
+        //this.getRoomRemain(event,this.ruleForm.selTypeId ? this.ruleForm.selTypeId : this.ruleForm.roomTypeId,null,obj);
       },
-      chgChildTag(event,index){
+      chgChildTag(event,index,obj){
         this.ruleForm.relaOrderList[index]['selTagId'] = event;
-        this.getRoomRemain(event,this.ruleForm.relaOrderList[index]['selTypeId'],index);
+        this.setRoomRemain(obj.check_in_time,obj.check_out_time,this.ruleForm.relaOrderList[index]['selTagId']?this.ruleForm.relaOrderList[index]['selTagId']:event,this.ruleForm.relaOrderList[index]['selTypeId'] ? this.ruleForm.relaOrderList[index]['selTypeId'] : this.ruleForm.relaOrderList[index].room_type_id,obj,index);
+        //this.getRoomRemain(event,this.ruleForm.relaOrderList[index]['selTypeId'] ? this.ruleForm.relaOrderList[index]['selTypeId'] : this.ruleForm.relaOrderList[index].room_type_id,index,obj);
       },
-      chgMainType(event){
+      chgMainType(event,obj){
         this.ruleForm.selTypeId = event;
-        this.getRoomRemain(this.ruleForm.selTagId,event);
+        this.setRoomRemain(obj.check_in_time,obj.check_out_time,this.ruleForm.selTagId?this.ruleForm.selTagId:this.ruleForm.tags[0].id,this.ruleForm.selTypeId ? this.ruleForm.selTypeId : event,obj,null);
+        //this.getRoomRemain(this.ruleForm.selTagId?this.ruleForm.selTagId:this.ruleForm.tags[0].id,event,null,obj);
       },
-      chgChildType(event,index){
+      chgChildType(event,index,obj){
         this.ruleForm.relaOrderList[index]['selTypeId'] = event;
-        this.getRoomRemain(this.ruleForm.relaOrderList[index]['selTagId'],event,index);
+        this.setRoomRemain(obj.check_in_time,obj.check_out_time,this.ruleForm.relaOrderList[index]['selTagId']?this.ruleForm.relaOrderList[index]['selTagId']:this.ruleForm.relaOrderList[index].room_tags[0].id,this.ruleForm.relaOrderList[index]['selTypeId'] ? this.ruleForm.relaOrderList[index]['selTypeId'] : event,obj,index);
+        //this.getRoomRemain(this.ruleForm.relaOrderList[index]['selTagId']?this.ruleForm.relaOrderList[index]['selTagId']:this.ruleForm.relaOrderList[index].room_tags[0].id,event,index,obj);
       },
-      getRoomRemain(tagId,typeId,index){
+      getRoomRemain(tagId,typeId,index,obj){
+        let startTime = "";
+        let endTime = "";
+        if(index>=0 && index != null){
+          startTime = this.$moment.unix(this.ruleForm.relaOrderList[index].check_in_time/1000).format('YYYY-MM-DD') + " " + this.ruleForm.relaOrderList[index].check_in_time_array[1];
+          endTime = this.$moment.unix(this.ruleForm.relaOrderList[index].check_out_time/1000).format('YYYY-MM-DD') + " " + this.ruleForm.relaOrderList[index].check_out_time_array[1];
+        }else{
+          startTime = this.$moment.unix(this.ruleForm.inTime/1000).format('YYYY-MM-DD') + " " + this.ruleForm.inTimeArr;
+          endTime = this.$moment.unix(this.ruleForm.outTime/1000).format('YYYY-MM-DD') + " " + this.ruleForm.outTimeArr;
+        }
         var params = {
           page:1,
           num:9999,
-          startTime:this.$moment.unix(this.ruleForm.inTime/1000).format('YYYY-MM-DD') + " " + this.ruleForm.inTimeArr,
-          endTime:this.$moment.unix(this.ruleForm.outTime/1000).format('YYYY-MM-DD') + " " + this.ruleForm.outTimeArr,
+          startTime:startTime,
+          endTime:endTime,
           roomTypeId:typeId,
           roomTagIds:tagId,
           notInIds:(this.allOrderId.substring(this.allOrderId.length-1)==',')?this.allOrderId.substring(0,this.allOrderId.length-1):this.allOrderId
         };
 
         this.$api.get("/proxy/room/remains", this.$utils.clearData(params) ,res => {
+          //过滤已经被选的房间
           var data = Object.assign({}, res.data);
-          this.roomList = data.data;
-          if(data.data.length > 0){
-            if(index>=0){
-              this.ruleForm.relaOrderList[index].room_id = data.data[0].id;
-              this.ruleForm.relaOrderList[index].room_no = data.data[0].room_no;
-              this.ruleForm.relaOrderList[index].room_group_name = data.data[0].group_level1_name;
-              this.ruleForm.relaOrderList[index].room_group_id = data.data[0].group_level1_id;
-            }else{
-              this.ruleForm.roomId = data.data[0].id;
-              this.ruleForm.roomNo = data.data[0].room_no;
-              console.log(data.data[0]);
-              this.ruleForm.groupName = data.data[0].group_level1_name;
-              this.ruleForm.roomGroupId = data.data[0].group_level1_id;
+          var arr = [];
+          for(var i=0;i<data.data.length;i++){
+            if(this.isInArray(this.roomArr,data.data[i].id) == false){
+              arr.push(data.data[i]);
             }
-          }else{
-            if(index>=0){
+          }
+          this.roomList = arr;
+          if(this.roomList.length == 0){
+            if(index>=0 && index != null){
               this.ruleForm.relaOrderList[index].room_id = '';
             }else{
               this.ruleForm.roomId = '';
             }
           }
+          //默认选中第一个房间
+          /*if(obj){
+            if(index>=0 && index != null){
+              if(this.roomList.length == 0){
+                this.ruleForm.relaOrderList[index].room_id = '';
+              }
+              if(obj.roomId == this.roomList[0].id){
+                if(this.roomList.length > 0){
+                  this.ruleForm.relaOrderList[index].room_id = data.data[0].id;
+                  this.ruleForm.relaOrderList[index].room_no = data.data[0].room_no;
+                  this.ruleForm.relaOrderList[index].room_group_name = data.data[0].group_level1_name;
+                  this.ruleForm.relaOrderList[index].room_group_id = data.data[0].group_level1_id;
+                }else{
+                  this.ruleForm.relaOrderList[index].room_id = '';
+                }
+              }else {
+                if(this.roomList.length > 0){
+                  this.ruleForm.relaOrderList[index].room_id = data.data[0].id;
+                  this.ruleForm.relaOrderList[index].room_no = data.data[0].room_no;
+                  this.ruleForm.relaOrderList[index].room_group_name = data.data[0].group_level1_name;
+                  this.ruleForm.relaOrderList[index].room_group_id = data.data[0].group_level1_id;
+                }else{
+                  this.ruleForm.relaOrderList[index].room_id = '';
+                }
+              }
+            }else{
+              if(this.roomList.length == 0){
+                this.ruleForm.roomId = '';
+              }
+              if(obj.roomId == this.roomList[0].id){
+                if(this.roomList.length > 0){
+                  this.ruleForm.roomId = data.data[0].id;
+                  this.ruleForm.roomNo = data.data[0].room_no;
+                  this.ruleForm.groupName = data.data[0].group_level1_name;
+                  this.ruleForm.roomGroupId = data.data[0].group_level1_id;
+                }else{
+                  this.ruleForm.roomId = '';
+                }
+              }else {
+                if(this.roomList.length > 0){
+                  this.ruleForm.roomId = data.data[0].id;
+                  this.ruleForm.roomNo = data.data[0].room_no;
+                  this.ruleForm.groupName = data.data[0].group_level1_name;
+                  this.ruleForm.roomGroupId = data.data[0].group_level1_id;
+                }else{
+                  this.ruleForm.roomId = '';
+                }
+              }
+            }
+          }*/
         });
       },
       selMainTime(event,type){
@@ -1154,6 +1292,54 @@
       },
       clearChildTag(index){
         this.ruleForm.relaOrderList[index].selTagId = '';
+      },
+      filterRoom(event,roomId,startTime,endTime,tagId,typeId,obj,index){//过滤已经选择的房间
+        if(event){
+          this.setRoomRemain(startTime,endTime,tagId,typeId,obj,index);
+        }
+      },
+      setRoomRemain(startTime,endTime,tagId,typeId,obj,index){
+        this.roomArr = [];
+        let startInTime = "";
+        let endOutTime = "";
+        let selfStartTime = startTime;
+        let selfEndTime = endTime;
+        let timeList = [];
+        timeList.push(this.ruleForm);
+        for(var i=0;i<this.ruleForm.relaOrderList.length;i++){
+          timeList.push(this.ruleForm.relaOrderList[i]);
+        }
+        for(var i=0;i<timeList.length;i++){
+          if(i==0){
+            if(obj != timeList[i]){
+              this.roomArr.push(timeList[i].roomId);
+            }
+            startInTime = timeList[i].inTime;
+            endOutTime = timeList[i].outTime;
+          }else{
+            if(obj != timeList[i]){
+              this.roomArr.push(timeList[i].room_id);
+            }
+            startInTime = timeList[i].check_in_time;
+            endOutTime = timeList[i].check_out_time;
+          }
+          if(obj != timeList[i]){
+            if((selfStartTime <= startInTime && selfEndTime > startInTime) || (selfStartTime >= startInTime && selfStartTime < endOutTime)){
+              this.roomArr = this.roomArr;
+            }else{
+              this.roomArr = [];
+            }
+          }
+        }
+        this.getRoomRemain(tagId,typeId,index,obj);
+      },
+      isInArray(arr,value){//判断数组中存在某个原素
+        for(var i = 0; i < arr.length; i++){
+          if(value === arr[i]){
+            return true;
+          }
+        }
+        return false;
       }
     },
     mounted () {
@@ -1162,7 +1348,6 @@
     watch: {
       'checkList': {
         handler: function(val, oldVal) {
-          console.log(val);
           /*if (val.length === this.checkboxList.length) {
             this.checked = true;
           } else {

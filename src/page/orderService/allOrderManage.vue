@@ -8,7 +8,7 @@
     <div class="line-title"></div>
     <div class="padding-top0-top25 margin-top15" style="position: relative">
       <div>
-        <Input placeholder="请输入姓名或者手机号" v-model="userSearch" class="w180"></Input>
+        <Input placeholder="请输入姓名或者手机号" v-model="userSearch" clearable @on-change="search()" class="w180"></Input>
         <Button type="success" @click=search()>搜索</Button>
       </div>
       <div class="margin-top10">
@@ -133,12 +133,13 @@
       v-model="addDetailModal"
       :title="modalTitle"
       :mask-closable="false"
+      :closable="false"
       @on-visible-change = "chgModal"  width="760">
       <div slot="header" class="modalTitle">
         <h3>{{modalTitle}}</h3>
       </div>
       <Form ref="ruleForm" label-position="right" :label-width="100" inline style="width: 100%;margin:0 auto;">
-        <div v-if="updateStatus == false">
+        <div v-if="updateStatus == false || (updateStatus && ruleForm.orderStatus == 'livedIn')">
           <FormItem label="订单号:" class="margin-bottom0">
             {{ruleForm.orderSn}}
           </FormItem>
@@ -228,7 +229,7 @@
           <Card class="orderCard pull-right" :class="{'w96-full':showEditOrder,'w100-full':!showEditOrder}">
             <div>
               <div>
-                <div v-if="updateStatus == false">
+                <div v-if="updateStatus == false || (updateStatus && ruleForm.orderStatus == 'livedIn')"">
                   <FormItem :label-width="70" label="姓名:" class="margin-bottom0">
                     {{ruleForm.realName}}
                   </FormItem>
@@ -242,7 +243,7 @@
                     {{ruleForm.cardId}}
                   </FormItem>
                 </div>
-                <div v-if="updateStatus" class="editOrder">
+                <div v-if="updateStatus && ruleForm.orderStatus == 'notLiveIn'" class="editOrder">
                   <FormItem :label-width="50" label="姓名:" class="margin-bottom0">
                     <Input placeholder="" size="small" style="width:100px" v-model="ruleForm.realName"></Input>
                   </FormItem>
@@ -269,7 +270,7 @@
                 </div>
               </div>
               <div>
-                <div v-if="updateStatus == false">
+                <div v-if="updateStatus == false || (updateStatus && ruleForm.orderStatus == 'livedIn')"">
                   <FormItem :label-width="70" label="房间:" class="margin-bottom0">
                     {{ruleForm.roomNo}}({{ruleForm.roomGroupName}})
                   </FormItem>
@@ -295,7 +296,7 @@
                     {{$moment.unix(ruleForm.outTime/1000).format("YYYY-MM-DD HH:mm")}}
                   </FormItem>
                 </div>
-                <div v-if="updateStatus" class="editOrder">
+                <div v-if="updateStatus && ruleForm.orderStatus == 'notLiveIn'" class="editOrder">
                   <FormItem :label-width="50" label="房间:" class="margin-bottom0">
                     <Select v-model="ruleForm.roomId" clearable size="small" style="width:100px" @on-open-change="filterRoom($event,ruleForm.roomId,ruleForm.inTime,ruleForm.outTime,ruleForm.tags[0].id,ruleForm.roomTypeId,ruleForm)">
                       <Option v-for="(item,index) in roomList" :key="index" :value="item.id" @click.native="chgRoom($event,item.id,item.room_no,item.group_level1_name,item.group_level1_id)">{{item.room_no}}({{item.group_level1_name}})</Option>
@@ -321,7 +322,7 @@
                 </div>
               </div>
               <div>
-                <div v-if="updateStatus == false">
+                <div v-if="updateStatus == false || (updateStatus && ruleForm.orderStatus == 'livedIn')"">
                   <FormItem :label-width="70" label="订单类型:" class="margin-bottom0">
                     <span v-if="ruleForm.orderType == '1'">日租</span>
                     <span v-if="ruleForm.orderType == '2'">时租</span>
@@ -334,7 +335,7 @@
                     <span v-if="ruleForm.status == 'cancel'">已取消</span>
                   </FormItem>
                 </div>
-                <div v-if="updateStatus">
+                <div v-if="updateStatus && ruleForm.orderStatus == 'notLiveIn'">
                   <FormItem :label-width="50" label="房型:" class="margin-bottom0">
                     <Select v-model="ruleForm.roomTypeId" clearable size="small" style="width:100px" @on-change="chgMainType($event,ruleForm)" @on-clear="clearRoomType()">
                       <Option v-for="(item,index) in typeList" :key="index" :value="item.id">{{item.name}}</Option>
@@ -363,7 +364,7 @@
             <Card class="orderCard pull-right margin-bottom10" :class="{'w96-full':showEditOrder,'w100-full':!showEditOrder}">
               <div>
                 <div>
-                  <div v-if="updateStatus == false">
+                  <div v-if="updateStatus == false || (updateStatus && item.order_status == 'livedIn')">
                     <FormItem :label-width="70" label="姓名:" class="margin-bottom0">
                       {{item.real_name}}
                     </FormItem>
@@ -377,7 +378,7 @@
                       {{item.card_id}}
                     </FormItem>
                   </div>
-                  <div v-if="updateStatus" class="editOrder">
+                  <div v-if="updateStatus && item.order_status == 'notLiveIn'" class="editOrder">
                     <FormItem :label-width="50" label="姓名:" class="margin-bottom0">
                       <Input placeholder="" size="small" style="width:100px" v-model="item.real_name"></Input>
                     </FormItem>
@@ -404,7 +405,7 @@
                   </div>
                 </div>
                 <div>
-                  <div v-if="updateStatus == false">
+                  <div v-if="updateStatus == false || (updateStatus && item.order_status == 'livedIn')">
                     <FormItem :label-width="70" label="房间:" class="margin-bottom0">
                       {{item.room_no}}({{item.room_group_name}})
                     </FormItem>
@@ -430,7 +431,7 @@
                       {{$moment.unix(item.check_out_time/1000).format("YYYY-MM-DD HH:mm")}}
                     </FormItem>
                   </div>
-                  <div v-if="updateStatus" class="editOrder">
+                  <div v-if="updateStatus && item.order_status == 'notLiveIn'"" class="editOrder">
                     <FormItem :label-width="50" label="房间:" class="margin-bottom0">
                       <Select v-model="item.room_id" clearable size="small" style="width:100px" @on-open-change="filterRoom($event,item.room_id,item.check_in_time,item.check_out_time,item.room_tags[0].id,item.room_type_id,item,index)">
                         <Option v-for="(item,roomIndex) in roomList" :key="roomIndex" :value="item.id" @click.native="chgChildRoom($event,index,item.id,item.room_no,item.group_level1_name,item.group_level1_id)">{{item.room_no}}({{item.group_level1_name}})</Option>
@@ -456,7 +457,7 @@
                   </div>
                 </div>
                 <div>
-                  <div v-if="updateStatus == false">
+                  <div v-if="updateStatus == false || (updateStatus && item.order_status == 'livedIn')"">
                     <FormItem :label-width="70" label="订单类型:" class="margin-bottom0">
                       <span v-if="item.check_in_type == '1'">日租</span>
                       <span v-if="item.check_in_type == '2'">时租</span>
@@ -469,7 +470,7 @@
                       <span v-if="item.order_status == 'cancel'">已取消</span>
                     </FormItem>
                   </div>
-                  <div v-if="updateStatus">
+                  <div v-if="updateStatus && item.order_status == 'notLiveIn'">
                     <FormItem :label-width="50" label="房型:" class="margin-bottom0">
                       <Select v-model="item.room_type_id" clearable size="small" style="width:100px" @on-change="chgChildType($event,index,item)" @on-clear="clearRoomChildType(index)">
                         <Option v-for="(item,index) in typeList" :key="index" :value="item.id">{{item.name}}</Option>
@@ -526,6 +527,7 @@
         checkedOrder:false,
         trueValue:true,
         updateStatus:false,
+        editStatus:false,
         timeType:1,
         modalTitle:'',
         userSearch:"",
@@ -847,7 +849,7 @@
         this.G_ORDERID = orderId;
         this.G_ORDERSN = orderSn;
       },
-      cancelOrderOpr(status){
+      cancelOrderOpr(status,type){
         this.detailOrder(this.G_ORDERID,this.G_ORDERSN);
         this.goOutStatus = status;
         this.showEditOrder = status;
@@ -939,7 +941,7 @@
             });
           }
         }
-        //console.log(this.orderUserInfo);
+        //console.log(this.checkList);
       },
       selOnlyBox(event,val,realName,phone,cardType,cardId,roomNo,groupName){
         if(event.target.checked){
@@ -977,27 +979,43 @@
         if(this.oprType=='sendPwd' && type == "livedIn"){
           return this.checkList.includes(item) ? item : false;
         }
-        if(this.oprType=='sendPwd' && type == "notliveIn"){
+        if(this.oprType=='sendPwd' && type == "notLiveIn"){
           return this.checkList.includes(item) ? item : false;
         }
-        if(this.oprType=='inRoom' && type != "notliveIn"){
+        if(this.oprType=='inRoom' && type == "notLiveIn"){
           return this.checkList.includes(item) ? item : false;
         }
-        if(this.oprType=='cancelOrder' && type != "notliveIn"){
+        if(this.oprType=='cancelOrder' && (type != "livedIn" && type != "levelOff")){
           return this.checkList.includes(item) ? item : false;
+        }
+
+        //如果有被禁用的项，过滤掉
+        if(this.checkList.includes(item)){
+          for(var i=0;i<this.checkList.length;i++){
+            if(this.checkList[i] == item){
+              this.checkList.splice(i,1);
+            }
+          }
+          console.log(this.checkList);
         }
       },
       setDisabled(item){
         if(this.oprType=='outRoom' && item != "livedIn"){
           return true;
         }
-        if(this.oprType=='sendPwd' && (item != "notliveIn" && item != "livedIn")){
+        if(this.oprType=='sendPwd' && (item != "notLiveIn" && item != "livedIn")){
           return true;
         }
-        if(this.oprType=='inRoom' && item == "notliveIn"){
+        if(this.oprType=='inRoom' && item != "notLiveIn"){
           return true;
         }
-        if(this.oprType=='cancelOrder' && item == "notliveIn"){
+        if(this.oprType=='inRoom' && item == "livedIn"){
+          return true;
+        }
+        if(this.oprType=='cancelOrder' && item == "livedIn"){
+          return true;
+        }
+        if(this.oprType=='cancelOrder' && item == "levelOff"){
           return true;
         }
       },

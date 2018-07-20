@@ -30,19 +30,19 @@
         </div>
       </router-link>
       <router-link to="/layout/preInOrderManage" @click.native="activeSliderMenu('preInOrderManage')">
-        <div :class="{'menu-active-green':menu=='preInOrderManage'}" style="height:35px;line-height:35px;border-radius: 5px;text-align: center;position: relative">
+        <div :class="{'menu-active-green':menu=='preInOrderManage'}" style="height:35px;line-height:35px;border-radius: 5px;text-align: center;margin-top:10px;position: relative">
           今日预住
           <Badge :count="preInOrder" class-name="demo-badge-alone menu-badge text-green"></Badge>
         </div>
       </router-link>
       <router-link to="/layout/nowInOrderManage" @click.native="activeSliderMenu('nowInOrderManage')">
-        <div :class="{'menu-active-green':menu=='nowInOrderManage'}" style="height:35px;line-height:35px;border-radius: 5px;text-align: center;position: relative">
+        <div :class="{'menu-active-green':menu=='nowInOrderManage'}" style="height:35px;line-height:35px;border-radius: 5px;text-align: center;margin-top:10px;position: relative">
           当前入住
           <Badge :count="nowInOrder" class-name="demo-badge-alone menu-badge text-green"></Badge>
         </div>
       </router-link>
       <router-link to="/layout/preOutOrderManage" @click.native="activeSliderMenu('preOutOrderManage')">
-        <div :class="{'menu-active-green':menu=='preOutOrderManage'}" style="height:35px;line-height:35px;border-radius: 5px;text-align: center;position: relative">
+        <div :class="{'menu-active-green':menu=='preOutOrderManage'}" style="height:35px;line-height:35px;border-radius: 5px;text-align: center;margin-top:10px;position: relative">
           今日预离
           <Badge :count="preOutOrder" class-name="demo-badge-alone menu-badge text-green"></Badge>
         </div>
