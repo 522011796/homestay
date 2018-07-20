@@ -1,22 +1,28 @@
 <template>
   <div>
-    <Button type="success" @click="show()">click</Button>
-    <Modal
-      v-model="showmodel"
-      title="Title"
-      ok-text="保存"
-      cancel-text="取消"
-      width="700"
-      >
-        <Form inline class="editOrder">
-          <FormItem label="姓名:" class="margin-bottom0" :label-width="70">
-            <Input type="text" size="small" style="width:100px" v-model="ruleForm.relaName" :maxlength="20"></Input>
-          </FormItem>
-          <FormItem label="手机:" class="margin-bottom0" :label-width="70">
-            <Input type="text" size="small" style="width:100px" v-model="ruleForm.phone" :maxlength="11"></Input>
-          </FormItem>
-        </Form>
-    </Modal>
+    <div>
+      <Form :model="ruleForm" ref="ruleForm" :label-width="80">
+        <!--<FormItem label="test" prop="roomNo" :rules="$filter_rules({required:true})">
+          <div>
+            <Input type="text" style="width: 120px" v-model="ruleForm.roomNo"></Input>
+            <i class=" fa fa-plus-circle" @click="add()"></i>
+          </div>
+        </FormItem>-->
+        <FormItem v-for="(item,index) in ruleForm.inputList" :key="index" label="test" :prop="'inputList.' + index + '.roomNo'" :rules="$filter_rules({required:true})">
+          <div>
+            <Input type="text" v-model="item.roomNo" style="width: 120px"></Input>
+            <i v-if="index==0" class="fa fa-plus-circle" @click="add()"></i>
+            <i v-else class="fa fa-minus-circle" @click="muti(index)"></i>
+          </div>
+        </FormItem>
+        <FormItem label="test2" prop="roomNo1" :rules="$filter_rules({required:true})">
+          <div>
+            <Input type="text" v-model="ruleForm.roomNo1" style="width: 120px"></Input>
+          </div>
+        </FormItem>
+      </Form>
+      <button type="button" @click="sub('ruleForm')">click</button>
+    </div>
   </div>
 </template>
 
@@ -25,36 +31,11 @@
     name: 'test',
     data () {
       return {
-        showmodel:false,
         ruleForm:{
-          orderSn:'',
-          payType:'',
-          channel:'',
-          remarks:'',
-          realName:'',
-          roomId:'',
-          phone:'',
-          cardType:'',
-          cardId:'',
-          roomNo:'',
-          roomGroupName:'',
-          roomGroupId:'',
-          tags:[],
-          inTime:'',
-          outTime:'',
-          orderType:'',
-          status:'',
-          relaOrderList:[],
-          orderId:'',
-          orderStatus:'',
-          groupName:'',
-          inTimeArr:'',
-          outTimeArr:'',
-          subSn:'',
-          liveNowGl:false,
-          selTagId:'',//用于修改订单时候存主订单的tagid
-          selTypeId:'',//用于修改订单时候存主订单的typeid
-          roomTypeId:''
+          inputList:[{
+            roomNo:''
+          }],
+          roomNo1:''
         }
       }
     },
@@ -62,8 +43,24 @@
 
     },
     methods:{
-      show(){
-        this.showmodel = true;
+      add(){
+        this.ruleForm.inputList.push(
+          {roomNo:''}
+        );
+      },
+      muti(index){
+        this.ruleForm.inputList.splice(index,1);
+      },
+      sub(name){
+        this.$refs[name].validate((valid) => {
+          if (valid) {
+            var str = "";
+            for(var i=0;i<this.ruleForm.inputList.length;i++){
+              str += this.ruleForm.inputList[i].roomNo+",";
+            }
+            console.log(str);
+          }
+        });
       }
     }
   }
