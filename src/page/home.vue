@@ -108,7 +108,9 @@
               <Row class="w200 margin-top10" v-if="item.status == 101">
                 <Col span="20">
                 <span>预定</span>
-                <span class="home-status-num"></span>
+                <span class="home-status-num">
+                  <i class="fa fa-calendar-minus-o text-green" style="font-size: 10px"></i>
+                </span>
                 </Col>
                 <Col span="4" class="custom-font-999999 text-right">
                 {{item.count}}
@@ -117,7 +119,9 @@
               <Row class="w200 margin-top10" v-if="item.status == 102">
                 <Col span="20">
                 <span>维修</span>
-                <span class="home-status-num"></span>
+                <span class="home-status-num">
+                  <i class="fa fa-warning custom-font-ffa044" style="font-size: 10px"></i>
+                </span>
                 </Col>
                 <Col span="4" class="custom-font-999999 text-right">
                 {{item.count}}
@@ -210,7 +214,7 @@
                 <div class="margin-top10">
                   <!--<span class="home-room-statusIcon-bulid span-inline"></span>
                   <span class="home-room-statusIcon-clean span-inline"></span>-->
-                  <i class="fa fa-check-circle text-green" aria-hidden="true" v-if="item.book_status == 1"></i>
+                  <i class="fa fa-calendar-minus-o text-green" aria-hidden="true" v-if="item.book_status != 0"></i>
                   <i class="fa fa-warning custom-font-ffa044" aria-hidden="true" v-if="item.fix_status == 1"></i>
                 </div>
                 <div>
