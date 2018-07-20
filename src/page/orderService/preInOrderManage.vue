@@ -851,7 +851,7 @@
         this.G_ORDERSN = orderSn;
       },
       cancelOrderOpr(status,type){
-        this.detailOrder(this.G_ORDERID,this.G_ORDERSN);
+        //this.detailOrder(this.G_ORDERID,this.G_ORDERSN);
         this.goOutStatus = status;
         this.showEditOrder = status;
         this.goInStatus = status;
