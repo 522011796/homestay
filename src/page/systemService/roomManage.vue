@@ -10,7 +10,14 @@
           <Button type="success" icon="plus" @click="show('roomList')">
             添加房间
           </Button>
-          <Dropdown trigger="click" class="margin-top0-lr8">
+          <Poptip placement="bottom-start" width="100px">
+            <Button type="success" icon="locked">添加门锁</Button>
+            <div class="api" slot="content" style="text-align: center">
+              <div>请扫描二维码下载APP添加门锁</div>
+              <img src="./../../assets/img/192.png" style="height:100px;width: 100px">
+            </div>
+          </Poptip>
+          <Dropdown trigger="click" class="">
             <Button type="default">
               {{searchRoomGroup}}
               <Icon type="arrow-down-b"></Icon>
@@ -19,7 +26,7 @@
               <DropdownItem v-for="(item,index) in groups.list" :key="index" :data-name="item.name" @click.native="selGroup($event,item.id)">{{item.name}}</DropdownItem>
             </DropdownMenu>
           </Dropdown>
-          <Dropdown trigger="click" class="margin-top0-lr8">
+          <Dropdown trigger="click" class="">
             <Button type="default">
               {{searchRoomType}}
               <Icon type="arrow-down-b"></Icon>
@@ -28,7 +35,7 @@
               <DropdownItem v-for="(item,index) in types" :key="index" :data-name="item.name" @click.native="selType($event,item.id)">{{item.name}}</DropdownItem>
             </DropdownMenu>
           </Dropdown>
-          <Dropdown trigger="click" class="margin-top0-lr8">
+          <Dropdown trigger="click" class="">
             <Button type="default">
               {{searchRoomTags}}
               <Icon type="arrow-down-b"></Icon>
@@ -37,7 +44,7 @@
               <DropdownItem v-for="(item,index) in tags" :key="index" :data-name="item.name" @click.native="selTag($event,item.id)">{{item.tag}}</DropdownItem>
             </DropdownMenu>
           </Dropdown>
-          <Dropdown trigger="click" class="margin-top0-lr8">
+          <Dropdown trigger="click" class="">
             <Button type="default">
               {{searchRoomLocks}}
               <Icon type="arrow-down-b"></Icon>
@@ -49,7 +56,7 @@
               <DropdownItem  @click.native="selLocks($event,'none')">未添加</DropdownItem>
             </DropdownMenu>
           </Dropdown>
-          <Input placeholder="请输入房间号" class="w150" v-model="roomNo" clearable @on-change="search()"></Input>
+          <Input placeholder="请输入房间号" class="w100" v-model="roomNo" clearable @on-change="search()"></Input>
           <Button type="success" @click="search()">搜索</Button>
           <Button @click="clearSearch()">清除</Button>
 

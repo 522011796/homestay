@@ -28,7 +28,7 @@
               <Button type="success">添加门卡</Button>
               <div class="api" slot="content" style="text-align: center">
                 <div>请扫描二维码下载APP添加门卡</div>
-                <img src="./../../assets/img/192.png" style="height:100px;width: 120px">
+                <img src="./../../assets/img/192.png" style="height:100px;width: 100px">
               </div>
             </Poptip>
             <Input placeholder="请输入名称" class="w180" v-model="searchCardName" clearable @on-change="searchCard()"></Input>
