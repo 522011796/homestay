@@ -163,8 +163,10 @@
         <h3>{{modalTitle}}</h3>
       </div>
       <Form :model="ruleForm" ref="ruleForm" :label-width="80" style="width: 60%;margin:0 auto;">
-        <FormItem label="房间号" prop="roomNo" :rules="$filter_rules({required:true})">
-          <Input v-model="ruleForm.roomNo" placeholder="" class="w220" :maxlength="20"></Input>
+        <FormItem v-for="(item,index) in ruleForm.inputList" :key="index" :label="index==0 ? '房间号' : ''" :prop="'inputList.' + index + '.roomNo'" :rules="$filter_rules({required:true})" style="position: relative">
+          <Input v-model="item.roomNo" placeholder="" class="w220" :maxlength="20"></Input>
+          <i v-if="index==0 && !editRoomNo" class="fa fa-plus-circle" style="position: absolute;top:10px;right:-20px;" @click="add()"></i>
+          <i v-else-if="index > 0 && editRoomNo == false" class="fa fa-minus-circle" style="position: absolute;top:10px;right:-20px;" @click="muti(index)"></i>
         </FormItem>
         <FormItem label="房间分组" prop="groupLevel1Name" :rules="$filter_rules({required:true})">
           <Input v-model="ruleForm.groupLevel1Name" style="display: none"></Input>
@@ -327,6 +329,7 @@
         editTags:false,
         editType:false,
         editGroup:false,
+        editRoomNo:false,
         errorTips:'',
         allCheckBox:[],
         roomNo:'',
@@ -522,6 +525,9 @@
           addGroupName:'',//用于添加单个组
           addTypeName:'',//用于添加单个房型
           addTagsName:'',//用于添加单个房态
+          inputList:[{//房间号列表
+            roomNo:''
+          }]
         },
         ruleTypeForm: {
           id:'',
@@ -567,6 +573,7 @@
       },
       init(page){
         page = page ? page : 1;
+        this.current = page;
         var params = {
           page:page,
           num:this.pageNum,
@@ -704,11 +711,13 @@
       edit (params,type) {
         if(type == 'roomList'){
           this.modalTitle = "编辑房间";
+          this.editRoomNo = true;
           this.allCheckBox = [];
           this.ruleForm.roomTags = [];
           this.ruleForm = {
             id:params.row.id,
             roomNo: params.row.room_no,
+            inputList:[{roomNo:params.row.room_no}],
             roomType: params.row.room_type,
             roomTypeId: params.row.room_type_id,
             groupLevel1Id: params.row.group_level1_id,
@@ -813,12 +822,17 @@
             }
             this.ruleForm.roomTags = JSON.stringify(this.ruleForm.roomTags);
             this.ruleForm.roomTagIds = (ids.substring(ids.length-1)==',')?ids.substring(0,ids.length-1):ids;
-            var params = Object.assign({}, data);
+            var params = Object.assign({}, data);;
             var url = "";
             if(this.ruleForm.id){
               url = "/proxy/room/update";
             }else{
               url = "/proxy/room/add";
+              var str = [];
+              for(var i=0;i<this.ruleForm.inputList.length;i++){
+                str.push(this.ruleForm.inputList[i].roomNo);
+              }
+              params.roomNo = JSON.stringify(str);
             }
             this.$api.postQs(url, this.$utils.clearData(params) ,res => {
               this.$Message.success(res.data.desc);
@@ -1032,13 +1046,23 @@
           this.$Message.success(res.data.desc);
         },{"Content-Type":'application/x-www-form-urlencoded; charset=UTF-8'});
       },
+      add(){
+        this.ruleForm.inputList.push(
+          {roomNo:''}
+        );
+      },
+      muti(index){
+        this.ruleForm.inputList.splice(index,1);
+      },
       closeModal(){
         this.roomGroupText = "请选择分组";
         this.roomTypeText = "请选择房型";
         this.roomTagsText = "请选择特性";
+        this.editRoomNo = false;
         this.ruleForm = {
           id:'',
           roomNo: '',
+          inputList:[{roomNo:''}],
           roomType: '',
           roomTypeId: '',
           groupLevel1Id: '',
