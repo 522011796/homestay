@@ -13,10 +13,16 @@
       <Modal
       :styles="{top: '65px'}"
       v-model="showmodel"
-      title="xxxxxxx"
       :mask-closable="false"
       :closable="false"
-      @on-visible-change = "chgModal"  width="760">
+      @on-visible-change = "chgModal"  width="760" class="orderTab">
+
+        <div slot="header" class="modalTitle">
+          <Tabs @on-click="tabChange($event)" value="checkin">
+            <TabPane label="入住" name="in"></TabPane>
+            <TabPane label="预定" name="checkin"></TabPane>
+          </Tabs>
+        </div>
 
       <Form inline v-for="(item,index) in ruleForm" :key="index">
         <div class="editOrder">
@@ -27,7 +33,7 @@
             <Input type="text" size="small" style="width:100px" v-model="item.phone" :maxlength="11"></Input>
           </FormItem>
           <FormItem :label-width="50" label="证件:" class="margin-bottom0">
-            <Select size="small" v-model="item.cardType" style="width:100px" @on-change="chgCardType($event)">
+            <Select size="small" v-model="item.cardType" style="width:100px" @on-change="chgCardType($event,index)">
               <Option value="idcard">身份证</Option>
               <Option value="residenceBooklet">户口簿</Option>
               <Option value="passportCard1">外交护照</Option>
@@ -57,9 +63,10 @@
             </Select>
           </FormItem>
           <FormItem :label-width="50" label="入住:" class="margin-bottom0">
-            <DatePicker size="small" type="date" placeholder="Select date" style="width: 90px" :value="item.inTime" @on-change="chgMainTime($event,'mainInTime',index)"></DatePicker>
-            <TimePicker v-show="item.timeType == 1" format="HH:mm" :steps="[1, 100]" size="small" placeholder="Select time" style="width:60px" :value="item.inTimeArr" @on-change="selMainTime($event,'mainInTime',index)"></TimePicker>
-            <TimePicker v-show="item.timeType == 2" format="HH:mm" :steps="[1, 5]" size="small" placeholder="Select time" style="width:60px" :value="item.inTimeArr" @on-change="selMainTime($event,'mainInTime',index)"></TimePicker>
+            <Input v-if="tabType == 'in'" size="small" v-model="item.inTime + ' ' + item.inTimeArr" style="width: 153px"></Input>
+            <DatePicker v-if="tabType == 'checkin'" size="small" type="date" placeholder="Select date" style="width: 90px" :value="item.inTime" @on-change="chgMainTime($event,'mainInTime',index)"></DatePicker>
+            <TimePicker v-show="item.timeType == 1 && tabType == 'checkin'" format="HH:mm" :steps="[1, 100]" size="small" placeholder="Select time" style="width:60px" :value="item.inTimeArr" @on-change="selMainTime($event,'mainInTime',index)"></TimePicker>
+            <TimePicker v-show="item.timeType == 2 && tabType == 'checkin'" format="HH:mm" :steps="[1, 5]" size="small" placeholder="Select time" style="width:60px" :value="item.inTimeArr" @on-change="selMainTime($event,'mainInTime',index)"></TimePicker>
           </FormItem>
           <FormItem :label-width="50" label="离店:" class="margin-bottom0">
             <DatePicker size="small" type="date" placeholder="Select date" style="width: 90px" :value="item.outTime" :options="optionsEnd" @on-change="chgMainTime($event,'mainOutTime',index)" @on-open-change="openOutTime($event,index,'main')"></DatePicker>
@@ -110,6 +117,7 @@
         tagList:[],
         typeList:[],
         showmodel:false,
+        tabType:'checkin',
         ruleForm:[{
           timeType:'1',
           orderSn:'',
@@ -311,7 +319,7 @@
               this.ruleForm[index].roomId = '';
             }
           }else{
-            if(type == 'init' || type != 'openRoom'){
+            if(type == 'init' || type != 'openRoom'){//如果是初始或者不是展开房间下拉框，执行自动选择房间的操作
               this.ruleForm[index].roomId = arr[0].id;
             }
           }
@@ -319,7 +327,7 @@
       },
       save(){
         this.showmodel = true;
-        console.log(11);
+        console.log(this.ruleForm);
       },
       cancel(){
 
@@ -359,6 +367,25 @@
         this.ruleForm[index].roomNo = roomNo;
         this.ruleForm[index].groupName = groupName;
         this.ruleForm[index].roomGroupId = groupId;
+      },
+      tabChange(type){
+        this.tabType = type;
+        for(var i = 0;i < this.ruleForm.length;i++){
+          if(type == 'in'){
+            this.ruleForm[i].inTime = this.$moment().format('YYYY-MM-DD');
+            this.ruleForm[i].inTimeArr = this.$moment().format('HH:mm');
+            this.ruleForm[i].timeType = "1";
+          }
+          if(type == 'checkin'){
+            this.ruleForm[i].inTime = this.$moment().format('YYYY-MM-DD');
+            this.ruleForm[i].outTimeArr = "12:00";
+            this.ruleForm[i].inTimeArr = "12:00";
+            this.ruleForm[i].timeType = "1";
+          }
+        }
+      },
+      chgCardType(event,index){
+        this.ruleForm[index].cardType = event;
       }
     }
   }

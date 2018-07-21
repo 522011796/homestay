@@ -561,3 +561,12 @@ tr:hover{
   border-color: #3ab573;
   box-shadow: none;
 }
+.orderTab .ivu-modal-header {
+  border-bottom: 1px solid #e9eaec;
+  padding: 5px 0px;
+  line-height: 1;
+}
+.orderTab .ivu-tabs-bar{
+  border-bottom: 1px solid #dddee1;
+  margin-bottom: 0px;
+}
