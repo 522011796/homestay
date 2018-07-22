@@ -61,17 +61,17 @@ export default new Router({
             {
               path: '/layout/preInOrderManage',
               name: 'preInOrderManage',
-              component: PreInOrderManage
+              component: AllOrderManage
             },
             {
               path: '/layout/nowInOrderManage',
               name: 'nowInOrderManage',
-              component: NowInOrderManage
+              component: AllOrderManage
             },
             {
               path: '/layout/preOutOrderManage',
               name: 'preOutOrderManage',
-              component: PreOutOrderManage
+              component: AllOrderManage
             },
             {
               path: '/layout/basicManage',

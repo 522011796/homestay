@@ -629,7 +629,8 @@
           userSearch:this.userSearch,
           orderStatus:this.orderStatus,
           channel:this.orderChannel,
-          payType:this.orderPayType
+          payType:this.orderPayType,
+          filter:this.$route.query.type
         };
         this.showLoading = true;
         this.$api.get("/proxy/order/page", this.$utils.clearData(params) ,res => {
@@ -1408,6 +1409,10 @@
             this.checked = false;
           }*/
         }
+      },
+      '$route' (to, from) {
+        //刷新参数放到这里里面去触发就可以刷新相同界面了
+        this.init();
       }
     },
   }
