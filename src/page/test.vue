@@ -81,7 +81,7 @@
           <div class="editOrder">
             <FormItem :label-width="50" label="房型:" class="margin-bottom0">
               <Select v-model="item.roomTypeId" clearable size="small" style="width:100px" @on-change="chgMainType($event,item,index)" @on-clear="clearRoomType(index)">
-                <Option v-for="(itemType,indexType) in typeList" :key="indexType" :value="itemType.id">{{itemType.name}}</Option>
+                <Option v-for="(itemType,indexType) in typeOrderList" :key="indexType" :value="itemType.id">{{itemType.name}}</Option>
               </Select>
             </FormItem>
             <FormItem :label-width="70" label="订单类型:" class="margin-bottom0">
