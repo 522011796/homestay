@@ -26,6 +26,9 @@
           <Icon type="arrow-down-b"></Icon>
         </a>
         <DropdownMenu slot="list">
+          <DropdownItem>
+            <a href="http://reg.9451.com/findpas.php">找回密码</a>
+          </DropdownItem>
           <DropdownItem @click.native="logout">退出登录</DropdownItem>
         </DropdownMenu>
       </Dropdown>
