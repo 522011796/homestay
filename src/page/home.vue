@@ -591,7 +591,7 @@
       v-model="showmodel"
       :mask-closable="false"
       :closable="false"
-      @on-visible-change = "chgOrderModal"  width="760" class="orderTab">
+      @on-visible-change = "chgOrderModal"  width="760" class="orderTab orderCard">
 
       <div slot="header" class="modalTitle">
         <Tabs @on-click="tabChange($event)" :value="tabType">
@@ -854,7 +854,7 @@
           realName:'',
           roomId:'',
           phone:'',
-          cardType:'',
+          cardType:'idcard',
           cardId:'',
           roomNo:'',
           roomGroupName:'',
@@ -1527,7 +1527,7 @@
             realName:'',
             roomId:'',
             phone:'',
-            cardType:'',
+            cardType:'idcard',
             cardId:'',
             roomNo:'',
             roomGroupName:'',
