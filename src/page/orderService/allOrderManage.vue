@@ -99,7 +99,7 @@
                 <span>{{$moment.unix(item.check_in_time/1000).format("YYYY-MM-DD HH:mm")}}</span>
               </td>
               <td class="custom-td-value">
-                <span v-if="item.channel == null">--</span>
+                <span v-if="item.channel == null || !item.channel">--</span>
                 <span v-if="item.channel == '1'">线下</span>
                 <span v-if="item.channel == '2'">携程</span>
                 <span v-if="item.channel == '3'">艺龙</span>
@@ -108,7 +108,7 @@
                 <span v-if="item.channel == '99'">其他</span>
               </td>
               <td class="custom-td-value">
-                <span v-if="item.pay_type == null">--</span>
+                <span v-if="item.pay_type == null || !item.pay_type">--</span>
                 <span v-if="item.pay_type == '1'">到店现付</span>
                 <span v-if="item.pay_type == '2'">已担保</span>
                 <span v-if="item.pay_type == '3'">全额预付</span>
@@ -144,20 +144,20 @@
             {{ruleForm.orderSn}}
           </FormItem>
           <FormItem label="支付类型:" class="margin-bottom0">
-            <span v-if="ruleForm.payType == null">--</span>
+            <span v-if="ruleForm.payType == null || !ruleForm.payType">--</span>
             <span v-if="ruleForm.payType == '1'">到店现付</span>
             <span v-if="ruleForm.payType == '2'">已担保</span>
             <span v-if="ruleForm.payType == '3'">全额预付</span>
             <span v-if="ruleForm.payType == '4'">部分预付</span>
           </FormItem>
           <FormItem label="渠道来源:" class="margin-bottom0">
-            <span v-if="ruleForm.payType == null">--</span>
-            <span v-if="ruleForm.payType == '1'">线下</span>
-            <span v-if="ruleForm.payType == '2'">携程</span>
-            <span v-if="ruleForm.payType == '3'">艺龙</span>
-            <span v-if="ruleForm.payType == '4'">去哪儿</span>
-            <span v-if="ruleForm.payType == '5'">飞猪</span>
-            <span v-if="ruleForm.payType == '99'">其他</span>
+            <span v-if="ruleForm.channel == null || !ruleForm.channel">--</span>
+            <span v-if="ruleForm.channel == '1'">线下</span>
+            <span v-if="ruleForm.channel == '2'">携程</span>
+            <span v-if="ruleForm.channel == '3'">艺龙</span>
+            <span v-if="ruleForm.channel == '4'">去哪儿</span>
+            <span v-if="ruleForm.channel == '5'">飞猪</span>
+            <span v-if="ruleForm.channel == '99'">其他</span>
           </FormItem>
           <FormItem label="备注:" class="margin-bottom0">
             <span v-if="ruleForm.remarks == ''">--</span>
@@ -238,9 +238,18 @@
                   </FormItem>
                   <FormItem :label-width="70" label="证件:" class="margin-bottom0">
                     <span v-if="ruleForm.cardType == 'idcard'">身份证</span>
+                    <span v-if="ruleForm.cardType == 'residenceBooklet'">户口簿</span>
+                    <span v-if="ruleForm.cardType == 'passportCard1'">外交护照</span>
+                    <span v-if="ruleForm.cardType == 'passportCard2'">普通护照</span>
+                    <span v-if="ruleForm.cardType == 'passportCard3'">公务护照</span>
+                    <span v-if="ruleForm.cardType == 'officeCard'">军官证</span>
+                    <span v-if="ruleForm.cardType == 'soldierCard'">士兵证</span>
+                    <span v-if="ruleForm.cardType == 'passCard'">能行证</span>
+                    <span v-if="ruleForm.cardType == 'otherCard'">otherCard</span>
                   </FormItem>
                   <FormItem :label-width="70" label="证件号码:" class="margin-bottom0">
-                    {{ruleForm.cardId}}
+                    <span v-if="ruleForm.cardId == ''">--</span>
+                    <span v-else="ruleForm.cardId == ''">{{ruleForm.cardId}}</span>
                   </FormItem>
                 </div>
                 <div v-if="updateStatus && ruleForm.orderStatus == 'notLiveIn'" class="editOrder">
@@ -373,9 +382,19 @@
                     </FormItem>
                     <FormItem :label-width="70" label="证件:" class="margin-bottom0">
                       <span v-if="item.card_type == 'idcard'">身份证</span>
+                      <span v-if="item.card_type == 'idcard'">身份证</span>
+                      <span v-if="item.card_type == 'residenceBooklet'">户口簿</span>
+                      <span v-if="item.card_type == 'passportCard1'">外交护照</span>
+                      <span v-if="item.card_typee == 'passportCard2'">普通护照</span>
+                      <span v-if="item.card_type == 'passportCard3'">公务护照</span>
+                      <span v-if="item.card_type == 'officeCard'">军官证</span>
+                      <span v-if="item.card_type == 'soldierCard'">士兵证</span>
+                      <span v-if="item.card_type == 'passCard'">能行证</span>
+                      <span v-if="item.card_type == 'otherCard'">otherCard</span>
                     </FormItem>
                     <FormItem :label-width="70" label="证件号码:" class="margin-bottom0">
-                      {{item.card_id}}
+                      <span v-if="item.card_id == ''">--</span>
+                      <span v-else="item.card_id == ''">{{item.card_id}}</span>
                     </FormItem>
                   </div>
                   <div v-if="updateStatus && item.order_status == 'notLiveIn'" class="editOrder">
@@ -555,6 +574,7 @@
         G_ORDERID:'',
         G_ORDERSN:'',
         errorTips:'',
+        pageNow:'',
         ruleForm:{
           orderSn:'',
           payType:'',
@@ -602,9 +622,9 @@
     },
     methods:{
       init(page){
-        page = page ? page : 1;
+        this.pageNow  = page ? page : this.pageNow;
         var params = {
-          page:page,
+          page:this.pageNow,
           num:this.pageNum,
           userSearch:this.userSearch,
           orderStatus:this.orderStatus,
@@ -796,7 +816,7 @@
         for(var i=0;i<this.ruleForm.relaOrderList.length;i++){
           if(this.ruleForm.relaOrderList[i].real_name == ''){
             this.errorTips = '关联订单中的姓名不能为空!';
-            break;
+            return;
           }
           if(this.ruleForm.relaOrderList[i].phone == ''){
             this.errorTips = '关联订单中的手机号不能为空!';

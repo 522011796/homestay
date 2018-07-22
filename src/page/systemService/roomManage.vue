@@ -338,6 +338,7 @@
         lockStatus:'',
         pageNum:12,
         current:1,
+        pageNow:'',
         totalCount:0,
         showLoading:false,
         tagList:[],
@@ -572,10 +573,9 @@
         }
       },
       init(page){
-        page = page ? page : 1;
-        this.current = page;
+        this.pageNow  = page ? page : this.pageNow;
         var params = {
-          page:page,
+          page:this.pageNow,
           num:this.pageNum,
           roomNo:this.roomNo,
           groupId:this.groupId,

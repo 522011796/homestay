@@ -146,6 +146,8 @@
         modalTitle:'',
         cardNameText:'暂不分配',
         titles:['可选房间','已选房间'],
+        pageNow: '',
+        pageNowCard: '',
         ruleCardForm:{
           id:'',
           name:'',
@@ -318,9 +320,9 @@
         this.initCard();
       },
       init(page){
-        page = page ? page : 1;
+        this.pageNow  = page ? page : this.pageNow;
         var params = {
-          page:page,
+          page:this.pageNow,
           num:this.pageNum,
           name:this.searchName
         };
@@ -334,9 +336,9 @@
         });
       },
       initCard(page){
-        page = page ? page : 1;
+        this.pageNowCard  = page ? page : this.pageNow;
         var params = {
-          page:page,
+          page:this.pageNowCard,
           num:this.pageNum,
           name:this.searchCardName
         };
