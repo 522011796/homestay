@@ -567,7 +567,7 @@ tr:hover{
   line-height: 1;
 }
 .orderTab .ivu-modal-body{
-  padding: px 16px 8px 16px;
+  padding: 16px 16px 8px 16px;
   font-size: 12px;
   line-height: 1.5;
 }
@@ -581,4 +581,16 @@ tr:hover{
 .app-footer .ivu-modal-footer{
   border-top: 0;
   padding: 0;
+}
+.head-username{
+  position: relative;
+  top:10px;
+  border-left:2px solid #ffffff;
+  display: inline-block;
+  height:30px;
+  line-height:30px;
+  color:#ffffff;
+  margin-left:10px;
+  padding-left:5px;
+  font-size:15px;
 }
