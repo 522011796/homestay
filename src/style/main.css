@@ -578,3 +578,7 @@ tr:hover{
 .editOrder textarea{
   height:100px !important;
 }
+.app-footer .ivu-modal-footer{
+  border-top: 0;
+  padding: 0;
+}
