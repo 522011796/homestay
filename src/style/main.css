@@ -583,8 +583,8 @@ tr:hover{
   padding: 0;
 }
 .head-username{
-  position: relative;
-  top:10px;
+  position: absolute;
+  top:25px;
   border-left:2px solid #ffffff;
   display: inline-block;
   height:30px;

@@ -1,10 +1,10 @@
 <template>
-  <div style="height:65px;line-height:65px;background: #3ab573">
+  <div style="height:65px;line-height:65px;background: #3ab573;position: relative">
     <div style="float: left;height:100%;position: relative">
       <img src="../assets/img/logo-in.png" style="height:55px;margin-top:5px;margin-left:35px;" alt="">
     </div>
-    <div style="float: left;">
-      <span class="head-username">{{headUsername}}</span>
+    <div class="head-username">
+      <span>{{headUsername}}</span>
     </div>
     <div style="float: left;height:100%;width: 70%">
       <div style="text-align: center;">
