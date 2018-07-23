@@ -155,7 +155,7 @@
                     });
                   }).catch(e => {
                     // 打印一下错误
-                    console.log(e)
+                    //console.log(e)
                   });
                   break;
                 default:
