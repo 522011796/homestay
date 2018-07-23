@@ -575,3 +575,6 @@ tr:hover{
   border-bottom: 1px solid #dddee1;
   margin-bottom: 0px;
 }
+.editOrder textarea{
+  height:100px !important;
+}

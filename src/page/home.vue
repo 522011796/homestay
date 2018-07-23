@@ -52,7 +52,7 @@
         </div>
         <div class="margin-top10">
             <div v-for="(item,index) in statusList" :key="index">
-              <Row class="w200 margin-top10" v-if="item.status == 0">
+              <Row class="w200 margin-top10" v-if="item.status == 0" @click.native="roomStatusSel('')">
                 <Col span="20">
                 <span>全部</span>
                 </Col>
@@ -60,7 +60,7 @@
                 {{item.count}}
                 </Col>
               </Row>
-              <Row class="w200 margin-top10" v-if="item.status == 1">
+              <Row class="w200 margin-top10" v-if="item.status == 1" @click.native="roomStatusSel(1)">
                 <Col span="20">
                 <span>空净</span>
                 <span class="home-status-num block-green"></span>
@@ -69,7 +69,7 @@
                 {{item.count}}
                 </Col>
               </Row>
-              <Row class="w200 margin-top10" v-if="item.status == 2">
+              <Row class="w200 margin-top10" v-if="item.status == 2" @click.native="roomStatusSel(2)">
                 <Col span="20">
                 <span>空脏</span>
                 <span class="home-status-num block-gray"></span>
@@ -78,7 +78,7 @@
                 {{item.count}}
                 </Col>
               </Row>
-              <Row class="w200 margin-top10" v-if="item.status == 3">
+              <Row class="w200 margin-top10" v-if="item.status == 3" @click.native="roomStatusSel(3)">
                 <Col span="20">
                 <span>住净</span>
                 <span class="home-status-num block-blue"></span>
@@ -87,7 +87,7 @@
                 {{item.count}}
                 </Col>
               </Row>
-              <Row class="w200 margin-top10" v-if="item.status == 4">
+              <Row class="w200 margin-top10" v-if="item.status == 4" @click.native="roomStatusSel(4)">
                 <Col span="20">
                 <span>住脏</span>
                 <span class="home-status-num block-link"></span>
@@ -96,7 +96,7 @@
                 {{item.count}}
                 </Col>
               </Row>
-              <Row class="w200 margin-top10" v-if="item.status == 99">
+              <Row class="w200 margin-top10" v-if="item.status == 99" @click.native="roomStatusSel(99)">
                 <Col span="20">
                 <span>停用</span>
                 <span class="home-status-num block-red"></span>
@@ -591,7 +591,7 @@
       v-model="showmodel"
       :mask-closable="false"
       :closable="false"
-      @on-visible-change = "chgOrderModal"  width="760" class="orderTab orderCard">
+      @on-visible-change = "chgOrderModal"  width="760" class="orderTab orderCard home-textarea">
 
       <div slot="header" class="modalTitle">
         <Tabs @on-click="tabChange($event)" :value="tabType">
@@ -641,7 +641,7 @@
               </Select>
             </FormItem>
             <FormItem :label-width="50" label="入住:" class="margin-bottom0">
-              <Input v-if="tabType == 'in'" size="small" v-model="item.inTime + ' ' + item.inTimeArr" style="width: 153px"></Input>
+              <Input v-if="tabType == 'in'" readonly size="small" v-model="item.inTime + ' ' + item.inTimeArr" style="width: 153px"></Input>
               <DatePicker v-if="tabType == 'checkin'" size="small" type="date" placeholder="Select date" style="width: 90px" :value="item.inTime" @on-change="chgMainTime($event,'mainInTime',index)"></DatePicker>
               <TimePicker v-show="item.timeType == 1 && tabType == 'checkin'" format="HH:mm" :steps="[1, 100]" size="small" placeholder="Select time" style="width:60px" :value="item.inTimeArr" @on-change="selMainTime($event,'mainInTime',index)"></TimePicker>
               <TimePicker v-show="item.timeType == 2 && tabType == 'checkin'" format="HH:mm" :steps="[1, 5]" size="small" placeholder="Select time" style="width:60px" :value="item.inTimeArr" @on-change="selMainTime($event,'mainInTime',index)"></TimePicker>
@@ -699,7 +699,7 @@
           </div>
           <div class="editOrder">
             <FormItem label="备注:" class="margin-bottom0">
-              <Input v-model="remarks" type="textarea" style="width:654px" placeholder=""  :maxlength="400"></Input>
+              <Input v-model="remarks" type="textarea" :rows="4" style="width:654px" placeholder="请输入不超过400个字符长度的信息"  :maxlength="400"></Input>
             </FormItem>
           </div>
         </Form>
@@ -778,6 +778,7 @@
         roomType:"",
         roomTags:"",
         lockStatus:"",
+        roomStatus:"",
         username:"",
         inTime:"",
         outTime:"",
@@ -979,7 +980,8 @@
           roomNo:this.searchRoomNo,
           groupLevel1Id:this.groupLevel1Id,
           roomTypeId:this.roomTypeId,
-          roomTagId:this.roomTagId
+          roomTagId:this.roomTagId,
+          status:this.roomStatus
         };
         this.$api.postQs("/proxy/room/countList", this.$utils.clearData(params) ,res => {
           var data = Object.assign({}, res.data.data);
@@ -1640,10 +1642,14 @@
         this.ruleOrderForm[index].selTypeId = '';
       },
       goIn(roomNo,roomId,groupName,groupId){
-        console.log(roomNo,roomId,groupName,groupId);
         this.tabType = 'in';
         this.orderOprType = 'in';
         this.showOrder(roomNo,roomId,groupName,groupId);
+      },
+      roomStatusSel(status){
+        console.log(status);
+        this.roomStatus = status;
+        this.getRoomList();
       }
     },
     mounted () {
