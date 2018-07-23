@@ -31,7 +31,7 @@ export default {
     }
   },
   created(){
-    var getExplorer = (function() {
+    var getExplorer = (function() {//版本检测
       var explorer = window.navigator.userAgent,
         compare = function(s) { return (explorer.indexOf(s) >= 0); },
         ie11 = (function() { return ("ActiveXObject" in window) })();
