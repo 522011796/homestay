@@ -3,7 +3,7 @@
     <router-view></router-view>
 
     <Modal
-      title="测试内容，如果你看到这个提示，表示浏览器版本验证生效"
+      title="测试内容，如果你看到这个提示，表示浏览器版本验证生效(样式什么的请暂时忽略)"
       v-model="ieVersion"
       :closable="false"
       :mask-closable="false"  class="app-footer">
@@ -46,7 +46,6 @@ export default {
     if (getExplorer == 'ie') {
       //alert('当前浏览器版本：IE');
       this.ieVersion = true;
-
     }
   }
 }
