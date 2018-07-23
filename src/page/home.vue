@@ -60,7 +60,7 @@
                 {{item.count}}
                 </Col>
               </Row>
-              <Row class="w200 margin-top10" v-if="item.status == 1" @click.native="roomStatusSel(1)">
+              <Row class="w200 margin-top10 home-status-hover" v-if="item.status == 1" @click.native="roomStatusSel(1)">
                 <Col span="20">
                 <span>空净</span>
                 <span class="home-status-num block-green"></span>
@@ -69,7 +69,7 @@
                 {{item.count}}
                 </Col>
               </Row>
-              <Row class="w200 margin-top10" v-if="item.status == 2" @click.native="roomStatusSel(2)">
+              <Row class="w200 margin-top10 home-status-hover" v-if="item.status == 2" @click.native="roomStatusSel(2)">
                 <Col span="20">
                 <span>空脏</span>
                 <span class="home-status-num block-gray"></span>
@@ -78,7 +78,7 @@
                 {{item.count}}
                 </Col>
               </Row>
-              <Row class="w200 margin-top10" v-if="item.status == 3" @click.native="roomStatusSel(3)">
+              <Row class="w200 margin-top10 home-status-hover" v-if="item.status == 3" @click.native="roomStatusSel(3)">
                 <Col span="20">
                 <span>住净</span>
                 <span class="home-status-num block-blue"></span>
@@ -87,7 +87,7 @@
                 {{item.count}}
                 </Col>
               </Row>
-              <Row class="w200 margin-top10" v-if="item.status == 4" @click.native="roomStatusSel(4)">
+              <Row class="w200 margin-top10 home-status-hover" v-if="item.status == 4" @click.native="roomStatusSel(4)">
                 <Col span="20">
                 <span>住脏</span>
                 <span class="home-status-num block-link"></span>
@@ -96,7 +96,7 @@
                 {{item.count}}
                 </Col>
               </Row>
-              <Row class="w200 margin-top10" v-if="item.status == 99" @click.native="roomStatusSel(99)">
+              <Row class="w200 margin-top10 home-status-hover" v-if="item.status == 99" @click.native="roomStatusSel(99)">
                 <Col span="20">
                 <span>停用</span>
                 <span class="home-status-num block-red"></span>
