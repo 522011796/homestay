@@ -1,7 +1,8 @@
 import qs from 'qs';
 
 // 配置API接口地址
-var root = '/'
+//var root = 'http://47.98.169.141:9991'
+var root = '/';
 // 引用axios
 var axios = require('axios')
 // 自定义判断元素类型JS
@@ -10,8 +11,6 @@ function toType (obj) {
 }
 // 参数过滤函数
 function filterNull (o) {
-
-  console.log(o);
   for (var key in o) {
     if (o[key] === null) {
       delete o[key]

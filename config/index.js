@@ -13,12 +13,13 @@ module.exports = {
     //代理到本地
     proxyTable: {
       '/**': {
-        target: 'http://192.168.11.56:8081', // 你接口的域名
+        //target: 'http://192.168.11.56:8081', // 你接口的域名
+        target:"http://47.98.169.141:9991/",
         secure: false,
         changeOrigin: false,//允许跨域
-        pathRewrite: {
-          '^/proxy': '/' //这里理解成用‘/api’代替target里面的地址，组件中我们调接口时直接用/api代替，比如我要调用'http://0.0:300/user/add'，直接写‘/proxy/user/add’即可 代理后地址栏显示/
-        }
+        // pathRewrite: {//
+        //   '^/proxy': '/' //这里理解成用‘/api’代替target里面的地址，组件中我们调接口时直接用/api代替，比如我要调用'http://0.0:300/user/add'，直接写‘/proxy/user/add’即可 代理后地址栏显示/
+        // }
       }
     },
 
@@ -53,7 +54,7 @@ module.exports = {
     // Paths
     assetsRoot: path.resolve(__dirname, '../dist'),
     assetsSubDirectory: 'static',
-    assetsPublicPath: '/',
+    assetsPublicPath: '',
 
     /**
      * Source Maps

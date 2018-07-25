@@ -62,7 +62,7 @@ module.exports = {
         test: /\.(woff2?|eot|ttf|otf)(\?.*)?$/,
         loader: 'url-loader',
         options: {
-          limit: 10000,
+          limit: 90000,//bulid需要改为90000，否则fonticon无法显示
           name: utils.assetsPath('fonts/[name].[hash:7].[ext]')
         }
       }
